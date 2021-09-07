@@ -2,7 +2,7 @@ const cookieParser = require("cookie-parser");
 const express = require("express");
 const logger = require("morgan");
 
-const helloController = require("./controller/hello");
+const helloController = require("./controller/users");
 
 const app = express();
 
@@ -19,7 +19,7 @@ app.use(function (req, res, next) {
     next();
 });
 
-app.use("/hello", helloController);
+app.use("/users", helloController);
 
 let options = {
     swaggerDefinition: {

@@ -1,7 +1,7 @@
 version: "3.7"
 
 services:
-  mysql:
+  mysqldb:
     image: mysql
     restart: unless-stopped
     ports:
@@ -13,7 +13,12 @@ services:
     volumes: 
       - ./data:/var/lib/mysql
       - ./db-init-scripts:/docker-entrypoint-initdb.d
+    networks: 
+      - uber-eats
+
   auth:
+    depends_on: 
+      - mysqldb
     build:
       context: ./auth
       dockerfile: Dockerfile
@@ -23,7 +28,9 @@ services:
       - type: bind
         source: ./auth
         target: /app
-      - /app/node_modules
+      - type: bind
+        source: ./auth/node_modules
+        target: /app/node_modules
     restart: unless-stopped
     networks: 
       - uber-eats
