@@ -1,16 +1,16 @@
-import app from "./app.js";
-import http from "http";
+const app = require("./app");
+const http = require("http");
 
 const port = process.env.PORT || "3000";
-app.set('port', port);
+app.set("port", port);
 
 var server = http.createServer(app);
 
 server.listen(port);
-server.on('error', (err) => {
+server.on("error", (err) => {
     console.error(err);
 });
 
-server.on('listening', () => {
+server.on("listening", () => {
     console.log(`Server listening on ${server.address().port}`);
 });
