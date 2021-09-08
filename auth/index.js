@@ -1,5 +1,5 @@
 const http = require("http");
-const _ = require("./config");
+require("./config");
 const { initDB } = require("./db");
 
 initDB()
