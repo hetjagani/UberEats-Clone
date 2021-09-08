@@ -1,8 +1,9 @@
 const cookieParser = require("cookie-parser");
 const express = require("express");
 const logger = require("morgan");
+const bodyParser = require('body-parser')
 
-const helloController = require("./controller/users");
+const authRoutes = require("./routes/auth.routes");
 
 const app = express();
 
@@ -11,6 +12,7 @@ const expressSwagger = require("express-swagger-generator")(app);
 // all middlewares
 app.use(logger("dev"));
 app.use(cookieParser());
+app.use(bodyParser.json());
 app.use(function (req, res, next) {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
@@ -19,7 +21,7 @@ app.use(function (req, res, next) {
     next();
 });
 
-app.use("/users", helloController);
+app.use("/auth", authRoutes);
 
 let options = {
     swaggerDefinition: {
@@ -40,8 +42,9 @@ let options = {
             },
         },
     },
+    // eslint-disable-next-line no-undef
     basedir: __dirname,
-    files: ["./controller/**/*.js"], //Path to the API handle folder
+    files: ["./routes/**/*.js"], //Path to the API handle folder
 };
 
 expressSwagger(options);
