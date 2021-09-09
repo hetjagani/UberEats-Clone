@@ -1,0 +1,29 @@
+{
+    "name": "restaurant",
+    "version": "1.0.0",
+    "description": "Restaurant Information Service in Uber Eats",
+    "main": "index.js",
+    "scripts": {
+    "start": "nodemon index.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Het Jagani",
+    "license": "ISC",
+    "dependencies": {
+        "bcrypt": "^5.0.1",
+        "cookie-parser": "^1.4.5",
+        "email-validator": "^2.0.4",
+        "express": "^4.17.1",
+        "express-swagger-generator": "^1.1.17",
+        "jsonwebtoken": "^8.5.1",
+        "lodash": "^4.17.21",
+        "morgan": "^1.10.0",
+        "mysql2": "^2.3.0",
+        "password-validator": "^5.1.1",
+        "sequelize": "^6.6.5"
+    },
+    "devDependencies": {
+        "eslint": "^7.32.0",
+        "nodemon": "^2.0.12"
+    }
+}

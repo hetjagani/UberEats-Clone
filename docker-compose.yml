@@ -35,5 +35,24 @@ services:
     networks: 
       - uber-eats
 
+  restaurant:
+    depends_on: 
+      - mysqldb
+    build:
+      context: ./restaurant
+      dockerfile: Dockerfile
+    ports:
+      - 7001:3000
+    volumes: 
+      - type: bind
+        source: ./restaurant
+        target: /app
+      - type: bind
+        source: ./restaurant/node_modules
+        target: /app/node_modules
+    restart: unless-stopped
+    networks: 
+      - uber-eats
+
 networks: 
   uber-eats:
