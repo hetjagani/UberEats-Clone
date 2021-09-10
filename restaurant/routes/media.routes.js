@@ -51,7 +51,7 @@ router.get("/:id", mediaController.getMediaByID);
 router.put("/:id", ...bodyValidators(), mediaController.updateMediaByID);
 
 /**
- * Delete Medis by ID
+ * Delete Media by ID
  * @route DELETE /media/{id}
  * @group Media
  * @param {integer} id.path.require

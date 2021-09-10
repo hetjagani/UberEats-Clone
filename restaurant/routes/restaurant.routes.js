@@ -1,4 +1,5 @@
 const resController = require("../controllers/restaurant");
+const dishRouter = require("./dish.routes");
 const express = require("express");
 const { body } = require("express-validator");
 
@@ -22,7 +23,7 @@ const router = express.Router();
 
 const bodyValidators = () => {
     return [
-        body("id").exists().isInt(),
+        body("id").exists().isInt().not().isIn([0]),
         body("name").exists().isString(),
         body("description").isString(),
         body("address").exists().isString(),
@@ -37,7 +38,9 @@ const bodyValidators = () => {
     ];
 };
 
-const [first, ...updateValidators] = bodyValidators();
+const [, ...updateValidators] = bodyValidators();
+
+router.use("/:resID/dishes", dishRouter);
 
 /**
  * Get list of Restaurants

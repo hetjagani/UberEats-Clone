@@ -11,7 +11,7 @@ const getAllRestaurants = async (req, res) => {
 
 const getRestaurantByID = async (req, res) => {
     const id = req.params.id;
-    if (!id) {
+    if (!id || id === 0) {
         res.status(400).json(errors.badRequest);
         return;
     }
@@ -52,7 +52,7 @@ const createRestaurant = async (req, res) => {
 
 const updateRestaurantByID = async (req, res) => {
     const id = req.params.id;
-    if (!id) {
+    if (!id || id === 0) {
         res.status(400).json(errors.badRequest);
         return;
     }
@@ -101,7 +101,7 @@ const updateRestaurantByID = async (req, res) => {
 
 const deleteRestaurant = async (req, res) => {
     const id = req.params.id;
-    if (!id) {
+    if (!id || id === 0) {
         res.status(400).json(errors.badRequest);
         return;
     }

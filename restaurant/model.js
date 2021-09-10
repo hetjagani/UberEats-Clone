@@ -76,7 +76,7 @@ const Dish = global.DB.define("dishes", {
         type: DataTypes.ENUM("veg", "non-veg", "vegan"),
     },
     category: {
-        type: DataTypes.ENUM("appetizer", "salad", "main course", "dessert", "beverage"),
+        type: DataTypes.ENUM("appetizer", "salad", "main_course", "dessert", "beverage"),
     },
 });
 
