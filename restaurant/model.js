@@ -3,7 +3,6 @@ const { DataTypes } = require("sequelize");
 const Restaurant = global.DB.define("restaurants", {
     id: {
         type: DataTypes.INTEGER,
-        autoIncrement: true,
         primaryKey: true,
         unique: true,
     },
@@ -11,6 +10,9 @@ const Restaurant = global.DB.define("restaurants", {
         type: DataTypes.STRING,
     },
     description: {
+        type: DataTypes.STRING,
+    },
+    address: {
         type: DataTypes.STRING,
     },
     city: {
@@ -33,6 +35,9 @@ const Restaurant = global.DB.define("restaurants", {
     },
     food_type: {
         type: DataTypes.ENUM("veg", "non-veg", "vegan"),
+    },
+    restaurant_type: {
+        type: DataTypes.ENUM("delivery", "pickup"),
     },
 });
 
@@ -70,29 +75,8 @@ const Dish = global.DB.define("dishes", {
     food_type: {
         type: DataTypes.ENUM("veg", "non-veg", "vegan"),
     },
-});
-
-const Category = global.DB.define("categories", {
-    id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-        unique: true,
-    },
-    name: {
-        type: DataTypes.STRING,
-    },
-});
-
-const Ingredient = global.DB.define("ingrediants", {
-    id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-        unique: true,
-    },
-    name: {
-        type: DataTypes.STRING,
+    category: {
+        type: DataTypes.ENUM("appetizer", "salad", "main course", "dessert", "beverage"),
     },
 });
 
@@ -105,29 +89,14 @@ Restaurant.hasMany(Dish, {
 });
 Dish.belongsTo(Restaurant);
 
-Dish.belongsToMany(Category, { through: "dish_categories" });
-Category.belongsToMany(Dish, { through: "dish_categories" });
-
 Dish.belongsToMany(Media, { through: "dish_media" });
 Media.belongsToMany(Dish, { through: "dish_media" });
-
-Dish.hasMany(Ingredient, {
-    onDelete: "CASCADE",
-    onUpdate: "CASCADE",
-});
-Ingredient.belongsTo(Dish);
 
 const runMigration = async () => {
     if (!global.DB) {
         return Promise.reject("please initialize DB");
     }
     global.DB.sync({ alter: true });
-
-    Category.findOrCreate({ where: { name: "Appetizer" }, defaults: { name: "Appetizer" } });
-    Category.findOrCreate({ where: { name: "Salad" }, defaults: { name: "Salad" } });
-    Category.findOrCreate({ where: { name: "Main Course" }, defaults: { name: "Main Course" } });
-    Category.findOrCreate({ where: { name: "Dessert" }, defaults: { name: "Dessert" } });
-    Category.findOrCreate({ where: { name: "Beverage" }, defaults: { name: "Beverage" } });
 };
 
-module.exports = { Restaurant, Media, runMigration };
+module.exports = { Restaurant, Media, Dish, runMigration };

@@ -1,11 +1,13 @@
 const cookieParser = require("cookie-parser");
 const express = require("express");
 const logger = require("morgan");
-const bodyParser = require('body-parser')
+const bodyParser = require("body-parser");
 
 const app = express();
 
 const expressSwagger = require("express-swagger-generator")(app);
+
+const restaurantRouter = require("./routes/restaurant.routes");
 
 // all middlewares
 app.use(logger("dev"));
@@ -19,9 +21,8 @@ app.use(function (req, res, next) {
     next();
 });
 
-app.get("/hello", (req, res) => {
-    res.send("Hello from restaurant");
-});
+
+app.use("/restaurants", restaurantRouter);
 
 let options = {
     swaggerDefinition: {
