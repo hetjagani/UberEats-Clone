@@ -1,32 +1,31 @@
 const { validationResult } = require("express-validator");
-const { Restaurant } = require("../model");
+const { Media } = require("../model");
 const errors = require("../util/errors");
 
 // TODO: paiganation
-const getAllRestaurants = async (req, res) => {
-    const restaurants = await Restaurant.findAll();
+const getAllMedia = async (req, res) => {
+    const media = await Media.findAll();
 
-    res.status(200).json(restaurants);
+    res.status(200).json(media);
 };
 
-const getRestaurantByID = async (req, res) => {
+const getMediaByID = async (req, res) => {
     const id = req.params.id;
     if (!id) {
         res.status(400).json(errors.badRequest);
         return;
     }
 
-    const restaurant = await Restaurant.findOne({ where: { id: id } });
-    if (!restaurant) {
+    const media = await Media.findOne({ where: { id: id } });
+    if (!media) {
         res.status(401).send(errors.notFound);
         return;
     }
 
-    res.status(200).json(restaurant);
+    res.status(200).json(media);
 };
 
-// TODO: check if the logged in user ID == req.body.id
-const createRestaurant = async (req, res) => {
+const createMedia = async (req, res) => {
     const err = validationResult(req);
     if (!err.isEmpty()) {
         console.error(err);
@@ -34,10 +33,10 @@ const createRestaurant = async (req, res) => {
         return;
     }
 
-    const restaurant = req.body;
+    const media = req.body;
 
     try {
-        const createdRes = await Restaurant.create(restaurant);
+        const createdRes = await Media.create(media);
         res.status(201).json(createdRes);
         return;
     } catch (err) {
@@ -50,7 +49,7 @@ const createRestaurant = async (req, res) => {
     }
 };
 
-const updateRestaurantByID = async (req, res) => {
+const updateMediaByID = async (req, res) => {
     const id = req.params.id;
     if (!id) {
         res.status(400).json(errors.badRequest);
@@ -64,26 +63,17 @@ const updateRestaurantByID = async (req, res) => {
         return;
     }
 
-    const restaurant = req.body;
+    const media = req.body;
 
-    const dbRes = await Restaurant.findOne({ where: { id: id } });
+    const dbRes = await Media.findOne({ where: { id: id } });
     if (!dbRes) {
         res.status(404).json(errors.notFound);
         return;
     }
 
     try {
-        dbRes.name = restaurant.name;
-        dbRes.description = restaurant.description;
-        dbRes.address = restaurant.address;
-        dbRes.city = restaurant.city;
-        dbRes.state = restaurant.state;
-        dbRes.country = restaurant.country;
-        dbRes.contact_no = restaurant.contact_no;
-        dbRes.time_open = restaurant.time_open;
-        dbRes.time_close = restaurant.time_close;
-        dbRes.food_type = restaurant.food_type;
-        dbRes.restaurant_type = restaurant.restaurant_type;
+        dbRes.url = media.url;
+        dbRes.alt_text = media.alt_text;
 
         const updatedRes = await dbRes.save();
 
@@ -99,21 +89,21 @@ const updateRestaurantByID = async (req, res) => {
     }
 };
 
-const deleteRestaurant = async (req, res) => {
+const deleteMediaByID = async (req, res) => {
     const id = req.params.id;
     if (!id) {
         res.status(400).json(errors.badRequest);
         return;
     }
 
-    const restaurant = await Restaurant.findOne({ where: { id: id } });
-    if (!restaurant) {
+    const media = await Media.findOne({ where: { id: id } });
+    if (!media) {
         res.status(401).send(errors.notFound);
         return;
     }
 
     try {
-        await restaurant.destroy();
+        await media.destroy();
         res.status(200).send(null);
         return;
     } catch (err) {
@@ -127,9 +117,9 @@ const deleteRestaurant = async (req, res) => {
 };
 
 module.exports = {
-    getAllRestaurants,
-    getRestaurantByID,
-    createRestaurant,
-    updateRestaurantByID,
-    deleteRestaurant,
+    getAllMedia,
+    getMediaByID,
+    createMedia,
+    updateMediaByID,
+    deleteMediaByID,
 };

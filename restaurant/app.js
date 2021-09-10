@@ -8,6 +8,7 @@ const app = express();
 const expressSwagger = require("express-swagger-generator")(app);
 
 const restaurantRouter = require("./routes/restaurant.routes");
+const mediaRouter = require("./routes/media.routes");
 
 // all middlewares
 app.use(logger("dev"));
@@ -21,8 +22,8 @@ app.use(function (req, res, next) {
     next();
 });
 
-
 app.use("/restaurants", restaurantRouter);
+app.use("/media", mediaRouter);
 
 let options = {
     swaggerDefinition: {
