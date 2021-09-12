@@ -11,6 +11,7 @@ const router = express.Router({mergeParams: true});
  * @property {float} price.required
  * @property {string} food_type.required
  * @property {string} category.required
+ * @property {Array<integer>} media.required
  */
 
 const bodyValidators = () => {
@@ -20,6 +21,7 @@ const bodyValidators = () => {
         body("price").exists().isFloat(),
         body("food_type").exists().matches("veg|non-veg|vegan").isString(),
         body("category").exists().matches("appetizer|salad|main_course|dessert|beverage").isString(),
+        body("media").isArray(),
     ];
 };
 

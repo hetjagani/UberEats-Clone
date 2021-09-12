@@ -1,5 +1,5 @@
 const { validationResult } = require("express-validator");
-const { Dish, Restaurant } = require("../model");
+const { Dish, Restaurant, Media } = require("../model");
 const errors = require("../util/errors");
 
 const getDishesForRestaurant = async (req, res) => {
@@ -9,7 +9,7 @@ const getDishesForRestaurant = async (req, res) => {
         return;
     }
 
-    const dishes = await Dish.findAll({ where: { restaurantId: resID } });
+    const dishes = await Dish.findAll({ where: { restaurantId: resID }, include: Media });
 
     res.status(200).json(dishes);
 };
@@ -27,7 +27,7 @@ const getDishForRestaurantByID = async (req, res) => {
         return;
     }
 
-    const dish = await Dish.findOne({ where: { id: dishID, restaurantId: resID } });
+    const dish = await Dish.findOne({ where: { id: dishID, restaurantId: resID }, include: Media });
     if (!dish) {
         res.status(404).json(errors.notFound);
         return;
@@ -58,12 +58,22 @@ const createDishForRestaurant = async (req, res) => {
 
     const dish = req.body;
 
+    const t = await global.DB.transaction();
     try {
         dish.restaurantId = resID;
-        const createdRes = await Dish.create(dish);
-        res.status(201).json(createdRes);
+        const createdRes = await Dish.create(dish, { transaction: t });
+
+        if (dish.media && dish.media.length > 0) {
+            await createdRes.setMedia(dish.media, { transaction: t });
+        }
+        await t.commit();
+
+        const result = await Dish.findOne({ where: { id: createdRes.id }, include: Media }, { transaction: t });
+
+        res.status(201).json(result);
         return;
     } catch (err) {
+        await t.rollback();
         console.error(err);
         if (err.original) {
             res.status(500).json({ status: 500, message: err.original.sqlMessage });
@@ -101,6 +111,7 @@ const updateDishInRestaurant = async (req, res) => {
 
     const dish = req.body;
 
+    const t = await global.DB.transaction();
     try {
         dbRes.name = dish.name;
         dbRes.description = dish.description;
@@ -108,11 +119,19 @@ const updateDishInRestaurant = async (req, res) => {
         dbRes.food_type = dish.food_type;
         dbRes.category = dish.category;
 
-        const updatedRes = await dbRes.save();
+        const updatedRes = await dbRes.save({ transaction: t });
 
-        res.status(200).json(updatedRes);
+        if (dish.media && dish.media.length > 0) {
+            await updatedRes.setMedia(dish.media, { transaction: t });
+        }
+
+        await t.commit();
+
+        const result = await Dish.findOne({ where: { id: updatedRes.id }, include: Media }, { transaction: t });
+        res.status(200).json(result);
         return;
     } catch (err) {
+        await t.rollback();
         console.error(err);
         if (err.original) {
             res.status(500).json({ status: 500, message: err.original.sqlMessage });

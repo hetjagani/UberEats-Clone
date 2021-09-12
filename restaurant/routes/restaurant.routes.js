@@ -36,6 +36,7 @@ const bodyValidators = () => {
         body("time_close").exists().matches("..:.."),
         body("food_type").exists().matches("veg|non-veg|vegan").isString(),
         body("restaurant_type").exists().matches("delivery|pickup").isString(),
+        body("media").isArray(),
     ];
 };
 
