@@ -1,6 +1,7 @@
 const express = require("express");
 const customerController = require("../controllers/customer");
 const { body } = require("express-validator");
+const favouriteRouter = require("./favourite.routes");
 
 const router = express.Router();
 
@@ -31,6 +32,8 @@ const bodyValidators = () => {
 };
 
 const [, ...updateValidators] = bodyValidators();
+
+router.use("/favourites", favouriteRouter);
 
 /**
  * Get list of Customers

@@ -44,6 +44,16 @@ const [, ...updateValidators] = bodyValidators();
 
 router.use("/:resID/dishes", dishRouter);
 
+
+/**
+ * Get list of Restaurants
+ * @route GET /restaurants/all
+ * @group Restaurants
+ * @param {string} authorization.header.require
+ * @returns {Array.<Restaurant>} 200 - List of restaurant info
+ */
+router.get("/all", resController.allRestaurants);
+
 /**
  * Get list of Restaurants
  * @route GET /restaurants

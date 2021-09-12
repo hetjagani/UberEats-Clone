@@ -3,6 +3,12 @@ const { Restaurant, Media, Dish } = require("../model");
 const errors = require("../util/errors");
 const getPaiganation = require("../util/paiganation");
 
+const allRestaurants = async (req, res) => {
+    const restaurants = await Restaurant.findAll({ include: [Media, Dish] });
+
+    res.status(200).json(restaurants);
+};
+
 const getAllRestaurants = async (req, res) => {
     const { limit, offset } = getPaiganation(req.query.page, req.query.limit);
 
@@ -166,6 +172,7 @@ const deleteRestaurant = async (req, res) => {
 };
 
 module.exports = {
+    allRestaurants,
     getAllRestaurants,
     getRestaurantByID,
     createRestaurant,
