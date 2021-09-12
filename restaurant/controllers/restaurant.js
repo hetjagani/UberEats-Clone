@@ -1,12 +1,15 @@
 const { validationResult } = require("express-validator");
 const { Restaurant, Media, Dish } = require("../model");
 const errors = require("../util/errors");
+const getPaiganation = require("../util/paiganation");
 
-// TODO: paiganation
 const getAllRestaurants = async (req, res) => {
-    const restaurants = await Restaurant.findAll({ include: [Media, Dish] });
+    const { limit, offset } = getPaiganation(req.query.page, req.query.limit);
 
-    res.status(200).json(restaurants);
+    const resCount = await Restaurant.count();
+    const restaurants = await Restaurant.findAll({ limit: limit, offset: offset, include: [Media, Dish] });
+
+    res.status(200).json({ total: resCount, nodes: restaurants });
 };
 
 const getRestaurantByID = async (req, res) => {

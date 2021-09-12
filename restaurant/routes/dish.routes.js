@@ -31,6 +31,8 @@ const bodyValidators = () => {
  * @group Dishes
  * @param {string} authorization.header.require
  * @param {integer} resID.path.require
+ * @param {integer} page.query.require
+ * @param {integer} limit.query.require
  * @returns {Array.<Dish>} 200 - List of dishes info
  */
 router.get("/", dishController.getDishesForRestaurant);

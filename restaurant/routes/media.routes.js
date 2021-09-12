@@ -19,6 +19,8 @@ const bodyValidators = () => {
  * @route GET /media
  * @group Media
  * @param {string} authorization.header.require
+ * @param {integer} page.query.require
+ * @param {integer} limit.query.require
  * @returns {Array.<Media>} 200 - List of media info
  */
 router.get("/", mediaController.getAllMedia);

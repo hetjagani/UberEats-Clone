@@ -1,12 +1,15 @@
 const { validationResult } = require("express-validator");
 const { Media } = require("../model");
 const errors = require("../util/errors");
+const getPaiganation = require("../util/paiganation");
 
-// TODO: paiganation
 const getAllMedia = async (req, res) => {
-    const media = await Media.findAll();
+    const { limit, offset } = getPaiganation(req.query.page, req.query.limit);
 
-    res.status(200).json(media);
+    const mediaCount = await Media.count();
+    const media = await Media.findAll({ limit: limit, offset: offset });
+
+    res.status(200).json({ total: mediaCount, nodes: media });
 };
 
 const getMediaByID = async (req, res) => {

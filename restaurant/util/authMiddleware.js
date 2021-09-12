@@ -26,7 +26,7 @@ const authMiddleware = (req, res, next) => {
         })
         .catch((err) => {
             console.error(err);
-            res.status(500).send(errors.serverError);
+            res.status(401).send(errors.unauthorized);
             return;
         });
 };

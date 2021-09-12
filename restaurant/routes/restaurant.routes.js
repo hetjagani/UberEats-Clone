@@ -49,6 +49,8 @@ router.use("/:resID/dishes", dishRouter);
  * @route GET /restaurants
  * @group Restaurants
  * @param {string} authorization.header.require
+ * @param {integer} page.query.require
+ * @param {integer} limit.query.require
  * @returns {Array.<Restaurant>} 200 - List of restaurant info
  */
 router.get("/", resController.getAllRestaurants);

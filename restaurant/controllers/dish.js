@@ -1,6 +1,7 @@
 const { validationResult } = require("express-validator");
 const { Dish, Restaurant, Media } = require("../model");
 const errors = require("../util/errors");
+const getPaiganation = require("../util/paiganation");
 
 const getDishesForRestaurant = async (req, res) => {
     const resID = req.params.resID;
@@ -9,9 +10,12 @@ const getDishesForRestaurant = async (req, res) => {
         return;
     }
 
-    const dishes = await Dish.findAll({ where: { restaurantId: resID }, include: Media });
+    const { limit, offset } = getPaiganation(req.query.page, req.query.limit);
 
-    res.status(200).json(dishes);
+    const dishCount = await Dish.count({ where: { restaurantId: resID } });
+    const dishes = await Dish.findAll({ where: { restaurantId: resID }, limit: limit, offset: offset, include: Media });
+
+    res.status(200).json({ total: dishCount, nodes: dishes });
 };
 
 const getDishForRestaurantByID = async (req, res) => {
