@@ -33,14 +33,6 @@ let options = {
         host: "localhost:7001",
         produces: ["application/json"],
         schemes: ["http"],
-        securityDefinitions: {
-            JWT: {
-                type: "apiKey",
-                in: "header",
-                name: "Authorization",
-                description: "",
-            },
-        },
     },
     // eslint-disable-next-line no-undef
     basedir: __dirname,

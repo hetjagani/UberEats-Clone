@@ -9,6 +9,7 @@ const expressSwagger = require("express-swagger-generator")(app);
 const authMiddleware = require("./util/authMiddleware");
 
 const customerRouter = require("./routes/customer.routes");
+const mediaRouter = require("./routes/media.routes");
 
 // all middlewares
 app.use(logger("dev"));
@@ -43,5 +44,6 @@ expressSwagger(options);
 app.use(authMiddleware);
 
 app.use("/customers", customerRouter);
+app.use("/media", mediaRouter);
 
 module.exports = app;
