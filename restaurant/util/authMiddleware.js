@@ -1,6 +1,10 @@
 const axios = require("axios");
 const errors = require("./errors");
 
+if(!global.gConfig.auth_url) {
+    console.error("please provide auth_url in config file...");
+}
+
 const authMiddleware = (req, res, next) => {
     const authHeader = req.get("Authorization");
     if (!authHeader) {
