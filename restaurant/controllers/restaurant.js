@@ -1,10 +1,10 @@
 const { validationResult } = require("express-validator");
-const { Restaurant } = require("../model");
+const { Restaurant, Media } = require("../model");
 const errors = require("../util/errors");
 
 // TODO: paiganation
 const getAllRestaurants = async (req, res) => {
-    const restaurants = await Restaurant.findAll();
+    const restaurants = await Restaurant.findAll({include: Media});
 
     res.status(200).json(restaurants);
 };
@@ -16,7 +16,7 @@ const getRestaurantByID = async (req, res) => {
         return;
     }
 
-    const restaurant = await Restaurant.findOne({ where: { id: id } });
+    const restaurant = await Restaurant.findOne({ where: { id: id }, include: Media });
     if (!restaurant) {
         res.status(401).send(errors.notFound);
         return;
@@ -25,8 +25,16 @@ const getRestaurantByID = async (req, res) => {
     res.status(200).json(restaurant);
 };
 
-// TODO: check if the logged in user ID == req.body.id
 const createRestaurant = async (req, res) => {
+    const user = req.headers.user;
+    if (user !== req.body.id) {
+        res.status(400).json({
+            ...errors.badRequest,
+            message: "restaurant.id in body should be same as logged in user",
+        });
+        return;
+    }
+
     const err = validationResult(req);
     if (!err.isEmpty()) {
         console.error(err);
@@ -36,11 +44,21 @@ const createRestaurant = async (req, res) => {
 
     const restaurant = req.body;
 
+    const t = await global.DB.transaction();
     try {
-        const createdRes = await Restaurant.create(restaurant);
-        res.status(201).json(createdRes);
+        const createdRes = await Restaurant.create(restaurant, { transaction: t });
+
+        if (restaurant.media && restaurant.media.length > 0) {
+            await createdRes.setMedia(restaurant.media, { transaction: t });
+        }
+        await t.commit();
+
+        const result = await Restaurant.findOne({ where: { id: createdRes.id }, include: Media }, { transaction: t });
+
+        res.status(201).json(result);
         return;
     } catch (err) {
+        await t.rollback();
         console.error(err);
         if (err.original) {
             res.status(500).json({ status: 500, message: err.original.sqlMessage });
@@ -51,6 +69,14 @@ const createRestaurant = async (req, res) => {
 };
 
 const updateRestaurantByID = async (req, res) => {
+    const user = req.headers.user;
+    if (user !== req.body.id) {
+        res.status(400).json({
+            ...errors.badRequest,
+            message: "restaurant.id in body should be same as logged in user",
+        });
+        return;
+    }
     const id = req.params.id;
     if (!id || id === 0) {
         res.status(400).json(errors.badRequest);
@@ -72,6 +98,7 @@ const updateRestaurantByID = async (req, res) => {
         return;
     }
 
+    const t = await global.DB.transaction();
     try {
         dbRes.name = restaurant.name;
         dbRes.description = restaurant.description;
@@ -85,11 +112,20 @@ const updateRestaurantByID = async (req, res) => {
         dbRes.food_type = restaurant.food_type;
         dbRes.restaurant_type = restaurant.restaurant_type;
 
-        const updatedRes = await dbRes.save();
+        const updatedRes = await dbRes.save({ transaction: t });
 
-        res.status(200).json(updatedRes);
+        if (restaurant.media && restaurant.media.length > 0) {
+            await updatedRes.setMedia(restaurant.media, { transaction: t });
+        }
+
+        await t.commit();
+
+        const result = await Restaurant.findOne({ where: { id: updatedRes.id }, include: Media }, { transaction: t });
+
+        res.status(200).json(result);
         return;
     } catch (err) {
+        t.rollback();
         console.error(err);
         if (err.original) {
             res.status(500).json({ status: 500, message: err.original.sqlMessage });

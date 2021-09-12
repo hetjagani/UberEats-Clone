@@ -2,6 +2,7 @@ const cookieParser = require("cookie-parser");
 const express = require("express");
 const logger = require("morgan");
 const bodyParser = require("body-parser");
+const authMiddleware = require("./util/authMiddleware");
 
 const app = express();
 
@@ -21,9 +22,6 @@ app.use(function (req, res, next) {
     res.setHeader("Access-Control-Allow-Credentials", true);
     next();
 });
-
-app.use("/restaurants", restaurantRouter);
-app.use("/media", mediaRouter);
 
 let options = {
     swaggerDefinition: {
@@ -50,5 +48,11 @@ let options = {
 };
 
 expressSwagger(options);
+
+app.use(authMiddleware);
+
+app.use("/restaurants", restaurantRouter);
+app.use("/media", mediaRouter);
+
 
 module.exports = app;

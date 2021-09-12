@@ -19,6 +19,7 @@ const router = express.Router();
  * @property {string} time_close.required
  * @property {string} food_type.required
  * @property {string} restaurant_type.required
+ * @property {Array<integer>} media.required
  */
 
 const bodyValidators = () => {
@@ -46,6 +47,7 @@ router.use("/:resID/dishes", dishRouter);
  * Get list of Restaurants
  * @route GET /restaurants
  * @group Restaurants
+ * @param {string} authorization.header.require
  * @returns {Array.<Restaurant>} 200 - List of restaurant info
  */
 router.get("/", resController.getAllRestaurants);
@@ -54,6 +56,7 @@ router.get("/", resController.getAllRestaurants);
  * Create a Restaurant
  * @route POST /restaurants
  * @group Restaurants
+ * @param {string} authorization.header.require
  * @param {Restaurant.model} Restaurant.body.require
  * @returns {Restaurant.model} 201 - Created Restaurant
  */
@@ -63,6 +66,7 @@ router.post("/", ...bodyValidators(), resController.createRestaurant);
  * Get Restaurant by ID
  * @route GET /restaurants/{id}
  * @group Restaurants
+ * @param {string} authorization.header.require
  * @param {integer} id.path.require
  * @returns {Restaurant.model} 200 - Restaurant for given ID
  */
@@ -72,6 +76,7 @@ router.get("/:id", resController.getRestaurantByID);
  * Update Restaurant by ID
  * @route PUT /restaurants/{id}
  * @group Restaurants
+ * @param {string} authorization.header.require
  * @param {integer} id.path.require
  * @param {Restaurant.model} Restaurant.body.require
  * @returns {Restaurant.model} 200 - Updated Restaurant
@@ -82,6 +87,7 @@ router.put("/:id", ...updateValidators, resController.updateRestaurantByID);
  * Delete Restaurant by ID
  * @route DELETE /restaurants/{id}
  * @group Restaurants
+ * @param {string} authorization.header.require
  * @param {integer} id.path.require
  * @returns {null} 200 - Delete Restaurant
  */

@@ -98,7 +98,7 @@ const validateToken = async (req, res) => {
 
     jwt.verify(token, JWT_SECRET, async (err, data) => {
         if (err) {
-            res.status(401).send("Invalid Token");
+            res.status(401).send({valid: false});
             return;
         }
 
