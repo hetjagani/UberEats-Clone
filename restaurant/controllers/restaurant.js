@@ -14,14 +14,14 @@ const getAllRestaurants = async (req, res) => {
 
 const getRestaurantByID = async (req, res) => {
     const id = req.params.id;
-    if (!id || id === 0) {
+    if (!id || id == 0) {
         res.status(400).json(errors.badRequest);
         return;
     }
 
     const restaurant = await Restaurant.findOne({ where: { id: id }, include: [Media, Dish] });
     if (!restaurant) {
-        res.status(401).send(errors.notFound);
+        res.status(404).send(errors.notFound);
         return;
     }
 
@@ -81,7 +81,7 @@ const updateRestaurantByID = async (req, res) => {
         return;
     }
     const id = req.params.id;
-    if (!id || id === 0) {
+    if (!id || id == 0) {
         res.status(400).json(errors.badRequest);
         return;
     }
@@ -140,7 +140,7 @@ const updateRestaurantByID = async (req, res) => {
 
 const deleteRestaurant = async (req, res) => {
     const id = req.params.id;
-    if (!id || id === 0) {
+    if (!id || id == 0) {
         res.status(400).json(errors.badRequest);
         return;
     }

@@ -6,6 +6,9 @@ const bodyParser = require("body-parser");
 const app = express();
 
 const expressSwagger = require("express-swagger-generator")(app);
+const authMiddleware = require("./util/authMiddleware");
+
+const customerRouter = require("./routes/customer.routes");
 
 // all middlewares
 app.use(logger("dev"));
@@ -18,10 +21,6 @@ app.use(function (req, res, next) {
     res.setHeader("Access-Control-Allow-Credentials", true);
     next();
 });
-
-app.get("/hello", (req,res)=> {
-    res.send("hello");
-})
 
 let options = {
     swaggerDefinition: {
@@ -40,5 +39,9 @@ let options = {
 };
 
 expressSwagger(options);
+
+app.use(authMiddleware);
+
+app.use("/customers", customerRouter);
 
 module.exports = app;

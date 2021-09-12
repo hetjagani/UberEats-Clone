@@ -5,7 +5,7 @@ const getPaiganation = require("../util/paiganation");
 
 const getDishesForRestaurant = async (req, res) => {
     const resID = req.params.resID;
-    if (!resID || resID === 0) {
+    if (!resID || resID == 0) {
         res.status(400).json(errors.badRequest);
         return;
     }
@@ -20,13 +20,13 @@ const getDishesForRestaurant = async (req, res) => {
 
 const getDishForRestaurantByID = async (req, res) => {
     const resID = req.params.resID;
-    if (!resID || resID === 0) {
+    if (!resID || resID == 0) {
         res.status(400).json(errors.badRequest);
         return;
     }
 
     const dishID = req.params.dishID;
-    if (!dishID || dishID === 0) {
+    if (!dishID || dishID == 0) {
         res.status(400).json(errors.badRequest);
         return;
     }
@@ -42,7 +42,7 @@ const getDishForRestaurantByID = async (req, res) => {
 
 const createDishForRestaurant = async (req, res) => {
     const resID = req.params.resID;
-    if (!resID || resID === 0) {
+    if (!resID || resID == 0) {
         res.status(400).json(errors.badRequest);
         return;
     }
@@ -89,13 +89,13 @@ const createDishForRestaurant = async (req, res) => {
 
 const updateDishInRestaurant = async (req, res) => {
     const resID = req.params.resID;
-    if (!resID || resID === 0) {
+    if (!resID || resID == 0) {
         res.status(400).json(errors.badRequest);
         return;
     }
 
     const dishID = req.params.dishID;
-    if (!dishID || dishID === 0) {
+    if (!dishID || dishID == 0) {
         res.status(400).json(errors.badRequest);
         return;
     }
@@ -147,13 +147,13 @@ const updateDishInRestaurant = async (req, res) => {
 
 const deleteDishInRestaurant = async (req, res) => {
     const resID = req.params.resID;
-    if (!resID || resID === 0) {
+    if (!resID || resID == 0) {
         res.status(400).json(errors.badRequest);
         return;
     }
 
     const dishID = req.params.dishID;
-    if (!dishID || dishID === 0) {
+    if (!dishID || dishID == 0) {
         res.status(400).json(errors.badRequest);
         return;
     }

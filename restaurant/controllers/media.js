@@ -14,7 +14,7 @@ const getAllMedia = async (req, res) => {
 
 const getMediaByID = async (req, res) => {
     const id = req.params.id;
-    if (!id || id === 0) {
+    if (!id || id == 0) {
         res.status(400).json(errors.badRequest);
         return;
     }
@@ -54,7 +54,7 @@ const createMedia = async (req, res) => {
 
 const updateMediaByID = async (req, res) => {
     const id = req.params.id;
-    if (!id || id === 0) {
+    if (!id || id == 0) {
         res.status(400).json(errors.badRequest);
         return;
     }
@@ -94,7 +94,7 @@ const updateMediaByID = async (req, res) => {
 
 const deleteMediaByID = async (req, res) => {
     const id = req.params.id;
-    if (!id || id === 0) {
+    if (!id || id == 0) {
         res.status(400).json(errors.badRequest);
         return;
     }
