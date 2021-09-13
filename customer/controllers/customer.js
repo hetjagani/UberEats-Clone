@@ -1,4 +1,4 @@
-const { Customer, Media } = require("../model");
+const { Customer, Media, Address } = require("../model");
 const { validationResult } = require("express-validator");
 const errors = require("../util/errors");
 const getPaiganation = require("../util/paiganation");
@@ -7,7 +7,7 @@ const getAllCustomers = async (req, res) => {
     const { limit, offset } = getPaiganation(req.query.page, req.query.limit);
 
     const cusCount = await Customer.count();
-    const customers = await Customer.findAll({ limit: limit, offset: offset, include: [Media] });
+    const customers = await Customer.findAll({ limit: limit, offset: offset, include: [Media, Address] });
 
     res.status(200).json({ total: cusCount, nodes: customers });
 };
@@ -19,7 +19,7 @@ const getCustomerByID = async (req, res) => {
         return;
     }
 
-    const customer = await Customer.findOne({ where: { id: id }, include: [Media] });
+    const customer = await Customer.findOne({ where: { id: id }, include: [Media, Address] });
     if (!customer) {
         res.status(404).send(errors.notFound);
         return;

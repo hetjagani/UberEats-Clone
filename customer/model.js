@@ -56,6 +56,36 @@ const Favourite = global.DB.define("favourites", {
     },
 });
 
+const Address = global.DB.define("addresses", {
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+        unique: true,
+    },
+    firstLine: {
+        type: DataTypes.STRING,
+    },
+    secondLine: {
+        type: DataTypes.STRING,
+    },
+    zipcode: {
+        type: DataTypes.INTEGER,
+    },
+    city: {
+        type: DataTypes.STRING,
+    },
+    country: {
+        type: DataTypes.STRING,
+    },
+});
+
+Customer.hasMany(Address, {
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+});
+Address.belongsTo(Customer);
+
 Media.hasMany(Customer, {
     onDelete: "SET NULL",
 });
@@ -74,4 +104,4 @@ const runMigration = async () => {
     global.DB.sync({ alter: true });
 };
 
-module.exports = { Customer, Media, Favourite, runMigration };
+module.exports = { Customer, Media, Favourite, Address, runMigration };

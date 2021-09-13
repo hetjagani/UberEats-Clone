@@ -16,6 +16,10 @@ const getCustomerFavourites = async (req, res) => {
 const getCustomerFavouriteByID = async (req, res) => {
     const user = req.headers.user;
     const favID = req.params.favID;
+    if(!favID || favID == 0) {
+        res.status(400).json(errors.badRequest);
+        return;
+    }
 
     const favourite = await Favourite.findOne({ where: { id: favID, customerId: user } });
     const restaurants = await getRestaurants([favourite], req.headers.authorization);
