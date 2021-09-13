@@ -41,6 +41,7 @@ const getAllCartItems = async (req, res) => {
       dishId: ele.dishId,
       dish: dishMap[ele.dishId],
       quantity: ele.quantity,
+      notes: ele.notes,
     }));
 
     res.status(200).json(result);
@@ -100,6 +101,7 @@ const addCartItem = async (req, res) => {
       dishId: req.body.dishId,
       restaurantId: req.body.restaurantId,
       quantity: req.body.quantity,
+      notes: req.body.notes,
     });
 
     const result = {
@@ -109,12 +111,17 @@ const addCartItem = async (req, res) => {
       dishId: nCartItem.dishId,
       dish: dishMap[nCartItem.dishId],
       quantity: nCartItem.quantity,
+      notes: nCartItem.notes,
     };
 
     res.status(201).json(result);
     return;
   } catch (err) {
     console.log(err);
+    if (err.isAxiosError) {
+      res.status(500).json({ ...errors.serverError, message: err.message });
+      return;
+    }
     res.status(500).json(errors.serverError);
   }
 };

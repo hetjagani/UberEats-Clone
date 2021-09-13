@@ -10,12 +10,14 @@ const router = express.Router();
  * @property {integer} dishId.required
  * @property {integer} restaurantId.required
  * @property {integer} quantity.required
+ * @property {string} notes
  */
 
 const bodyValidators = () => [
   body('dishId').exists().isInt().not().isIn([0]),
   body('restaurantId').exists().isInt().not().isIn([0]),
   body('quantity').exists().isInt().not().isIn([0]),
+  body('notes').isString(),
 ];
 
 /**

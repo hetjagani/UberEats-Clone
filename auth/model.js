@@ -25,7 +25,8 @@ const runMigration = async () => {
     if (!global.DB) {
         return Promise.reject("please initialize DB");
     }
-    User.sync();
+    await User.sync();
+    return Promise.resolve(global.DB);
 };
 
 module.exports = { User, runMigration };

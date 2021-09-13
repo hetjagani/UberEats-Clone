@@ -9,6 +9,7 @@ const expressSwagger = require('express-swagger-generator')(app);
 
 const authMiddleware = require('./util/authMiddleware');
 const cartitemRouter = require('./routes/cartitem.routes');
+const orderRouter = require('./routes/order.routes');
 
 // all middlewares
 app.use(logger('dev'));
@@ -43,5 +44,6 @@ expressSwagger(options);
 app.use(authMiddleware);
 
 app.use('/cartitems', cartitemRouter);
+app.use('/orders', orderRouter);
 
 module.exports = app;

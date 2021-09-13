@@ -101,7 +101,8 @@ const runMigration = async () => {
     if (!global.DB) {
         return Promise.reject("please initialize DB");
     }
-    global.DB.sync({ alter: true });
+    await global.DB.sync({ alter: true });
+    return Promise.resolve(global.DB);
 };
 
 module.exports = { Customer, Media, Favourite, Address, runMigration };

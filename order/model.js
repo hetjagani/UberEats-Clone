@@ -21,6 +21,9 @@ const CartItem = global.DB.define('cartitems', {
   quantity: {
     type: DataTypes.INTEGER,
   },
+  notes: {
+    type: DataTypes.STRING,
+  },
 });
 
 const Order = global.DB.define('orders', {
@@ -47,12 +50,10 @@ const Order = global.DB.define('orders', {
   },
   addressId: {
     type: DataTypes.INTEGER,
+    defaultValue: null,
   },
   type: {
     type: DataTypes.ENUM('delivery', 'pickup'),
-  },
-  notes: {
-    type: DataTypes.STRING,
   },
 });
 
@@ -71,6 +72,9 @@ const OrderItem = global.DB.define('orderitems', {
   },
   quantity: {
     type: DataTypes.INTEGER,
+  },
+  notes: {
+    type: DataTypes.STRING,
   },
 });
 

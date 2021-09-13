@@ -96,7 +96,7 @@ const runMigration = async () => {
   if (!global.DB) {
     return Promise.reject(new Error('please initialize DB'));
   }
-  global.DB.sync({ alter: true });
+  await global.DB.sync({ alter: true });
   return Promise.resolve(global.DB);
 };
 
