@@ -1,8 +1,8 @@
-const express = require("express");
-const { body } = require("express-validator");
-const dishController = require("../controllers/dish");
+const express = require('express');
+const { body } = require('express-validator');
+const dishController = require('../controllers/dish');
 
-const router = express.Router({mergeParams: true});
+const router = express.Router({ mergeParams: true });
 
 /**
  * @typedef Dish
@@ -14,16 +14,14 @@ const router = express.Router({mergeParams: true});
  * @property {Array<integer>} media.required
  */
 
-const bodyValidators = () => {
-    return [
-        body("name").exists().isString(),
-        body("description").isString(),
-        body("price").exists().isFloat(),
-        body("food_type").exists().matches("veg|non-veg|vegan").isString(),
-        body("category").exists().matches("appetizer|salad|main_course|dessert|beverage").isString(),
-        body("media").isArray(),
-    ];
-};
+const bodyValidators = () => [
+  body('name').exists().isString(),
+  body('description').isString(),
+  body('price').exists().isFloat(),
+  body('food_type').exists().matches('veg|non-veg|vegan').isString(),
+  body('category').exists().matches('appetizer|salad|main_course|dessert|beverage').isString(),
+  body('media').isArray(),
+];
 
 /**
  * Get list of Dishes for restaurant
@@ -35,7 +33,7 @@ const bodyValidators = () => {
  * @param {integer} limit.query.require
  * @returns {Array.<Dish>} 200 - List of dishes info
  */
-router.get("/", dishController.getDishesForRestaurant);
+router.get('/', dishController.getDishesForRestaurant);
 
 /**
  * Create Dish in a restaurant
@@ -46,7 +44,7 @@ router.get("/", dishController.getDishesForRestaurant);
  * @param {Dish.model} Dish.body.require
  * @returns {Dish.model} 201 - Created Dish
  */
-router.post("/", ...bodyValidators(), dishController.createDishForRestaurant);
+router.post('/', ...bodyValidators(), dishController.createDishForRestaurant);
 
 /**
  * Get Dish by ID
@@ -57,7 +55,7 @@ router.post("/", ...bodyValidators(), dishController.createDishForRestaurant);
  * @param {integer} dishID.path.require
  * @returns {Dish.model} 200 - Dish for given ID
  */
-router.get("/:dishID", dishController.getDishForRestaurantByID);
+router.get('/:dishID', dishController.getDishForRestaurantByID);
 
 /**
  * Update Dish by ID
@@ -69,7 +67,7 @@ router.get("/:dishID", dishController.getDishForRestaurantByID);
  * @param {Dish.model} Dish.body.require
  * @returns {Dish.model} 200 - Updated Dish
  */
-router.put("/:dishID", ...bodyValidators(), dishController.updateDishInRestaurant);
+router.put('/:dishID', ...bodyValidators(), dishController.updateDishInRestaurant);
 
 /**
  * Delete Dish by ID
@@ -80,6 +78,6 @@ router.put("/:dishID", ...bodyValidators(), dishController.updateDishInRestauran
  * @param {integer} dishID.path.require
  * @returns {null} 200 - Delete Dish
  */
-router.delete("/:dishID", dishController.deleteDishInRestaurant);
+router.delete('/:dishID', dishController.deleteDishInRestaurant);
 
 module.exports = router;

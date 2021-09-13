@@ -1,7 +1,8 @@
-const resController = require("../controllers/restaurant");
-const dishRouter = require("./dish.routes");
-const express = require("express");
-const { body } = require("express-validator");
+/* eslint-disable newline-per-chained-call */
+const express = require('express');
+const { body } = require('express-validator');
+const resController = require('../controllers/restaurant');
+const dishRouter = require('./dish.routes');
 
 const router = express.Router();
 
@@ -22,28 +23,25 @@ const router = express.Router();
  * @property {Array<integer>} media.required
  */
 
-const bodyValidators = () => {
-    return [
-        body("id").exists().isInt().not().isIn([0]),
-        body("name").exists().isString(),
-        body("description").isString(),
-        body("address").exists().isString(),
-        body("city").exists().isString(),
-        body("state").exists().isString(),
-        body("country").exists().isString(),
-        body("contact_no").exists().isString(),
-        body("time_open").exists().matches("..:.."),
-        body("time_close").exists().matches("..:.."),
-        body("food_type").exists().matches("veg|non-veg|vegan").isString(),
-        body("restaurant_type").exists().matches("delivery|pickup").isString(),
-        body("media").isArray(),
-    ];
-};
+const bodyValidators = () => [
+  body('id').exists().isInt().not().isIn([0]),
+  body('name').exists().isString(),
+  body('description').isString(),
+  body('address').exists().isString(),
+  body('city').exists().isString(),
+  body('state').exists().isString(),
+  body('country').exists().isString(),
+  body('contact_no').exists().isString(),
+  body('time_open').exists().matches('..:..'),
+  body('time_close').exists().matches('..:..'),
+  body('food_type').exists().matches('veg|non-veg|vegan').isString(),
+  body('restaurant_type').exists().matches('delivery|pickup').isString(),
+  body('media').isArray(),
+];
 
 const [, ...updateValidators] = bodyValidators();
 
-router.use("/:resID/dishes", dishRouter);
-
+router.use('/:resID/dishes', dishRouter);
 
 /**
  * Get list of Restaurants
@@ -52,7 +50,7 @@ router.use("/:resID/dishes", dishRouter);
  * @param {string} authorization.header.require
  * @returns {Array.<Restaurant>} 200 - List of restaurant info
  */
-router.get("/all", resController.allRestaurants);
+router.get('/all', resController.allRestaurants);
 
 /**
  * Get list of Restaurants
@@ -63,7 +61,7 @@ router.get("/all", resController.allRestaurants);
  * @param {integer} limit.query.require
  * @returns {Array.<Restaurant>} 200 - List of restaurant info
  */
-router.get("/", resController.getAllRestaurants);
+router.get('/', resController.getAllRestaurants);
 
 /**
  * Create a Restaurant
@@ -73,7 +71,7 @@ router.get("/", resController.getAllRestaurants);
  * @param {Restaurant.model} Restaurant.body.require
  * @returns {Restaurant.model} 201 - Created Restaurant
  */
-router.post("/", ...bodyValidators(), resController.createRestaurant);
+router.post('/', ...bodyValidators(), resController.createRestaurant);
 
 /**
  * Get Restaurant by ID
@@ -83,7 +81,7 @@ router.post("/", ...bodyValidators(), resController.createRestaurant);
  * @param {integer} id.path.require
  * @returns {Restaurant.model} 200 - Restaurant for given ID
  */
-router.get("/:id", resController.getRestaurantByID);
+router.get('/:id', resController.getRestaurantByID);
 
 /**
  * Update Restaurant by ID
@@ -94,7 +92,7 @@ router.get("/:id", resController.getRestaurantByID);
  * @param {Restaurant.model} Restaurant.body.require
  * @returns {Restaurant.model} 200 - Updated Restaurant
  */
-router.put("/:id", ...updateValidators, resController.updateRestaurantByID);
+router.put('/:id', ...updateValidators, resController.updateRestaurantByID);
 
 /**
  * Delete Restaurant by ID
@@ -104,6 +102,6 @@ router.put("/:id", ...updateValidators, resController.updateRestaurantByID);
  * @param {integer} id.path.require
  * @returns {null} 200 - Delete Restaurant
  */
-router.delete("/:id", resController.deleteRestaurant);
+router.delete('/:id', resController.deleteRestaurant);
 
 module.exports = router;
