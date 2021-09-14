@@ -16,7 +16,22 @@ const router = express.Router();
  * @property {string} type.required
  */
 
-const bodyValidators = () => [body('status').exists().isString()];
+/**
+ * @typedef PlaceOrder
+ * @property {integer} orderId.required
+ * @property {integer} addressId.required
+ */
+
+/**
+ * @typedef UpdateOrder
+ * @property {string} status.required
+ */
+
+const bodyValidators = () => [body('status').exists().isString().isIn(['PLACED', 'PREPARING', 'COMPLETE', 'PICKUP_READY', 'CANCEL'])];
+const placeOrderValidators = () => [
+  body('orderId').exists().isInt().not().isIn([0]),
+  body('addressId').exists().isInt().not().isIn([0]),
+];
 
 /**
  * Get list of Orders
@@ -25,7 +40,17 @@ const bodyValidators = () => [body('status').exists().isString()];
  * @param {string} authorization.header.require
  * @returns {Array.<Order>} 200 - List of orders info
  */
-router.get('/', orderController.getAllOrders);
+router.get('/', orderController.getAllCustomersOrders);
+
+/**
+ * Place Order
+ * @route POST /orders/place
+ * @group Orders
+ * @param {string} authorization.header.require
+ * @param {PlaceOrder.model} PlaceOrder.body.require
+ * @returns {Order.model} 201 - Created Order
+ */
+router.post('/place', ...placeOrderValidators(), orderController.placeOrder);
 
 /**
  * Create Order
@@ -38,7 +63,7 @@ router.get('/', orderController.getAllOrders);
 router.post('/:type', orderController.createOrder);
 
 /**
- * Get Restaurant by ID
+ * Get Order by ID
  * @route GET /orders/{id}
  * @group Orders
  * @param {string} authorization.header.require
@@ -53,18 +78,9 @@ router.get('/:id', orderController.getOrderById);
  * @group Orders
  * @param {string} authorization.header.require
  * @param {integer} id.path.require
+ * @param {UpdateOrder.model} UpdateOrder.body.require
  * @returns {Order.model} 200 - Updated Order
  */
 router.put('/:id', ...bodyValidators(), orderController.updateOrderStatus);
-
-/**
- * Delete Order by ID
- * @route DELETE /orders/{id}
- * @group Orders
- * @param {string} authorization.header.require
- * @param {integer} id.path.require
- * @returns {null} 200 - Delete Order
- */
-router.delete('/:id', orderController.deleteOrder);
 
 module.exports = router;

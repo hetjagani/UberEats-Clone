@@ -18,7 +18,20 @@ const getRestaurants = async (auth) => {
   return map;
 };
 
-const getAllOrders = async (req, res) => {
+const getAddresses = async (auth) => {
+  const res = await axios.get(`${global.gConfig.customer_url}/customers/addresses`, {
+    headers: { Authorization: auth },
+  });
+
+  const map = {};
+  res.data.forEach((ele) => {
+    map[ele.id] = ele;
+  });
+
+  return map;
+};
+
+const getAllCustomersOrders = async (req, res) => {
   const { user } = req.headers;
 
   const orders = await Order.findAll({
@@ -29,6 +42,7 @@ const getAllOrders = async (req, res) => {
   try {
     // get all restaurants
     const restaurantMap = await getRestaurants(req.headers.authorization);
+    const addressMap = await getAddresses(req.headers.authorization);
 
     // map each order with restaurant and dishes
     const result = orders.map((order) => {
@@ -46,17 +60,95 @@ const getAllOrders = async (req, res) => {
         ...order.dataValues,
         restaurant: restaurantMap[order.restaurantId],
         orderitems: dishes,
+        address: order.addressId ? addressMap[order.addressId] : null,
       };
     });
 
     res.status(200).json(result);
   } catch (err) {
     console.error(err);
-    res.status(500).json(errors.serverError);
+    if (err.isAxiosError) {
+      if (err.response.status == 404) {
+        res.status(404).json({ ...errors.notFound, message: err.message });
+      } else {
+        res.status(500).json({ ...errors.serverError, message: err.message });
+      }
+    } else if (err.original) {
+      res.status(500).json({ status: 500, message: err.original.sqlMessage });
+    } else {
+      res.status(500).json(errors.serverError);
+    }
   }
 };
 
-const getOrderById = async (req, res) => {};
+const getOrderById = async (req, res) => {
+  const { id } = req.params;
+  const { user } = req.headers;
+
+  const order = await Order.findOne({
+    where: { customerId: user, id },
+    include: [OrderItem],
+  });
+  if (!order) {
+    res.status(404).json(errors.notFound);
+    return;
+  }
+
+  try {
+    const resResp = await axios(
+      `${global.gConfig.restaurant_url}/restaurants/${order.restaurantId}`,
+      { headers: { Authorization: req.headers.authorization } },
+    );
+    if (resResp.status != 200) {
+      res.status(500).json(errors.serverError);
+      return;
+    }
+
+    const dishMap = {};
+    resResp.data.dishes.forEach((dish) => {
+      dishMap[dish.id] = dish;
+    });
+
+    const orderItems = order.orderitems.map((item) => ({
+      ...item.dataValues,
+      dish: dishMap[item.dishId],
+    }));
+
+    const result = {
+      ...order.dataValues,
+      restaurant: resResp.data,
+      orderitems: orderItems,
+    };
+
+    if (order.addressId) {
+      const addResp = await axios(
+        `${global.gConfig.customer_url}/customers/addresses/${order.addressId}`,
+        { headers: { Authorization: req.headers.authorization } },
+      );
+      if (resResp.status != 200) {
+        res.status(500).json(errors.serverError);
+        return;
+      }
+      result.address = addResp.data;
+    }
+
+    res.status(200).json(result);
+    return;
+  } catch (err) {
+    console.error(err);
+    if (err.isAxiosError) {
+      if (err.response.status == 404) {
+        res.status(404).json({ ...errors.notFound, message: err.message });
+      } else {
+        res.status(500).json({ ...errors.serverError, message: err.message });
+      }
+    } else if (err.original) {
+      res.status(500).json({ status: 500, message: err.original.sqlMessage });
+    } else {
+      res.status(500).json(errors.serverError);
+    }
+  }
+};
 
 const createOrder = async (req, res) => {
   const { user } = req.headers;
@@ -138,7 +230,13 @@ const createOrder = async (req, res) => {
   } catch (err) {
     await t.rollback();
     console.error(err);
-    if (err.original) {
+    if (err.isAxiosError) {
+      if (err.response.status == 404) {
+        res.status(404).json({ ...errors.notFound, message: err.message });
+      } else {
+        res.status(500).json({ ...errors.serverError, message: err.message });
+      }
+    } else if (err.original) {
       res.status(500).json({ status: 500, message: err.original.sqlMessage });
     } else {
       res.status(500).json(errors.serverError);
@@ -146,14 +244,172 @@ const createOrder = async (req, res) => {
   }
 };
 
-const deleteOrder = async (req, res) => {};
+const placeOrder = async (req, res) => {
+  const { user } = req.headers;
 
-const updateOrderStatus = async (req, res) => {};
+  const valErr = validationResult(req);
+  if (!valErr.isEmpty()) {
+    console.error(valErr);
+    res.status(400).json({ status: 400, message: valErr.array() });
+    return;
+  }
+
+  const { orderId, addressId } = req.body;
+
+  const order = await Order.findOne({ where: { id: orderId, customerId: user } });
+  if (!order) {
+    res.status(404).json(errors.notFound);
+    return;
+  }
+  try {
+    // check if address with given id exists for customer
+    const response = await axios.get(
+      `${global.gConfig.customer_url}/customers/addresses/${addressId}`,
+      { headers: { Authorization: req.headers.authorization } },
+    );
+
+    if (response.status != 200) {
+      res.status(404).json({ ...errors.notFound, message: 'address not found' });
+      return;
+    }
+
+    // if exists then update order with status PLACED and addressId
+    order.addressId = response.data.id;
+    order.status = 'PLACED';
+
+    await order.save();
+
+    const nOrder = await Order.findOne({ where: { id: order.id }, include: [OrderItem] });
+
+    const resResp = await axios.get(
+      `${global.gConfig.restaurant_url}/restaurants/${nOrder.restaurantId}`,
+      { headers: { Authorization: req.headers.authorization } },
+    );
+
+    if (resResp.status != 200) {
+      res.status(500).json(errors.serverError);
+      return;
+    }
+
+    const dishMap = {};
+    resResp.data.dishes.forEach((dish) => {
+      dishMap[parseInt(dish.id, 10)] = dish;
+    });
+
+    const orderDishes = nOrder.orderitems.map((item) => ({
+      ...item.dataValues,
+      dish: dishMap[item.dishId],
+    }));
+
+    res.status(200).json({
+      ...nOrder.dataValues,
+      address: response.data,
+      orderitems: orderDishes,
+      restaurant: resResp.data,
+    });
+    return;
+  } catch (err) {
+    console.error(err);
+    if (err.isAxiosError) {
+      if (err.response.status == 404) {
+        res.status(404).json({ ...errors.notFound, message: err.message });
+      } else {
+        res.status(500).json({ ...errors.serverError, message: err.message });
+      }
+    } else if (err.original) {
+      res.status(500).json({ status: 500, message: err.original.sqlMessage });
+    } else {
+      res.status(500).json(errors.serverError);
+    }
+  }
+};
+
+const updateOrderStatus = async (req, res) => {
+  const { user } = req.headers;
+  const { id } = req.params;
+
+  const valErr = validationResult(req);
+  if (!valErr.isEmpty()) {
+    console.error(valErr);
+    res.status(400).json({ status: 400, message: valErr.array() });
+    return;
+  }
+
+  const { status } = req.body;
+
+  const order = await Order.findOne({ where: { id, restaurantId: user } });
+  if (!order) {
+    res.status(404).json(errors.notFound);
+    return;
+  }
+
+  order.status = status;
+
+  await order.save();
+
+  try {
+    const nOrder = await Order.findOne({ where: { id: order.id }, include: [OrderItem] });
+
+    const resResp = await axios.get(
+      `${global.gConfig.restaurant_url}/restaurants/${nOrder.restaurantId}`,
+      { headers: { Authorization: req.headers.authorization } },
+    );
+
+    if (resResp.status != 200) {
+      res.status(500).json(errors.serverError);
+      return;
+    }
+
+    const dishMap = {};
+    resResp.data.dishes.forEach((dish) => {
+      dishMap[parseInt(dish.id, 10)] = dish;
+    });
+
+    const orderDishes = nOrder.orderitems.map((item) => ({
+      ...item.dataValues,
+      dish: dishMap[item.dishId],
+    }));
+
+    const result = {
+      ...nOrder.dataValues,
+      orderitems: orderDishes,
+      restaurant: resResp.data,
+    };
+
+    if (order.addressId) {
+      const addResp = await axios(
+        `${global.gConfig.customer_url}/customers/addresses/${order.addressId}`,
+        { headers: { Authorization: req.headers.authorization } },
+      );
+      if (resResp.status != 200) {
+        res.status(500).json(errors.serverError);
+        return;
+      }
+      result.address = addResp.data;
+    }
+
+    res.status(200).json(result);
+    return;
+  } catch (err) {
+    console.error(err);
+    if (err.isAxiosError) {
+      if (err.response.status == 404) {
+        res.status(404).json({ ...errors.notFound, message: err.message });
+      } else {
+        res.status(500).json({ ...errors.serverError, message: err.message });
+      }
+    } else if (err.original) {
+      res.status(500).json({ status: 500, message: err.original.sqlMessage });
+    } else {
+      res.status(500).json(errors.serverError);
+    }
+  }
+};
 
 module.exports = {
-  getAllOrders,
+  getAllCustomersOrders,
   getOrderById,
   createOrder,
-  deleteOrder,
+  placeOrder,
   updateOrderStatus,
 };
