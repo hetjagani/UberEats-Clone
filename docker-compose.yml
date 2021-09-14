@@ -92,5 +92,19 @@ services:
     networks: 
       - uber-eats
 
+  nginx:
+    depends_on: 
+      - mysqldb
+    image: nginx:alpine
+    ports:
+      - 8000:8000
+    volumes: 
+      - type: bind
+        source: ./nginx/nginx.conf
+        target: /etc/nginx/conf.d/default.conf
+    restart: unless-stopped
+    networks: 
+      - uber-eats
+
 networks: 
   uber-eats:
