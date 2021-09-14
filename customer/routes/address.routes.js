@@ -1,6 +1,6 @@
-const express = require("express");
-const { body } = require("express-validator");
-const addressController = require("../controllers/address");
+const express = require('express');
+const { body } = require('express-validator');
+const addressController = require('../controllers/address');
 
 const router = express.Router();
 
@@ -14,16 +14,14 @@ const router = express.Router();
  * @property {integer} customerId.required
  */
 
-const bodyValidators = () => {
-    return [
-        body("firstLine").exists().isString(),
-        body("secondLine").isString(),
-        body("zipcode").isInt(),
-        body("city").exists().isString(),
-        body("country").exists().isString(),
-        body("customerId").exists().isNumeric(),
-    ];
-};
+const bodyValidators = () => [
+  body('firstLine').exists().isString(),
+  body('secondLine').isString(),
+  body('zipcode').isInt(),
+  body('city').exists().isString(),
+  body('country').exists().isString(),
+  body('customerId').exists().isNumeric(),
+];
 
 /**
  * Get list of Addresses
@@ -34,7 +32,7 @@ const bodyValidators = () => {
  * @param {integer} limit.query.require
  * @returns {Array.<Address>} 200 - List of address info
  */
-router.get("/", addressController.getAllAddresses);
+router.get('/', addressController.getAllAddresses);
 
 /**
  * Create Address
@@ -44,7 +42,7 @@ router.get("/", addressController.getAllAddresses);
  * @param {Address.model} Address.body.require
  * @returns {Address.model} 201 - Created Address
  */
-router.post("/", ...bodyValidators(), addressController.createAddress);
+router.post('/', ...bodyValidators(), addressController.createAddress);
 
 /**
  * Get Address by ID
@@ -54,7 +52,7 @@ router.post("/", ...bodyValidators(), addressController.createAddress);
  * @param {integer} addID.path.require
  * @returns {Media.model} 200 - Media for given ID
  */
-router.get("/:addID", addressController.getAddressByID);
+router.get('/:addID', addressController.getAddressByID);
 
 /**
  * Update Address by ID
@@ -65,7 +63,7 @@ router.get("/:addID", addressController.getAddressByID);
  * @param {Address.model} Address.body.require
  * @returns {Address.model} 200 - Updated Address
  */
-router.put("/:addID", ...bodyValidators(), addressController.updateAddress);
+router.put('/:addID', ...bodyValidators(), addressController.updateAddress);
 
 /**
  * Delete Address by ID
@@ -75,6 +73,6 @@ router.put("/:addID", ...bodyValidators(), addressController.updateAddress);
  * @param {integer} addID.path.require
  * @returns {null} 200 - Delete Media
  */
-router.delete("/:addID", addressController.deleteAddress);
+router.delete('/:addID', addressController.deleteAddress);
 
 module.exports = router;

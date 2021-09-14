@@ -1,17 +1,18 @@
-const express = require("express");
-const { getToken, signUp, validateToken } = require("../controller/auth");
+const express = require('express');
+const { getToken, signUp, validateToken } = require('../controller/auth');
+
 const router = express.Router();
 
 /**
  * @typedef AuthReq
- * @property {string} email.required 
- * @property {string} password.required 
+ * @property {string} email.required
+ * @property {string} password.required
  */
 
 /**
  * @typedef SignUpReq
- * @property {string} email.required 
- * @property {string} password.required 
+ * @property {string} email.required
+ * @property {string} password.required
  * @property {string} role.required - must be customer/restaurant
  */
 
@@ -22,7 +23,7 @@ const router = express.Router();
  * @param {AuthReq.model} AuthReq.body.required
  * @returns {object} 200 - {token: token}
  */
-router.post("/login", getToken);
+router.post('/login', getToken);
 
 /**
  * Signup user
@@ -31,7 +32,7 @@ router.post("/login", getToken);
  * @param {SignUpReq.model} SignUpReq.body.required
  * @returns {object} 201 - {token: token}
  */
-router.post("/signup", signUp);
+router.post('/signup', signUp);
 
 /**
  * Validate JWT token
@@ -40,6 +41,6 @@ router.post("/signup", signUp);
  * @param {string} token.query.required
  * @returns {object} 201 - {token: token}
  */
-router.get("/validate", validateToken);
+router.get('/validate', validateToken);
 
 module.exports = router;

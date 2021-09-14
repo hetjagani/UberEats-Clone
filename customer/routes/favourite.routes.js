@@ -1,6 +1,6 @@
-const express = require("express");
-const { body } = require("express-validator");
-const favouriteController = require("../controllers/favourite");
+const express = require('express');
+const { body } = require('express-validator');
+const favouriteController = require('../controllers/favourite');
 
 const router = express.Router();
 
@@ -9,9 +9,7 @@ const router = express.Router();
  * @property {integer} restaurantId.required
  */
 
-const bodyValidators = () => {
-    return [body("restaurantId").exists().isNumeric()];
-};
+const bodyValidators = () => [body('restaurantId').exists().isNumeric()];
 
 /**
  * Get list of Favourites for Customer
@@ -22,7 +20,7 @@ const bodyValidators = () => {
  * @param {integer} limit.query.require
  * @returns {Array.<Dish>} 200 - List of dishes info
  */
-router.get("/", favouriteController.getCustomerFavourites);
+router.get('/', favouriteController.getCustomerFavourites);
 
 /**
  * Create Favourite for Customer
@@ -32,7 +30,7 @@ router.get("/", favouriteController.getCustomerFavourites);
  * @param {Favourite.model} Favourite.body.require
  * @returns {Favourite.model} 201 - Created Favourite
  */
-router.post("/", ...bodyValidators(), favouriteController.createCustomerFavourite);
+router.post('/', ...bodyValidators(), favouriteController.createCustomerFavourite);
 
 /**
  * Get Favourite by ID
@@ -42,7 +40,7 @@ router.post("/", ...bodyValidators(), favouriteController.createCustomerFavourit
  * @param {integer} favID.path.require
  * @returns {Favourite.model} 200 - Favourite for given ID
  */
-router.get("/:favID", favouriteController.getCustomerFavouriteByID);
+router.get('/:favID', favouriteController.getCustomerFavouriteByID);
 
 /**
  * Delete Favourite by ID
@@ -52,6 +50,6 @@ router.get("/:favID", favouriteController.getCustomerFavouriteByID);
  * @param {integer} favID.path.require
  * @returns {null} 200 - Delete Favourite
  */
-router.delete("/:favID", favouriteController.deleteCustomerFavourite);
+router.delete('/:favID', favouriteController.deleteCustomerFavourite);
 
 module.exports = router;

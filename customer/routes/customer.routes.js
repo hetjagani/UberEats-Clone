@@ -1,8 +1,9 @@
-const express = require("express");
-const customerController = require("../controllers/customer");
-const { body } = require("express-validator");
-const favouriteRouter = require("./favourite.routes");
-const addressRouter = require("./address.routes");
+/* eslint-disable newline-per-chained-call */
+const express = require('express');
+const { body } = require('express-validator');
+const customerController = require('../controllers/customer');
+const favouriteRouter = require('./favourite.routes');
+const addressRouter = require('./address.routes');
 
 const router = express.Router();
 
@@ -19,23 +20,21 @@ const router = express.Router();
  * @property {integer} mediumId
  */
 
-const bodyValidators = () => {
-    return [
-        body("id").exists().isInt().not().isIn([0]),
-        body("name").exists().isString(),
-        body("nickname").isString(),
-        body("about").isString(),
-        body("city").exists().isString(),
-        body("state").exists().isString(),
-        body("country").exists().isString(),
-        body("contact_no").exists().isString(),
-    ];
-};
+const bodyValidators = () => [
+  body('id').exists().isInt().not().isIn([0]),
+  body('name').exists().isString(),
+  body('nickname').isString(),
+  body('about').isString(),
+  body('city').exists().isString(),
+  body('state').exists().isString(),
+  body('country').exists().isString(),
+  body('contact_no').exists().isString(),
+];
 
 const [, ...updateValidators] = bodyValidators();
 
-router.use("/favourites", favouriteRouter);
-router.use("/addresses", addressRouter);
+router.use('/favourites', favouriteRouter);
+router.use('/addresses', addressRouter);
 
 /**
  * Get list of Customers
@@ -46,7 +45,7 @@ router.use("/addresses", addressRouter);
  * @param {integer} limit.query.require
  * @returns {Array.<Customer>} 200 - List of customer info
  */
-router.get("/", customerController.getAllCustomers);
+router.get('/', customerController.getAllCustomers);
 
 /**
  * Create a Customer
@@ -56,7 +55,7 @@ router.get("/", customerController.getAllCustomers);
  * @param {Customer.model} Customer.body.require
  * @returns {Customer.model} 201 - Created Customer
  */
-router.post("/", ...bodyValidators(), customerController.createCustomer);
+router.post('/', ...bodyValidators(), customerController.createCustomer);
 
 /**
  * Get Customer by ID
@@ -66,7 +65,7 @@ router.post("/", ...bodyValidators(), customerController.createCustomer);
  * @param {integer} id.path.require
  * @returns {Customer.model} 200 - Customer for given ID
  */
-router.get("/:id", customerController.getCustomerByID);
+router.get('/:id', customerController.getCustomerByID);
 
 /**
  * Update Customer by ID
@@ -77,7 +76,7 @@ router.get("/:id", customerController.getCustomerByID);
  * @param {Customer.model} Customer.body.require
  * @returns {Customer.model} 200 - Updated Customer
  */
-router.put("/:id", ...updateValidators, customerController.updateCustomerByID);
+router.put('/:id', ...updateValidators, customerController.updateCustomerByID);
 
 /**
  * Delete Customer by ID
@@ -87,6 +86,6 @@ router.put("/:id", ...updateValidators, customerController.updateCustomerByID);
  * @param {integer} id.path.require
  * @returns {null} 200 - Delete Customer
  */
-router.delete("/:id", customerController.deleteCustomerByID);
+router.delete('/:id', customerController.deleteCustomerByID);
 
 module.exports = router;
