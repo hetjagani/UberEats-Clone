@@ -30,7 +30,10 @@ const getRestaurantByID = async (req, res) => {
     return;
   }
 
-  const restaurant = await Restaurant.findOne({ where: { id }, include: [Media, Dish] });
+  const restaurant = await Restaurant.findOne({
+    where: { id },
+    include: [Media, { model: Dish, include: Media }],
+  });
   if (!restaurant) {
     res.status(404).send(errors.notFound);
     return;
@@ -86,17 +89,18 @@ const createRestaurant = async (req, res) => {
 };
 
 const updateRestaurantByID = async (req, res) => {
-  const { user } = req.headers;
-  if (user !== req.body.id) {
-    res.status(400).json({
-      ...errors.badRequest,
-      message: 'restaurant.id in body should be same as logged in user',
-    });
-    return;
-  }
   const { id } = req.params;
   if (!id || id == 0) {
     res.status(400).json(errors.badRequest);
+    return;
+  }
+
+  const { user } = req.headers;
+  if (user !== req.params.id) {
+    res.status(400).json({
+      ...errors.badRequest,
+      message: 'id should be same as logged in user',
+    });
     return;
   }
 

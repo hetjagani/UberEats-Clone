@@ -3,7 +3,8 @@ const cookieParser = require('cookie-parser');
 const express = require('express');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
-const authMiddleware = require('./util/authMiddleware');
+const acl = require('./acl');
+const { getAuthMiddleware, getAccessMiddleware } = require('u-server-utils');
 
 const app = express();
 
@@ -11,6 +12,7 @@ const expressSwagger = require('express-swagger-generator')(app);
 
 const restaurantRouter = require('./routes/restaurant.routes');
 const mediaRouter = require('./routes/media.routes');
+const validate = require('./util/authValidator');
 
 // all middlewares
 app.use(logger('dev'));
@@ -42,7 +44,8 @@ const options = {
 
 expressSwagger(options);
 
-app.use(authMiddleware);
+app.use(getAuthMiddleware(validate));
+app.use(getAccessMiddleware(acl));
 
 app.use('/restaurants', restaurantRouter);
 app.use('/media', mediaRouter);
