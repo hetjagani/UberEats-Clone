@@ -31,6 +31,7 @@ const getAddresses = async (auth) => {
   return map;
 };
 
+// TODO: get all restaurant's orders
 const getAllCustomersOrders = async (req, res) => {
   const { user } = req.headers;
 
@@ -81,6 +82,7 @@ const getAllCustomersOrders = async (req, res) => {
   }
 };
 
+// TODO: access order details based in role
 const getOrderById = async (req, res) => {
   const { id } = req.params;
   const { user } = req.headers;

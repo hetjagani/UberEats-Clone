@@ -1,0 +1,18 @@
+module.exports = {
+  'GET /customers$': ['restaurant'],
+  'GET /customers?(.+)': ['customer'],
+  'POST /customers': ['customer'],
+  'PUT /customers?(.+)': ['customer'],
+  'DELETE /customers?(.+)': ['admin'],
+  'GET /customers/addresses?(.+)': ['customer'],
+  'POST /customers/addresses': ['customer'],
+  'PUT /customers/addresses?(.+)': ['customer'],
+  'DELETE /customers/addresses?(.+)': ['customer'],
+  'GET /customers/favourites?(.+)': ['customer'],
+  'POST /customers/favourites': ['customer'],
+  'DELETE /customers/favourites?(.+)': ['customer'],
+  'GET /media?(.+)': ['restaurant', 'customer'],
+  'POST /media': ['customer'],
+  'PUT /media?(.+)': ['customer'],
+  'DELETE /media?(.+)': ['customer'],
+};

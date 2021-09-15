@@ -4,6 +4,7 @@ const { Customer, Media, Address } = require('../model');
 const errors = require('../util/errors');
 const getPaiganation = require('../util/paiganation');
 
+// TODO: only for restaurants
 const getAllCustomers = async (req, res) => {
   const { limit, offset } = getPaiganation(req.query.page, req.query.limit);
 
@@ -17,10 +18,17 @@ const getAllCustomers = async (req, res) => {
   res.status(200).json({ total: cusCount, nodes: customers });
 };
 
+// TODO: restaurant should be able to get info of his/her customer
+// this function only returns the details of logged in customer
 const getCustomerByID = async (req, res) => {
   const { id } = req.params;
   if (!id || id === 0) {
     res.status(400).json(errors.badRequest);
+    return;
+  }
+
+  if (id != req.headers.user) {
+    res.status(401).json(errors.unauthorized);
     return;
   }
 
