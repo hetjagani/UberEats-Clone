@@ -5,6 +5,7 @@ import Header from './Header';
 import { Drawer, ANCHOR, SIZE } from 'baseui/drawer';
 import { Button, SIZE as BSIZE } from 'baseui/button';
 import { Input, SIZE as ISIZE, ADJOINED } from 'baseui/input';
+import { Link } from 'react-router-dom';
 
 const LandingPage = () => {
   const [css, theme] = useStyletron();
@@ -49,10 +50,14 @@ const LandingPage = () => {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email address"
           />
-          <span style={{ marginLeft: '20px', width: 500 }}>
-            <Button size={BSIZE.large}>Sign up</Button>
-          </span>
+          <Link to={`/auth/registeruser?email=${email}`}>
+            <span style={{ marginLeft: '20px', width: 500 }}>
+              <Button size={BSIZE.large}>Sign up</Button>
+            </span>
+          </Link>
         </div>
+        <span className={css({fontWeight:'bold', margin:'5px'})} >Click Here to <Link to={'/auth/registerres'}>add your restaurant</Link>
+        </span>
       </div>
       <Drawer
         onClose={() => setIsOpen(false)}
@@ -61,14 +66,18 @@ const LandingPage = () => {
         size={SIZE.auto}
       >
         <div className={buttonStyle}>
-          <Button className={buttonStyle} size={BSIZE.large}>
-            <span className={labelStyle}>Sign in</span>
-          </Button>
+          <Link to={'/auth/login'}>
+            <Button className={buttonStyle} size={BSIZE.large}>
+              <span className={labelStyle}>Sign in</span>
+            </Button>
+          </Link>
         </div>
         <div className={buttonStyle}>
-          <Button className={buttonStyle} size={BSIZE.large}>
-            <span className={labelStyle}>Add your restaurant</span>
-          </Button>
+          <Link to={'/auth/registerres'}>
+            <Button className={buttonStyle} size={BSIZE.large}>
+              <span className={labelStyle}>Add your restaurant</span>
+            </Button>
+          </Link>
         </div>
       </Drawer>
     </div>

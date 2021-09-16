@@ -3,6 +3,7 @@ import React from 'react';
 import Menu from 'baseui/icon/menu';
 import { StyledLink } from 'baseui/link';
 import { Button, SIZE, SHAPE } from 'baseui/button';
+import { Link } from 'react-router-dom';
 
 function Header({ setIsOpen }) {
   const [css, theme] = useStyletron();
@@ -33,9 +34,11 @@ function Header({ setIsOpen }) {
         </a>
       </div>
       <div>
-      <Button onClick={() => alert('click')} size={SIZE.large} shape={SHAPE.pill}>
-        Sign in
-      </Button>
+        <Link to={'/auth/login'}>
+          <Button size={SIZE.large} shape={SHAPE.pill}>
+            Sign in
+          </Button>
+        </Link>
       </div>
     </div>
   );
