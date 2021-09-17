@@ -5,6 +5,9 @@ import { useLocation } from 'react-router-dom';
 import { Input } from 'baseui/input';
 import { Button } from 'baseui/button';
 import { Notification, KIND } from 'baseui/notification';
+import axios from 'axios';
+import { Select, SIZE, TYPE } from 'baseui/select';
+import getLoginDetails from '../../utils/getLoginDetails';
 
 const AuthPage = ({ flow, role, ...props }) => {
   const [css, theme] = useStyletron();
@@ -36,6 +39,7 @@ const AuthPage = ({ flow, role, ...props }) => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [inprole, setInpRole] = useState([{ label: role, id: role }]);
   const [verifyPass, setVerifyPass] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -53,6 +57,16 @@ const AuthPage = ({ flow, role, ...props }) => {
   };
 
   const submitHandler = () => {
+    if (flow === 'login' && (email == '' || password == '')) {
+      setErrorMessage('Any field cannot be empty');
+      return;
+    }
+
+    if (flow === 'register' && (email == '' || password == '' || validateEmail == '')) {
+      setErrorMessage('Any field cannot be empty');
+      return;
+    }
+
     if (!validateEmail(email)) {
       setErrorMessage('Invalid Email Address');
     }
@@ -61,7 +75,34 @@ const AuthPage = ({ flow, role, ...props }) => {
       setErrorMessage('Input passwords do not match');
     }
 
-    // dispatch action to login or register
+    let authURL = '/auth/login';
+    if (flow === 'register') {
+      authURL = '/auth/signup';
+    }
+    axios
+      .post(`${window.BACKEND_API_URL}${authURL}`, { email, password, role: inprole[0].id })
+      .then((res) => {
+        const { token } = res.data;
+        document.cookie = `auth=${token};path=/`;
+        const { tokenRole } = getLoginDetails();
+
+        if (flow === 'register') {
+          // on details page we'll take profile details and save in backend
+          window.location.href = '/details';
+        } else {
+          if (tokenRole === 'customer') {
+            // show restaurants page after login
+            window.location.href = '/restaurants';
+          } else {
+            // show user's restaurant details page
+            window.location.href = '/restaurants/dashboard';
+          }
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        setErrorMessage(JSON.stringify(err.response.data));
+      });
   };
 
   const focusFields = () => {
@@ -103,7 +144,7 @@ const AuthPage = ({ flow, role, ...props }) => {
           <Label1>Enter password</Label1>
           <Input
             value={password}
-            type='password'
+            type="password"
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter your password"
             onFocus={focusFields}
@@ -115,10 +156,31 @@ const AuthPage = ({ flow, role, ...props }) => {
             <Label1>Reenter your password</Label1>
             <Input
               value={verifyPass}
-              type='password'
+              type="password"
               onChange={(e) => setVerifyPass(e.target.value)}
               placeholder="Enter your password again"
               onFocus={focusFields}
+            />
+            <br />
+
+            <Select
+              backspaceRemoves={false}
+              clearable={false}
+              closeOnSelect={true}
+              deleteRemoves={false}
+              escapeClearsValue={false}
+              options={[
+                { label: 'Customer', id: 'customer' },
+                { label: 'Restaurant', id: 'restaurant' },
+              ]}
+              value={inprole}
+              ignoreCase={false}
+              onBlurResetsInput={false}
+              onCloseResetsInput={false}
+              onSelectResetsInput={false}
+              searchable={false}
+              placeholder="Select Account Type"
+              onChange={(params) => setInpRole(params.value)}
             />
           </div>
         )}

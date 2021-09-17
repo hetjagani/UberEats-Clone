@@ -27,7 +27,7 @@ const getToken = async (req, res) => {
 
   const accessToken = jwt.sign(
     {
-      email: user.email,
+      id: user.id,
       role: user.role,
     },
     JWT_SECRET,
@@ -78,7 +78,7 @@ const signUp = async (req, res) => {
 
   const accessToken = jwt.sign(
     {
-      email: user.email,
+      id: user.id,
       role: user.role,
     },
     JWT_SECRET,
@@ -102,7 +102,7 @@ const validateToken = async (req, res) => {
       return;
     }
 
-    const user = await User.findOne({ where: { email: data.email } });
+    const user = await User.findOne({ where: { id: data.id } });
 
     if (!user) {
       res.status(401).send('Unauthorized');

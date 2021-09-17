@@ -22,13 +22,13 @@ const router = express.Router();
 
 const bodyValidators = () => [
   body('id').exists().isInt().not().isIn([0]),
-  body('name').exists().isString(),
+  body('name').exists().isString().not().isIn(['']),
   body('nickname').isString(),
   body('about').isString(),
-  body('city').exists().isString(),
-  body('state').exists().isString(),
-  body('country').exists().isString(),
-  body('contact_no').exists().isString(),
+  body('city').exists().isString().not().isIn(['']),
+  body('state').exists().isString().not().isIn(['']),
+  body('country').exists().isString().not().isIn(['']),
+  body('contact_no').exists().isString().not().isIn(['']),
 ];
 
 const [, ...updateValidators] = bodyValidators();

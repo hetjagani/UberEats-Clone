@@ -1,12 +1,10 @@
 {
-  "plugins": ["react/recommended", "baseui"],
-  "rules": {
-    "baseui/deprecated-theme-api": "warn",
-    "baseui/deprecated-component-api": "warn",
-    "baseui/no-deep-imports": "warn"
-  },
+  "plugins": ["baseui"],
   "parserOptions": {
-    "sourceType": "module",
-    "ecmaVersion": 2019
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 2019,
+    "sourceType": "module"
   }
 }

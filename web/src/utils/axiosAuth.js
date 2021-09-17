@@ -4,7 +4,7 @@ function createAxiosAuthMiddleware() {
   return ({ getState }) =>
     (next) =>
     (action) => {
-      const authToken = document.cookie.split(';').filter((cookie) => {
+      const [authToken] = document.cookie.split(';').filter((cookie) => {
         const parts = cookie.split('=');
         if (parts[0].trim() == 'auth') {
           return parts[1];
@@ -12,10 +12,11 @@ function createAxiosAuthMiddleware() {
       });
 
       if (authToken) {
-        axios.defaults.headers.common['Authorization'] = authToken;
+        const token = authToken.split('=')[1];
+        axios.defaults.headers.common['Authorization'] = token;
       }
       axios.defaults.baseURL = window.BACKEND_API_URL;
-      axios.defaults.withCredentials = true;
+      axios.defaults.withCredentials = false;
       return next(action);
     };
 }
