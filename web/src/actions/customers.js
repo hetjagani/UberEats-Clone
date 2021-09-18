@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { notifyError } from './notify';
 import { CREATE_CUSTOMER, ERROR } from './types';
 
 export const createCustomer = (data) => {
@@ -12,10 +13,7 @@ export const createCustomer = (data) => {
         });
       })
       .catch((err) => {
-        dispatch({
-          type: ERROR,
-          payload: err.response.data,
-        });
+        dispatch(notifyError(JSON.stringify(err.response.data.message), err.response.status));
       });
   };
 };

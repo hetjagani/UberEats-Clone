@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux';
 import customerReducer from './customers';
-import errorReducer from './error';
+import notifyReducer from './notify';
 
 export default combineReducers({
   customers: customerReducer,
-  errors: errorReducer,
+  notifications: notifyReducer,
 });

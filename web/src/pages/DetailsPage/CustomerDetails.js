@@ -4,7 +4,7 @@ import { Input } from 'baseui/input';
 import { Textarea } from 'baseui/textarea';
 import { useStyletron } from 'baseui';
 import { Select } from 'baseui/select';
-import { Button, KIND, SIZE, SHAPE } from 'baseui/button';
+import { Button, SIZE } from 'baseui/button';
 import { useDispatch, useSelector } from 'react-redux';
 import { createCustomer } from '../../actions/customers';
 import { Notification } from 'baseui/notification';
@@ -45,24 +45,7 @@ function CustomerDetails({ loginDetails }) {
   const [country, setCountry] = useState([]);
   const [contactNo, setContactNo] = useState('');
 
-  const [showError, setShowError] = useState(false);
-
   const dispatch = useDispatch();
-
-  const { error, customer } = useSelector((state) => {
-    return {
-      error: state.errors.error,
-      customer: state.customers.customer,
-    };
-  });
-
-  useEffect(() => {
-    if (error.message && error.message != '') {
-      setShowError(true);
-    } else {
-      setShowError(false);
-    }
-  }, [error.message]);
 
   const saveCustomerDetails = () => {
     const data = {
@@ -127,12 +110,6 @@ function CustomerDetails({ loginDetails }) {
       <FormControl label={() => 'Contact No'}>
         <Input value={contactNo} onChange={(e) => setContactNo(e.target.value)} required />
       </FormControl>
-
-      {showError && (
-        <Notification kind="warning" $style={{ alignSelf: 'center', width: '50%' }} closeable>
-          {() => JSON.stringify(error.message)}
-        </Notification>
-      )}
 
       <Button
         type="submit"
