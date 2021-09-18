@@ -1,3 +1,5 @@
 export const CREATE_CUSTOMER = 'CREATE_CUSTOMER';
 
+export const CREATE_RESTAURANT = 'CREATE_RESTAURANT';
+
 export const NOTIFY = 'NOTIFY';

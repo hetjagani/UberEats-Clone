@@ -1,17 +1,17 @@
 import axios from 'axios';
 import { notifyError, notifyInfo } from './notify';
-import { CREATE_CUSTOMER } from './types';
+import { CREATE_RESTAURANT } from './types';
 
-export const createCustomer = (data) => {
+export const createRestaurant = (data) => {
   return (dispatch) => {
     return axios
-      .post('/customers', data)
+      .post('/restaurants', data)
       .then((res) => {
         dispatch({
-          type: CREATE_CUSTOMER,
+          type: CREATE_RESTAURANT,
           payload: res.data,
         });
-        dispatch(notifyInfo('Created Customer'));
+        dispatch(notifyInfo('Created Restaurant'));
       })
       .catch((err) => {
         dispatch(notifyError(JSON.stringify(err.response.data.message), err.response.status));

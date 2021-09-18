@@ -7,7 +7,8 @@ import { Select } from 'baseui/select';
 import { Button, SIZE } from 'baseui/button';
 import { useDispatch, useSelector } from 'react-redux';
 import { createCustomer } from '../../actions/customers';
-import { Notification } from 'baseui/notification';
+import { Display4 } from 'baseui/typography';
+import { Card } from 'baseui/card';
 
 function CustomerDetails({ loginDetails }) {
   const [css, theme] = useStyletron();
@@ -17,6 +18,14 @@ function CustomerDetails({ loginDetails }) {
     justifyContent: 'center',
     alignItems: 'center',
     width: '80%',
+  });
+  const mainContainer = css({
+    display: 'flex',
+    justifyContent: 'space-between',
+    width: '100%',
+  });
+  const imgContainer = css({
+    marginLeft: '50px',
   });
 
   const cityOpts = [
@@ -62,63 +71,78 @@ function CustomerDetails({ loginDetails }) {
   };
 
   return (
-    <div className={formContainer}>
-      <FormControl label={() => 'Name'}>
-        <Input value={name} onChange={(e) => setName(e.target.value)} required />
-      </FormControl>
-      <FormControl label={() => 'NickName'}>
-        <Input value={nickName} onChange={(e) => setNickName(e.target.value)} />
-      </FormControl>
+    <div className={mainContainer}>
+      <div className={formContainer}>
+        <Display4>Customer Profile</Display4>
+        <FormControl label={() => 'Name'}>
+          <Input value={name} onChange={(e) => setName(e.target.value)} required />
+        </FormControl>
+        <FormControl label={() => 'NickName'}>
+          <Input value={nickName} onChange={(e) => setNickName(e.target.value)} />
+        </FormControl>
 
-      <FormControl label="About You" caption="Tell us something about you">
-        <Textarea value={about} onChange={(event) => setAbout(event.currentTarget.value)} />
-      </FormControl>
+        <FormControl label="About You" caption="Tell us something about you">
+          <Textarea value={about} onChange={(event) => setAbout(event.currentTarget.value)} />
+        </FormControl>
 
-      <FormControl label="Type to search city">
-        <Select
-          value={city}
-          onChange={({ value }) => setCity(value)}
-          options={cityOpts}
-          labelKey="id"
-          valueKey="city"
-          required
-        />
-      </FormControl>
+        <FormControl label="Type to search city">
+          <Select
+            value={city}
+            onChange={({ value }) => setCity(value)}
+            options={cityOpts}
+            labelKey="id"
+            valueKey="city"
+            required
+          />
+        </FormControl>
 
-      <FormControl label="Type to search state">
-        <Select
-          value={state}
-          onChange={({ value }) => setState(value)}
-          options={stateOpts}
-          labelKey="id"
-          valueKey="state"
-          required
-        />
-      </FormControl>
+        <FormControl label="Type to search state">
+          <Select
+            value={state}
+            onChange={({ value }) => setState(value)}
+            options={stateOpts}
+            labelKey="id"
+            valueKey="state"
+            required
+          />
+        </FormControl>
 
-      <FormControl label="Type to search country">
-        <Select
-          value={country}
-          onChange={({ value }) => setCountry(value)}
-          options={countryOpts}
-          labelKey="id"
-          valueKey="country"
-          required
-        />
-      </FormControl>
+        <FormControl label="Type to search country">
+          <Select
+            value={country}
+            onChange={({ value }) => setCountry(value)}
+            options={countryOpts}
+            labelKey="id"
+            valueKey="country"
+            required
+          />
+        </FormControl>
 
-      <FormControl label={() => 'Contact No'}>
-        <Input value={contactNo} onChange={(e) => setContactNo(e.target.value)} required />
-      </FormControl>
+        <FormControl label={() => 'Contact No'}>
+          <MaskedInput
+            placeholder="Phone number"
+            mask="(999) 999-9999"
+            value={contactNo}
+            onChange={(e) => setContactNo(e.target.value)}
+          />
+        </FormControl>
 
-      <Button
-        type="submit"
-        $style={{ alignSelf: 'baseline', width: '30%' }}
-        size={SIZE.large}
-        onClick={saveCustomerDetails}
-      >
-        Save
-      </Button>
+        <Button
+          type="submit"
+          $style={{ alignSelf: 'baseline', width: '30%' }}
+          size={SIZE.large}
+          onClick={saveCustomerDetails}
+        >
+          Save
+        </Button>
+      </div>
+      <div className={imgContainer}>
+        <Card
+          overrides={{ Root: { style: { width: '512px' } } }}
+          headerImage={'https://source.unsplash.com/user/erondu/700x400'}
+          title="Profile Picture"
+        ></Card>
+      </div>
     </div>
   );
 }

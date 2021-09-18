@@ -87,14 +87,16 @@ const AuthPage = ({ flow, role, ...props }) => {
         const { tokenRole } = getLoginDetails();
 
         if (flow === 'register') {
-          // on details page we'll take profile details and save in backend
+          // on details page we'll take profile details and save in backend: saved user in the store
           window.location.href = '/details';
         } else {
           if (tokenRole === 'customer') {
             // show restaurants page after login
+            // TODO: fetch customer and save in store
             window.location.href = '/restaurants';
           } else {
             // show user's restaurant details page
+            // TODO: fetch restaurant and save in store
             window.location.href = '/restaurants/dashboard';
           }
         }

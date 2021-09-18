@@ -46,6 +46,7 @@ function App() {
           </Switch>
         ) : (
           <Switch>
+            <Route exact path="/" component={LandingPage} />
             <Route
               exact
               path="/details"

@@ -10,6 +10,7 @@ const app = express();
 
 const expressSwagger = require('express-swagger-generator')(app);
 
+const cors = require('cors');
 const restaurantRouter = require('./routes/restaurant.routes');
 const mediaRouter = require('./routes/media.routes');
 const validate = require('./util/authValidator');
@@ -18,11 +19,13 @@ const validate = require('./util/authValidator');
 app.use(logger('dev'));
 app.use(cookieParser());
 app.use(bodyParser.json());
+app.use(cors());
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Max-Age', 1728000);
   next();
 });
 
