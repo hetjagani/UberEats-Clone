@@ -8,8 +8,10 @@ import store from './store';
 import { Provider } from 'react-redux';
 import { LightTheme, BaseProvider } from 'baseui';
 import reportWebVitals from './reportWebVitals';
+import axios from 'axios';
 
 const engine = new Styletron();
+axios.defaults.baseURL = window.BACKEND_API_URL;
 
 ReactDOM.render(
   <Provider store={store}>

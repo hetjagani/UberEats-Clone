@@ -8,6 +8,9 @@ import { Notification, KIND } from 'baseui/notification';
 import axios from 'axios';
 import { Select, SIZE, TYPE } from 'baseui/select';
 import getLoginDetails from '../../utils/getLoginDetails';
+import { useDispatch } from 'react-redux';
+import { fetchAuthCustomer } from '../../actions/customers';
+import { fetchAuthRestaurant } from '../../actions/restaurants';
 
 const AuthPage = ({ flow, role, ...props }) => {
   const [css, theme] = useStyletron();
@@ -50,6 +53,8 @@ const AuthPage = ({ flow, role, ...props }) => {
     }
   }, []);
 
+  const dispatch = useDispatch();
+
   const validateEmail = (email) => {
     const re =
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -79,24 +84,25 @@ const AuthPage = ({ flow, role, ...props }) => {
     if (flow === 'register') {
       authURL = '/auth/signup';
     }
+
     axios
       .post(`${window.BACKEND_API_URL}${authURL}`, { email, password, role: inprole[0].id })
       .then((res) => {
         const { token } = res.data;
         document.cookie = `auth=${token};path=/`;
-        const { tokenRole } = getLoginDetails();
+        const tokenData = getLoginDetails();
 
         if (flow === 'register') {
           // on details page we'll take profile details and save in backend: saved user in the store
           window.location.href = '/details';
         } else {
-          if (tokenRole === 'customer') {
+          if (tokenData.role === 'customer') {
             // show restaurants page after login
-            // TODO: fetch customer and save in store
+            dispatch(fetchAuthCustomer(tokenData.id, token));
             window.location.href = '/restaurants';
           } else {
             // show user's restaurant details page
-            // TODO: fetch restaurant and save in store
+            dispatch(fetchAuthRestaurant(tokenData.id, token));
             window.location.href = '/restaurants/dashboard';
           }
         }
