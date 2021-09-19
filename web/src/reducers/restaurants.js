@@ -1,8 +1,8 @@
-import { CREATE_RESTAURANT } from "../actions/types";
-
+import { CREATE_RESTAURANT, CREATE_RESTAURANT_MEDIA } from '../actions/types';
 
 const initialState = {
   restaurant: {},
+  media: [],
 };
 
 export default (state = initialState, action) => {
@@ -11,6 +11,12 @@ export default (state = initialState, action) => {
       return {
         ...state,
         restaurant: action.payload,
+      };
+
+    case CREATE_RESTAURANT_MEDIA:
+      return {
+        ...state,
+        media: [...state.media, action.payload],
       };
 
     default:

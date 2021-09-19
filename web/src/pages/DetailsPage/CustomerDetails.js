@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { FormControl } from 'baseui/form-control';
-import { Input } from 'baseui/input';
+import { Input, MaskedInput } from 'baseui/input';
 import { Textarea } from 'baseui/textarea';
 import { useStyletron } from 'baseui';
-import { Select } from 'baseui/select';
+import { Select, StatefulSelect } from 'baseui/select';
 import { Button, SIZE } from 'baseui/button';
 import { useDispatch, useSelector } from 'react-redux';
-import { createCustomer } from '../../actions/customers';
+import { createCustomer, createCustomerMedium } from '../../actions/customers';
 import { Display4 } from 'baseui/typography';
 import { Card } from 'baseui/card';
+import { FileUploader } from 'baseui/file-uploader';
+import S3 from 'react-aws-s3';
+import { notifyError, notifyInfo } from '../../actions/notify';
 
 function CustomerDetails({ loginDetails }) {
   const [css, theme] = useStyletron();
@@ -46,6 +49,10 @@ function CustomerDetails({ loginDetails }) {
 
   const countryOpts = [{ id: 'United States', country: 'United States' }];
 
+  const medium = useSelector((state) => {
+    return state.customers.medium;
+  });
+
   const [name, setName] = useState('');
   const [nickName, setNickName] = useState('');
   const [about, setAbout] = useState('');
@@ -53,6 +60,8 @@ function CustomerDetails({ loginDetails }) {
   const [state, setState] = useState([]);
   const [country, setCountry] = useState([]);
   const [contactNo, setContactNo] = useState('');
+
+  const [isUploading, setIsUploading] = React.useState(false);
 
   const dispatch = useDispatch();
 
@@ -66,8 +75,39 @@ function CustomerDetails({ loginDetails }) {
       state: state[0] && state[0].state,
       country: country[0] && country[0].country,
       contact_no: contactNo,
+      mediumId: medium && medium.id,
     };
     dispatch(createCustomer(data));
+  };
+
+  const mediaUpload = (acceptedFiles, rejectedFiles) => {
+    const config = {
+      bucketName: window.AWS_BUCKET_NAME,
+      region: window.AWS_REGION,
+      accessKeyId: window.AWS_ACCESS_ID,
+      secretAccessKey: window.AWS_ACCESS_KEY,
+      s3Url: 'https://uber-eats-media.s3.amazonaws.com',
+    };
+
+    const s3 = new S3(config);
+
+    setIsUploading(true);
+
+    if (acceptedFiles.length > 0) {
+      s3.uploadFile(acceptedFiles[0], acceptedFiles[0].name)
+        .then((res) => {
+          dispatch(notifyInfo(`File ${res.key} uploaded...`));
+
+          if (res.status == 204) {
+            dispatch(createCustomerMedium({ alt_text: res.key, url: res.location }));
+          }
+          setIsUploading(false);
+        })
+        .catch((err) => {
+          console.log(err);
+          dispatch(notifyError(`Uploading File Failed`, err.status));
+        });
+    }
   };
 
   return (
@@ -136,12 +176,21 @@ function CustomerDetails({ loginDetails }) {
           Save
         </Button>
       </div>
+      {/* TODO: after upload the form fields are set to NULL */}
       <div className={imgContainer}>
-        <Card
-          overrides={{ Root: { style: { width: '512px' } } }}
-          headerImage={'https://source.unsplash.com/user/erondu/700x400'}
-          title="Profile Picture"
-        ></Card>
+        {medium && medium.id && medium.id !== 0 ? (
+          <Card
+            overrides={{ Root: { style: { width: '512px' } } }}
+            headerImage={medium.url}
+            title="Profile Picture"
+          ></Card>
+        ) : (
+          <FileUploader
+            onCancel={() => setIsUploading(false)}
+            onDrop={mediaUpload}
+            progressMessage={isUploading ? `Uploading... hang tight.` : ''}
+          />
+        )}
       </div>
     </div>
   );

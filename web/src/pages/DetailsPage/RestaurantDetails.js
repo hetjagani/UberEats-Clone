@@ -7,8 +7,13 @@ import { Button, SIZE } from 'baseui/button';
 import { Textarea } from 'baseui/textarea';
 import { Display4 } from 'baseui/typography';
 import { Card } from 'baseui/card';
-import { createRestaurant } from '../../actions/restaurants';
-import { useDispatch } from 'react-redux';
+import { createRestaurant, createRestaurantMedia } from '../../actions/restaurants';
+import { useDispatch, useSelector } from 'react-redux';
+import { FileUploader } from 'baseui/file-uploader';
+import S3 from 'react-aws-s3';
+import { notifyError, notifyInfo } from '../../actions/notify';
+import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a loader
+import { Carousel } from 'react-responsive-carousel';
 
 const RestaurantDetails = ({ loginDetails }) => {
   const [css, theme] = useStyletron();
@@ -27,6 +32,7 @@ const RestaurantDetails = ({ loginDetails }) => {
   });
   const imgContainer = css({
     marginLeft: '50px',
+    width: '30vw',
   });
 
   const cityOpts = [
@@ -47,6 +53,10 @@ const RestaurantDetails = ({ loginDetails }) => {
 
   const countryOpts = [{ id: 'United States', country: 'United States' }];
 
+  const media = useSelector((state) => {
+    return state.restaurants.media;
+  });
+
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [address, setAddress] = useState('');
@@ -59,9 +69,18 @@ const RestaurantDetails = ({ loginDetails }) => {
   const [foodType, setFoodType] = useState([]);
   const [resType, setResType] = useState([]);
 
+  const [isUploading, setIsUploading] = React.useState(false);
+
   const dispatch = useDispatch();
 
   const saveRestaurantDetails = () => {
+    let mediaArr = [];
+    if (media.length > 0) {
+      media.forEach((m) => {
+        mediaArr.push(m.id);
+      });
+    }
+
     const data = {
       id: loginDetails.id,
       name,
@@ -75,9 +94,40 @@ const RestaurantDetails = ({ loginDetails }) => {
       time_close: timeClose,
       food_type: foodType[0] && foodType[0].id,
       restaurant_type: resType[0] && resType[0].id,
-      media: [],
+      media: mediaArr,
     };
+
     dispatch(createRestaurant(data));
+  };
+
+  const mediaUpload = (acceptedFiles, rejectedFiles) => {
+    const config = {
+      bucketName: window.AWS_BUCKET_NAME,
+      region: window.AWS_REGION,
+      accessKeyId: window.AWS_ACCESS_ID,
+      secretAccessKey: window.AWS_ACCESS_KEY,
+      s3Url: 'https://uber-eats-media.s3.amazonaws.com',
+    };
+
+    const s3 = new S3(config);
+
+    setIsUploading(true);
+
+    acceptedFiles.forEach((file) => {
+      s3.uploadFile(file, file.name)
+        .then((res) => {
+          dispatch(notifyInfo(`File ${res.key} uploaded...`));
+
+          if (res.status == 204) {
+            dispatch(createRestaurantMedia({ alt_text: res.key, url: res.location }));
+          }
+          setIsUploading(false);
+        })
+        .catch((err) => {
+          console.log(err);
+          dispatch(notifyError(`Uploading File Failed`, err.status));
+        });
+    });
   };
 
   return (
@@ -200,11 +250,22 @@ const RestaurantDetails = ({ loginDetails }) => {
       </div>
 
       <div className={imgContainer}>
-        <Card
-          overrides={{ Root: { style: { width: '512px' } } }}
-          headerImage={'https://source.unsplash.com/user/erondu/700x400'}
-          title="Profile Picture"
-        ></Card>
+        <Carousel $style={{ width: '80%' }}>
+          {media &&
+            media.length > 0 &&
+            media.map((m) => {
+              return (
+                <div key={m.id}>
+                  <img src={m.url} alt={m.alt_text} width="500" />
+                </div>
+              );
+            })}
+        </Carousel>
+        <FileUploader
+          onCancel={() => setIsUploading(false)}
+          onDrop={mediaUpload}
+          progressMessage={isUploading ? `Uploading... hang tight.` : ''}
+        />
       </div>
     </div>
   );

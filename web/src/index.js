@@ -12,15 +12,13 @@ import reportWebVitals from './reportWebVitals';
 const engine = new Styletron();
 
 ReactDOM.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <StyletronProvider value={engine}>
-        <BaseProvider theme={LightTheme}>
-          <App />
-        </BaseProvider>
-      </StyletronProvider>
-    </Provider>
-  </React.StrictMode>,
+  <Provider store={store}>
+    <StyletronProvider value={engine}>
+      <BaseProvider theme={LightTheme}>
+        <App />
+      </BaseProvider>
+    </StyletronProvider>
+  </Provider>,
   document.getElementById('root'),
 );
 
