@@ -13,7 +13,7 @@ const getLoginDetails = () => {
     const tokendata = jwt.decode(token);
     return tokendata;
   } else {
-    return null;
+    return {};
   }
 };
 

@@ -6,7 +6,7 @@ import { Client as Styletron } from 'styletron-engine-atomic';
 import { Provider as StyletronProvider } from 'styletron-react';
 import store from './store';
 import { Provider } from 'react-redux';
-import { LightTheme, BaseProvider } from 'baseui';
+import { LightTheme, BaseProvider, DarkTheme } from 'baseui';
 import reportWebVitals from './reportWebVitals';
 import axios from 'axios';
 

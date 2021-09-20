@@ -2,6 +2,7 @@ import { useStyletron } from 'baseui';
 import React from 'react';
 import CustomerDetails from './CustomerDetails';
 import RestaurantDetails from './RestaurantDetails';
+import withAuth from '../AuthPage/withAuth';
 
 const DetailsPage = ({ loginDetails }) => {
   const [css, theme] = useStyletron();
@@ -38,4 +39,4 @@ const DetailsPage = ({ loginDetails }) => {
   );
 };
 
-export default DetailsPage;
+export default withAuth(DetailsPage);
