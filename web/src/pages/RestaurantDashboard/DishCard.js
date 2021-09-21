@@ -10,8 +10,12 @@ import { Select } from 'baseui/select';
 import { FileUploader } from 'baseui/file-uploader';
 import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a loader
 import { Carousel } from 'react-responsive-carousel';
+import S3 from 'react-aws-s3';
+import { notifyError, notifyInfo } from '../../actions/notify';
+import { clearDishMedia, createDishMedia, updateRestaurantDish } from '../../actions/restaurants';
+import { useDispatch } from 'react-redux';
 
-const DishCard = ({ dish, editable }) => {
+const DishCard = ({ dish, editable, resID }) => {
   const [css] = useStyletron();
   const imgContainer = css({
     display: 'flex',
@@ -35,7 +39,60 @@ const DishCard = ({ dish, editable }) => {
   const [price, setPrice] = useState(dish.price);
   const [foodType, setFoodType] = useState([{ id: dish.food_type }]);
   const [category, setCategory] = useState([{ id: dish.category }]);
-  const [media, setMedia] = useState(dish.media);
+
+  const [isUploading, setIsUploading] = useState(false);
+  const dispatch = useDispatch();
+
+  const mediaUpload = (acceptedFiles, rejectedFiles) => {
+    const config = {
+      bucketName: window.AWS_BUCKET_NAME,
+      region: window.AWS_REGION,
+      accessKeyId: window.AWS_ACCESS_ID,
+      secretAccessKey: window.AWS_ACCESS_KEY,
+      s3Url: 'https://uber-eats-media.s3.amazonaws.com',
+    };
+
+    const s3 = new S3(config);
+
+    setIsUploading(true);
+
+    acceptedFiles.forEach((file) => {
+      s3.uploadFile(file, file.name)
+        .then((res) => {
+          dispatch(notifyInfo(`File ${res.key} uploaded...`));
+
+          if (res.status == 204) {
+            dispatch(createDishMedia({ alt_text: res.key, url: res.location }, dish.id));
+          }
+          setIsUploading(false);
+        })
+        .catch((err) => {
+          console.log(err);
+          dispatch(notifyError(`Uploading File Failed`, err.status));
+        });
+    });
+  };
+
+  const clearMedia = () => {
+    dispatch(clearDishMedia(dish.id));
+  };
+
+  const saveDish = () => {
+    let mediaArr = [];
+    dish.media.forEach((m) => {
+      mediaArr.push(m.id);
+    });
+    const data = {
+      name,
+      description,
+      price,
+      food_type: foodType[0] && foodType[0].id,
+      category: category[0] && category[0].id,
+      media: mediaArr,
+    };
+    console.log(data)
+    dispatch(updateRestaurantDish(data, resID, dish.id));
+  };
 
   return (
     <>
@@ -145,8 +202,13 @@ const DishCard = ({ dish, editable }) => {
               </Carousel>
             </div>
             <div style={{ width: '80%', margin: '20px' }}>
-              <FileUploader />
+              <FileUploader
+                onCancel={() => setIsUploading(false)}
+                onDrop={mediaUpload}
+                progressMessage={isUploading ? `Uploading... hang tight.` : ''}
+              />
             </div>
+            <Button onClick={clearMedia}>Clear Images</Button>
           </div>
           <ModalButton
             kind="minimal"
@@ -156,7 +218,7 @@ const DishCard = ({ dish, editable }) => {
           >
             CANCEL
           </ModalButton>
-          <ModalButton>SAVE</ModalButton>
+          <ModalButton onClick={saveDish}>SAVE</ModalButton>
         </ModalFooter>
       </Modal>
     </>

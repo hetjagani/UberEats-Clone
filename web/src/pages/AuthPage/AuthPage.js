@@ -53,13 +53,6 @@ const AuthPage = ({ flow, role, ...props }) => {
     if (email && email != '') {
       setEmail(email);
     }
-
-    const ld = getLoginDetails();
-    if (ld.role === 'customer') {
-      window.location.href = '/restaurants';
-    } else if (ld.role === 'restaurant') {
-      window.location.href = '/dashboard';
-    }
   }, []);
 
   const dispatch = useDispatch();
@@ -103,16 +96,20 @@ const AuthPage = ({ flow, role, ...props }) => {
 
         setLoginRole(tokenData.role);
 
-        if (tokenData.role === 'customer') {
-          // show restaurants page after login
-          dispatch(fetchAuthCustomer(tokenData.id, token)).then(() => {
-            setIsAuthenticated(true);
-          });
+        if (flow === 'login') {
+          if (tokenData.role === 'customer') {
+            // show restaurants page after login
+            dispatch(fetchAuthCustomer(tokenData.id, token)).then(() => {
+              setIsAuthenticated(true);
+            });
+          } else {
+            // show user's restaurant details page
+            dispatch(fetchAuthRestaurant(tokenData.id, token)).then(() => {
+              setIsAuthenticated(true);
+            });
+          }
         } else {
-          // show user's restaurant details page
-          dispatch(fetchAuthRestaurant(tokenData.id, token)).then(() => {
-            setIsAuthenticated(true);
-          });
+          setIsAuthenticated(true);
         }
       })
       .catch((err) => {

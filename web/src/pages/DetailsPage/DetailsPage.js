@@ -39,4 +39,4 @@ const DetailsPage = ({ loginDetails }) => {
   );
 };
 
-export default withAuth(DetailsPage);
+export default withAuth(DetailsPage, 'any');

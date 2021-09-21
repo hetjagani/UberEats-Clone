@@ -33,7 +33,13 @@ const RestaurantDashboard = () => {
     justifyContent: 'center',
   };
 
-  const loginRestaurant = useSelector((state) => state.restaurants.loginRestaurant);
+  const { loginRestaurant, media, dishes } = useSelector((state) => {
+    return {
+      loginRestaurant: state.restaurants.loginRestaurant,
+      media: state.restaurants.media,
+      dishes: state.restaurants.dishes,
+    };
+  });
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
@@ -48,9 +54,9 @@ const RestaurantDashboard = () => {
             showThumbs={false}
             infiniteLoop={true}
           >
-            {loginRestaurant.media &&
-              loginRestaurant.media.length > 0 &&
-              loginRestaurant.media.map((m) => {
+            {media &&
+              media.length > 0 &&
+              media.map((m) => {
                 return (
                   <div key={m.id}>
                     <img src={m.url} alt={m.alt_text} width="500" />
@@ -85,11 +91,11 @@ const RestaurantDashboard = () => {
       </div>
       <div style={{ width: '90vw' }}>
         <FlexGrid flexGridColumnCount={3} flexGridColumnGap="scale800" flexGridRowGap="scale800">
-          {loginRestaurant.dishes.length > 0 &&
-            loginRestaurant.dishes.map((dish) => {
+          {dishes.length > 0 &&
+            dishes.map((dish) => {
               return (
                 <FlexGridItem {...itemProps} key={dish.id}>
-                  <DishCard dish={dish} editable={true} />
+                  <DishCard dish={dish} editable={true} resID={loginRestaurant.id} />
                 </FlexGridItem>
               );
             })}

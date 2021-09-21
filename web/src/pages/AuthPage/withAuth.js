@@ -13,6 +13,8 @@ const withAuth = (WrappedComponent, ar) => {
       return <WrappedComponent {...props} />;
     } else if (role === 'restaurant' && role === ar) {
       return <WrappedComponent {...props} />;
+    } else if (ar === 'any') {
+      return <WrappedComponent {...props} />;
     } else {
       return <div>Unauthorized</div>;
     }

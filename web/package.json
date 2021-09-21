@@ -21,6 +21,7 @@
     "react-toastify": "^8.0.2",
     "redux": "^4.1.1",
     "redux-devtools-extension": "^2.13.9",
+    "redux-persist": "^6.0.0",
     "redux-thunk": "^2.3.0",
     "styletron-engine-atomic": "^1.4.8",
     "styletron-react": "^6.0.1",

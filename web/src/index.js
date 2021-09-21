@@ -4,22 +4,27 @@ import './index.css';
 import App from './App';
 import { Client as Styletron } from 'styletron-engine-atomic';
 import { Provider as StyletronProvider } from 'styletron-react';
-import store from './store';
+import createStore from './store';
 import { Provider } from 'react-redux';
 import { LightTheme, BaseProvider, DarkTheme } from 'baseui';
 import reportWebVitals from './reportWebVitals';
 import axios from 'axios';
+import { PersistGate } from 'redux-persist/es/integration/react';
 
 const engine = new Styletron();
 axios.defaults.baseURL = window.BACKEND_API_URL;
 
+const { store, persistor } = createStore();
+
 ReactDOM.render(
   <Provider store={store}>
-    <StyletronProvider value={engine}>
-      <BaseProvider theme={LightTheme}>
-        <App />
-      </BaseProvider>
-    </StyletronProvider>
+    <PersistGate loading={null} persistor={persistor}>
+      <StyletronProvider value={engine}>
+        <BaseProvider theme={LightTheme}>
+          <App />
+        </BaseProvider>
+      </StyletronProvider>
+    </PersistGate>
   </Provider>,
   document.getElementById('root'),
 );
