@@ -4,7 +4,7 @@ import CustomerDetails from './CustomerDetails';
 import RestaurantDetails from './RestaurantDetails';
 import withAuth from '../AuthPage/withAuth';
 
-const DetailsPage = ({ loginDetails }) => {
+const DetailsPage = ({ loginDetails, update }) => {
   const [css, theme] = useStyletron();
   const container = css({
     display: 'flex',
@@ -31,9 +31,9 @@ const DetailsPage = ({ loginDetails }) => {
       </div>
 
       {loginDetails.role === 'customer' ? (
-        <CustomerDetails loginDetails={loginDetails} />
+        <CustomerDetails loginDetails={loginDetails}  update={update}/>
       ) : (
-        <RestaurantDetails loginDetails={loginDetails} />
+        <RestaurantDetails loginDetails={loginDetails} update={update} />
       )}
     </div>
   );

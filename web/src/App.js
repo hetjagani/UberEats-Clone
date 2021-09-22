@@ -30,7 +30,16 @@ function App() {
           <Route
             exact
             path="/details"
-            component={(props) => <DetailsPage {...props} loginDetails={{ id, role }} />}
+            component={(props) => (
+              <DetailsPage {...props} loginDetails={{ id, role }} update={false} />
+            )}
+          />
+          <Route
+            exact
+            path="/details/update"
+            component={(props) => (
+              <DetailsPage {...props} loginDetails={{ id, role }} update={true} />
+            )}
           />
           <Route exact path="/restaurants" component={(props) => <div>Restaurants Page</div>} />
           <Route exact path="/dashboard" component={(props) => <RestaurantDashboard />} />

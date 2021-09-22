@@ -1,9 +1,11 @@
 import {
   CLEAR_DISH_MEDIA,
+  CLEAR_RESTAURANT_MEDIA,
   CREATE_DISH_MEDIA,
   CREATE_RESTAURANT,
   CREATE_RESTAURANT_MEDIA,
   FETCH_AUTH_RESTAURANT,
+  UPDATE_RESTAURANT,
   UPDATE_RESTAURANT_DISH,
 } from '../actions/types';
 
@@ -31,10 +33,24 @@ export default (state = initialState, action) => {
         media: action.payload.media,
       };
 
+    case UPDATE_RESTAURANT:
+      return {
+        ...state,
+        loginRestaurant: action.payload,
+        dishes: action.payload.dishes || [],
+        media: action.payload.media,
+      };
+
     case CREATE_RESTAURANT_MEDIA:
       return {
         ...state,
         media: [...state.media, action.payload],
+      };
+
+    case CLEAR_RESTAURANT_MEDIA:
+      return {
+        ...state,
+        media: [],
       };
 
     case UPDATE_RESTAURANT_DISH:

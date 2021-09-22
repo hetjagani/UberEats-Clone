@@ -116,7 +116,10 @@ const updateDishInRestaurant = async (req, res) => {
     return;
   }
 
-  const dbRes = await Dish.findOne({ where: { id: dishID, restaurantId: resID } });
+  const dbRes = await Dish.findOne({
+    where: { id: dishID, restaurantId: resID },
+    include: [Media],
+  });
   if (!dbRes) {
     res.status(404).json({ ...errors.notFound, message: 'dish not found for restaurant' });
     return;
@@ -136,6 +139,8 @@ const updateDishInRestaurant = async (req, res) => {
 
     if (dish.media && dish.media.length > 0) {
       await updatedRes.setMedia(dish.media, { transaction: t });
+    } else {
+      await updatedRes.removeMedia(dbRes.media, { transaction: t });
     }
 
     await t.commit();

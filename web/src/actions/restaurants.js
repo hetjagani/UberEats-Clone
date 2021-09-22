@@ -2,10 +2,12 @@ import axios from 'axios';
 import notify from '../utils/notify';
 import {
   CLEAR_DISH_MEDIA,
+  CLEAR_RESTAURANT_MEDIA,
   CREATE_DISH_MEDIA,
   CREATE_RESTAURANT,
   CREATE_RESTAURANT_MEDIA,
   FETCH_AUTH_RESTAURANT,
+  UPDATE_RESTAURANT,
   UPDATE_RESTAURANT_DISH,
 } from './types';
 
@@ -42,6 +44,23 @@ export const createRestaurant = (data) => {
   };
 };
 
+export const updateRestaurant = (data, id) => {
+  return (dispatch) => {
+    return axios
+      .put(`/restaurants/${id}`, data)
+      .then((res) => {
+        dispatch({
+          type: UPDATE_RESTAURANT,
+          payload: res.data,
+        });
+        notify({ type: 'info', description: 'Updated Restaurant' });
+      })
+      .catch((err) => {
+        notify({ type: 'error', description: JSON.stringify(err.response.data.message) });
+      });
+  };
+};
+
 export const createRestaurantMedia = (data) => {
   return (dispatch) => {
     return axios
@@ -56,6 +75,15 @@ export const createRestaurantMedia = (data) => {
       .catch((err) => {
         notify({ type: 'error', description: JSON.stringify(err.response.data.message) });
       });
+  };
+};
+
+export const clearRestaurantMedia = () => {
+  return (dispatch) => {
+    dispatch({
+      type: CLEAR_RESTAURANT_MEDIA,
+      payload: [],
+    });
   };
 };
 

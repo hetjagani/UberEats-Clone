@@ -1,5 +1,5 @@
 import { useStyletron } from 'baseui';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FormControl } from 'baseui/form-control';
 import { Input, MaskedInput } from 'baseui/input';
 import { Select } from 'baseui/select';
@@ -7,15 +7,21 @@ import { Button, SIZE } from 'baseui/button';
 import { Textarea } from 'baseui/textarea';
 import { Display4 } from 'baseui/typography';
 import { Card } from 'baseui/card';
-import { createRestaurant, createRestaurantMedia } from '../../actions/restaurants';
+import {
+  clearRestaurantMedia,
+  createRestaurant,
+  createRestaurantMedia,
+  updateRestaurant,
+} from '../../actions/restaurants';
 import { useDispatch, useSelector } from 'react-redux';
 import { FileUploader } from 'baseui/file-uploader';
 import S3 from 'react-aws-s3';
 import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a loader
 import { Carousel } from 'react-responsive-carousel';
 import notify from '../../utils/notify';
+import { Redirect } from 'react-router';
 
-const RestaurantDetails = ({ loginDetails }) => {
+const RestaurantDetails = ({ loginDetails, update }) => {
   const [css, theme] = useStyletron();
   const formContainer = css({
     display: 'flex',
@@ -31,6 +37,9 @@ const RestaurantDetails = ({ loginDetails }) => {
     width: '100%',
   });
   const imgContainer = css({
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
     marginLeft: '50px',
     width: '30vw',
   });
@@ -53,8 +62,8 @@ const RestaurantDetails = ({ loginDetails }) => {
 
   const countryOpts = [{ id: 'United States', country: 'United States' }];
 
-  const media = useSelector((state) => {
-    return state.restaurants.media;
+  const { media, loginRestaurant } = useSelector((state) => {
+    return { media: state.restaurants.media, loginRestaurant: state.restaurants.loginRestaurant };
   });
 
   const [name, setName] = useState('');
@@ -69,7 +78,24 @@ const RestaurantDetails = ({ loginDetails }) => {
   const [foodType, setFoodType] = useState([]);
   const [resType, setResType] = useState([]);
 
-  const [isUploading, setIsUploading] = React.useState(false);
+  useEffect(() => {
+    if (update) {
+      setName(loginRestaurant.name);
+      setDescription(loginRestaurant.description);
+      setAddress(loginRestaurant.address);
+      setCity([{ city: loginRestaurant.city }]);
+      setState([{ state: loginRestaurant.state }]);
+      setCountry([{ country: loginRestaurant.country }]);
+      setContactNo(loginRestaurant.contact_no);
+      setTimeOpen(loginRestaurant.time_open);
+      setTimeClose(loginRestaurant.time_close);
+      setFoodType([{ id: loginRestaurant.food_type }]);
+      setResType([{ id: loginRestaurant.restaurant_type }]);
+    }
+  }, []);
+
+  const [isUploading, setIsUploading] = useState(false);
+  const [isChanged, setIsChanged] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -97,7 +123,15 @@ const RestaurantDetails = ({ loginDetails }) => {
       media: mediaArr,
     };
 
-    dispatch(createRestaurant(data));
+    if (update) {
+      dispatch(updateRestaurant(data, data.id)).then(() => {
+        setIsChanged(true);
+      });
+    } else {
+      dispatch(createRestaurant(data)).then(() => {
+        setIsChanged(true);
+      });
+    }
   };
 
   const mediaUpload = (acceptedFiles, rejectedFiles) => {
@@ -116,7 +150,7 @@ const RestaurantDetails = ({ loginDetails }) => {
     acceptedFiles.forEach((file) => {
       s3.uploadFile(file, file.name)
         .then((res) => {
-          notify({type: 'info', description: `File ${res.key} uploaded...`})
+          notify({ type: 'info', description: `File ${res.key} uploaded...` });
 
           if (res.status == 204) {
             dispatch(createRestaurantMedia({ alt_text: res.key, url: res.location }));
@@ -125,10 +159,18 @@ const RestaurantDetails = ({ loginDetails }) => {
         })
         .catch((err) => {
           console.log(err);
-          notify({type: 'error', description: `Uploading File Failed`})
+          notify({ type: 'error', description: `Uploading File Failed` });
         });
     });
   };
+
+  const clearMedia = () => {
+    dispatch(clearRestaurantMedia());
+  };
+
+  if (isChanged) {
+    return <Redirect to="/dashboard" />;
+  }
 
   return (
     <div className={mainContainer}>
@@ -261,6 +303,7 @@ const RestaurantDetails = ({ loginDetails }) => {
               );
             })}
         </Carousel>
+        <Button  className={css({margin: '20px'})} onClick={clearMedia}>Clear Images</Button>
         <FileUploader
           onCancel={() => setIsUploading(false)}
           onDrop={mediaUpload}

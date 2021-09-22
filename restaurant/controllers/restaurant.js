@@ -96,7 +96,7 @@ const updateRestaurantByID = async (req, res) => {
   }
 
   const { user } = req.headers;
-  if (user !== req.params.id) {
+  if (user != id) {
     res.status(400).json({
       ...errors.badRequest,
       message: 'id should be same as logged in user',
@@ -113,7 +113,7 @@ const updateRestaurantByID = async (req, res) => {
 
   const restaurant = req.body;
 
-  const dbRes = await Restaurant.findOne({ where: { id } });
+  const dbRes = await Restaurant.findOne({ where: { id }, include: [Media] });
   if (!dbRes) {
     res.status(404).json(errors.notFound);
     return;
@@ -137,12 +137,14 @@ const updateRestaurantByID = async (req, res) => {
 
     if (restaurant.media && restaurant.media.length > 0) {
       await updatedRes.setMedia(restaurant.media, { transaction: t });
+    } else {
+      await updatedRes.removeMedia(dbRes.media, { transaction: t });
     }
 
     await t.commit();
 
     const result = await Restaurant.findOne(
-      { where: { id: updatedRes.id }, include: Media },
+      { where: { id: updatedRes.id }, include: [Media, { model: Dish, include: Media }] },
       { transaction: t },
     );
 
