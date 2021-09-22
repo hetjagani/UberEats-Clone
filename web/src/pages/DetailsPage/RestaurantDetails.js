@@ -11,9 +11,9 @@ import { createRestaurant, createRestaurantMedia } from '../../actions/restauran
 import { useDispatch, useSelector } from 'react-redux';
 import { FileUploader } from 'baseui/file-uploader';
 import S3 from 'react-aws-s3';
-import { notifyError, notifyInfo } from '../../actions/notify';
 import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a loader
 import { Carousel } from 'react-responsive-carousel';
+import notify from '../../utils/notify';
 
 const RestaurantDetails = ({ loginDetails }) => {
   const [css, theme] = useStyletron();
@@ -116,7 +116,7 @@ const RestaurantDetails = ({ loginDetails }) => {
     acceptedFiles.forEach((file) => {
       s3.uploadFile(file, file.name)
         .then((res) => {
-          dispatch(notifyInfo(`File ${res.key} uploaded...`));
+          notify({type: 'info', description: `File ${res.key} uploaded...`})
 
           if (res.status == 204) {
             dispatch(createRestaurantMedia({ alt_text: res.key, url: res.location }));
@@ -125,7 +125,7 @@ const RestaurantDetails = ({ loginDetails }) => {
         })
         .catch((err) => {
           console.log(err);
-          dispatch(notifyError(`Uploading File Failed`, err.status));
+          notify({type: 'error', description: `Uploading File Failed`})
         });
     });
   };

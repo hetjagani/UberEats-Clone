@@ -1,21 +1,19 @@
-import { useStyletron } from 'baseui';
-import { Button } from 'baseui/button';
-import { Card, StyledAction, StyledBody, StyledThumbnail } from 'baseui/card';
-import { Paragraph1 } from 'baseui/typography';
-import React, { useState } from 'react';
-import { Modal, ModalHeader, ModalBody, ModalFooter, ModalButton, SIZE, ROLE } from 'baseui/modal';
+import React, { useEffect, useState } from 'react';
+import { Modal, ModalHeader, ModalBody, ModalFooter, ModalButton } from 'baseui/modal';
 import { FormControl } from 'baseui/form-control';
 import { Input, MaskedInput } from 'baseui/input';
 import { Select } from 'baseui/select';
 import { FileUploader } from 'baseui/file-uploader';
-import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a loader
-import { Carousel } from 'react-responsive-carousel';
-import S3 from 'react-aws-s3';
-import { clearDishMedia, createDishMedia, updateRestaurantDish } from '../../actions/restaurants';
 import { useDispatch } from 'react-redux';
+import S3 from 'react-aws-s3';
+import { Carousel } from 'react-responsive-carousel';
+import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a loader
+import { useStyletron } from 'baseui';
+import { Button } from 'baseui/button';
+import axios from 'axios';
 import notify from '../../utils/notify';
 
-const DishCard = ({ dish, editable, resID }) => {
+const AddDishModal = ({ isOpen, setIsOpen }) => {
   const [css] = useStyletron();
   const imgContainer = css({
     display: 'flex',
@@ -24,21 +22,16 @@ const DishCard = ({ dish, editable, resID }) => {
     justifyContent: 'center',
   });
 
-  let featuredMediaURL = '';
-  if (dish.media && dish.media.length > 0) {
-    featuredMediaURL = dish.media[0].url;
-  }
-
-  const [isOpen, setIsOpen] = React.useState(false);
   function close() {
     setIsOpen(false);
   }
 
-  const [name, setName] = useState(dish.name);
-  const [description, setDescription] = useState(dish.description);
-  const [price, setPrice] = useState(dish.price);
-  const [foodType, setFoodType] = useState([{ id: dish.food_type }]);
-  const [category, setCategory] = useState([{ id: dish.category }]);
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [price, setPrice] = useState(0.0);
+  const [foodType, setFoodType] = useState([]);
+  const [category, setCategory] = useState([]);
+  const [media, setMedia] = useState([]);
 
   const [isUploading, setIsUploading] = useState(false);
   const dispatch = useDispatch();
@@ -62,24 +55,33 @@ const DishCard = ({ dish, editable, resID }) => {
           notify({ type: 'info', description: `File ${res.key} uploaded...` });
 
           if (res.status == 204) {
-            dispatch(createDishMedia({ alt_text: res.key, url: res.location }, dish.id));
+            axios
+              .post(`/restaurants/media`, { alt_text: res.key, url: res.location })
+              .then((res) => {
+                setMedia([...media, res.data]);
+                setIsOpen(false);
+                notify({ type: 'info', description: 'Added dish media' });
+              })
+              .catch((err) => {
+                notify({ type: 'error', description: err.response && err.response.data.message });
+              });
           }
           setIsUploading(false);
         })
         .catch((err) => {
           console.log(err);
-          notify({ type: 'error', description: `Uploading File Failed` });
+          notify({ type: 'error', description: 'Uploading File Failed' });
         });
     });
   };
 
   const clearMedia = () => {
-    dispatch(clearDishMedia(dish.id));
+    setMedia([]);
   };
 
   const saveDish = () => {
     let mediaArr = [];
-    dish.media.forEach((m) => {
+    media.forEach((m) => {
       mediaArr.push(m.id);
     });
     const data = {
@@ -90,35 +92,11 @@ const DishCard = ({ dish, editable, resID }) => {
       category: category[0] && category[0].id,
       media: mediaArr,
     };
-    dispatch(updateRestaurantDish(data, resID, dish.id)).then(() => {
-      setIsOpen(false);
-    });
+    console.log(data);
   };
 
   return (
-    <>
-      <Card overrides={{ Root: { style: { width: '100%', margin: '10px' } } }} title={dish.name}>
-        <StyledThumbnail src={featuredMediaURL} />
-        <StyledBody>
-          <Paragraph1>{dish.description} </Paragraph1>
-          <Paragraph1>
-            <strong>Price: </strong> ${dish.price} <br />
-            <strong>Food Type: </strong> {dish.food_type} <br />
-            <strong>Category: </strong> {dish.category.replace('_', ' ')}
-          </Paragraph1>
-        </StyledBody>
-        {editable && (
-          <StyledAction>
-            <Button
-              overrides={{ BaseButton: { style: { width: '100%' } } }}
-              onClick={() => setIsOpen(true)}
-            >
-              Edit
-            </Button>
-          </StyledAction>
-        )}
-      </Card>
-
+    <div>
       <Modal
         onClose={close}
         isOpen={isOpen}
@@ -133,7 +111,7 @@ const DishCard = ({ dish, editable, resID }) => {
           },
         }}
       >
-        <ModalHeader>Edit Dish</ModalHeader>
+        <ModalHeader>Create Dish</ModalHeader>
         <ModalBody style={{ flex: '1 1 0' }}>
           <FormControl label={() => 'Name'}>
             <Input value={name} onChange={(e) => setName(e.target.value)} required />
@@ -192,9 +170,9 @@ const DishCard = ({ dish, editable, resID }) => {
                 showThumbs={false}
                 infiniteLoop={true}
               >
-                {dish.media &&
-                  dish.media.length > 0 &&
-                  dish.media.map((m) => {
+                {media &&
+                  media.length > 0 &&
+                  media.map((m) => {
                     return (
                       <div key={m.id}>
                         <img src={m.url} alt={m.alt_text} style={{ width: '50%', height: '50%' }} />
@@ -223,8 +201,10 @@ const DishCard = ({ dish, editable, resID }) => {
           <ModalButton onClick={saveDish}>SAVE</ModalButton>
         </ModalFooter>
       </Modal>
-    </>
+    </div>
   );
 };
 
-export default DishCard;
+export default React.memo(AddDishModal, (prevProps, nextProps) => {
+  return false;
+});

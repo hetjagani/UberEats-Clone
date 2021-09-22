@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { notifyError, notifyInfo } from './notify';
+import notify from '../utils/notify';
 import {
   CLEAR_DISH_MEDIA,
   CREATE_DISH_MEDIA,
@@ -20,7 +20,7 @@ export const fetchAuthRestaurant = (id, token) => {
         });
       })
       .catch((err) => {
-        dispatch(notifyError(JSON.stringify(err.response.data.message), err.response.status));
+        notify({ type: 'error', description: JSON.stringify(err.response.data.message) });
       });
   };
 };
@@ -34,10 +34,10 @@ export const createRestaurant = (data) => {
           type: CREATE_RESTAURANT,
           payload: res.data,
         });
-        dispatch(notifyInfo('Created Restaurant'));
+        notify({ type: 'info', description: 'Created Restaurant' });
       })
       .catch((err) => {
-        dispatch(notifyError(JSON.stringify(err.response.data.message), err.response.status));
+        notify({ type: 'error', description: JSON.stringify(err.response.data.message) });
       });
   };
 };
@@ -51,10 +51,10 @@ export const createRestaurantMedia = (data) => {
           type: CREATE_RESTAURANT_MEDIA,
           payload: res.data,
         });
-        dispatch(notifyInfo('Created Restaurant Media'));
+        notify({ type: 'info', description: 'Created Restaurant Media' });
       })
       .catch((err) => {
-        dispatch(notifyError(JSON.stringify(err.response.data.message), err.response.status));
+        notify({ type: 'error', description: JSON.stringify(err.response.data.message) });
       });
   };
 };
@@ -68,11 +68,10 @@ export const updateRestaurantDish = (data, resID, dishID) => {
           type: UPDATE_RESTAURANT_DISH,
           payload: { dish: res.data, dishID },
         });
-        dispatch(notifyInfo('Updated Restaurant Dish'));
+        notify({ type: 'info', description: 'Updated Restaurant Dish' });
       })
       .catch((err) => {
-        console.log(err);
-        dispatch(notifyError(JSON.stringify(err.response.data.message), err.response.status));
+        notify({ type: 'error', description: JSON.stringify(err.response.data.message) });
       });
   };
 };
@@ -86,10 +85,10 @@ export const createDishMedia = (data, dishID) => {
           type: CREATE_DISH_MEDIA,
           payload: { media: res.data, dishID },
         });
-        dispatch(notifyInfo('Created Dish Media'));
+        notify({ type: 'info', description: 'Created Dish Media' });
       })
       .catch((err) => {
-        dispatch(notifyError(JSON.stringify(err.response.data.message), err.response.status));
+        notify({ type: 'error', description: JSON.stringify(err.response.data.message) });
       });
   };
 };

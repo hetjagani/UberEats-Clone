@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import withAuth from '../AuthPage/withAuth';
 import Header from './Header';
 import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a loader
@@ -10,6 +10,7 @@ import { useSelector } from 'react-redux';
 import { FlexGrid, FlexGridItem } from 'baseui/flex-grid';
 import { Button } from 'baseui/button';
 import DishCard from './DishCard';
+import AddDishModal from './AddDishModal';
 
 const RestaurantDashboard = () => {
   const [css] = useStyletron();
@@ -41,6 +42,8 @@ const RestaurantDashboard = () => {
     };
   });
 
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
       <div className={mainContainer}>
@@ -53,6 +56,7 @@ const RestaurantDashboard = () => {
             interval={5000}
             showThumbs={false}
             infiniteLoop={true}
+            showIndicators={false}
           >
             {media &&
               media.length > 0 &&
@@ -85,7 +89,7 @@ const RestaurantDashboard = () => {
             </Paragraph2>
           </div>
           <div>
-            <Button>Add Dish</Button>
+            <Button onClick={() => setIsOpen(true)}>Add Dish</Button>
           </div>
         </div>
       </div>
@@ -101,8 +105,9 @@ const RestaurantDashboard = () => {
             })}
         </FlexGrid>
       </div>
+      <AddDishModal isOpen={isOpen} setIsOpen={setIsOpen} />
     </div>
   );
 };
 
-export default withAuth(RestaurantDashboard, 'restaurant');
+export default withAuth(React.memo(RestaurantDashboard), 'restaurant');

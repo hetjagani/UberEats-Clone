@@ -1,11 +1,11 @@
 import axios from 'axios';
-import { notifyError, notifyInfo } from './notify';
+import notify from '../utils/notify';
 import { CREATE_CUSTOMER, CREATE_CUSTOMER_MEDIUM, FETCH_AUTH_CUSTOMER } from './types';
 
 export const fetchAuthCustomer = (id, token) => {
   return (dispatch) => {
     return axios
-      .get(`/customers/${id}`, {headers: {Authorization: token}})
+      .get(`/customers/${id}`, { headers: { Authorization: token } })
       .then((res) => {
         dispatch({
           type: FETCH_AUTH_CUSTOMER,
@@ -13,7 +13,7 @@ export const fetchAuthCustomer = (id, token) => {
         });
       })
       .catch((err) => {
-        dispatch(notifyError(JSON.stringify(err.response.data.message), err.response.status));
+        notify({ type: 'error', description: JSON.stringify(err.response.data.message) });
       });
   };
 };
@@ -27,10 +27,10 @@ export const createCustomer = (data) => {
           type: CREATE_CUSTOMER,
           payload: res.data,
         });
-        dispatch(notifyInfo('Created Customer'));
+        notify({ type: 'info', description: 'Created Customer' });
       })
       .catch((err) => {
-        dispatch(notifyError(JSON.stringify(err.response.data.message), err.response.status));
+        notify({ type: 'error', description: JSON.stringify(err.response.data.message) });
       });
   };
 };
@@ -44,10 +44,10 @@ export const createCustomerMedium = (data) => {
           type: CREATE_CUSTOMER_MEDIUM,
           payload: res.data,
         });
-        dispatch(notifyInfo('Created Customer Media'));
+        notify({ type: 'info', description: 'Created Customer Media' });
       })
       .catch((err) => {
-        dispatch(notifyError(JSON.stringify(err.response.data.message), err.response.status));
+        notify({ type: 'error', description: JSON.stringify(err.response.data.message) });
       });
   };
 };

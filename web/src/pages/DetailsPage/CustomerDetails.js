@@ -11,7 +11,7 @@ import { Display4 } from 'baseui/typography';
 import { Card } from 'baseui/card';
 import { FileUploader } from 'baseui/file-uploader';
 import S3 from 'react-aws-s3';
-import { notifyError, notifyInfo } from '../../actions/notify';
+import notify from '../../utils/notify';
 
 function CustomerDetails({ loginDetails }) {
   const [css, theme] = useStyletron();
@@ -96,7 +96,7 @@ function CustomerDetails({ loginDetails }) {
     if (acceptedFiles.length > 0) {
       s3.uploadFile(acceptedFiles[0], acceptedFiles[0].name)
         .then((res) => {
-          dispatch(notifyInfo(`File ${res.key} uploaded...`));
+          notify({type: 'info', description: `File ${res.key} uploded...`})
 
           if (res.status == 204) {
             dispatch(createCustomerMedium({ alt_text: res.key, url: res.location }));
@@ -105,7 +105,7 @@ function CustomerDetails({ loginDetails }) {
         })
         .catch((err) => {
           console.log(err);
-          dispatch(notifyError(`Uploading File Failed`, err.status));
+          notify({type: 'error', description: `Uploading File Failed`})
         });
     }
   };

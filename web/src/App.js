@@ -12,22 +12,6 @@ import RestaurantDashboard from './pages/RestaurantDashboard/RestaurantDashboard
 function App() {
   const { role, id } = getLoginDetails();
 
-  const { type, message, description } = useSelector((state) => state.notifications);
-
-  useEffect(() => {
-    if (type && message && description) {
-      toast[type](`${message} \n${description}`, {
-        position: 'top-right',
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-    }
-  }, [description, type, message]);
-
   return (
     <div>
       <ToastContainer />
