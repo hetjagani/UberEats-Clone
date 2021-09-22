@@ -1,7 +1,7 @@
 import { applyMiddleware, createStore } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import thunk from 'redux-thunk';
-import axiosAuth from './utils/axiosAuth';
+import createAxiosAuthMiddleware from './utils/axiosAuth';
 import rootReducer from './reducers';
 import persistReducer from 'redux-persist/es/persistReducer';
 import persistStore from 'redux-persist/es/persistStore';
@@ -13,10 +13,10 @@ const persistConfig = {
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
-
-const middleware = [thunk];
+const axiosAuth = createAxiosAuthMiddleware();
 
 export default () => {
+  const middleware = [thunk];
   const store = createStore(
     persistedReducer,
     composeWithDevTools(applyMiddleware(...middleware, axiosAuth)),

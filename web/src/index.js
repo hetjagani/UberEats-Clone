@@ -12,7 +12,6 @@ import axios from 'axios';
 import { PersistGate } from 'redux-persist/es/integration/react';
 
 const engine = new Styletron();
-axios.defaults.baseURL = window.BACKEND_API_URL;
 
 const { store, persistor } = createStore();
 

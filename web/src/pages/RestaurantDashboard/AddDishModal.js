@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter, ModalButton } from 'baseui/modal';
 import { FormControl } from 'baseui/form-control';
-import { Input, MaskedInput } from 'baseui/input';
+import { Input } from 'baseui/input';
 import { Select } from 'baseui/select';
 import { FileUploader } from 'baseui/file-uploader';
-import { useDispatch } from 'react-redux';
 import S3 from 'react-aws-s3';
 import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a loader
@@ -34,7 +33,6 @@ const AddDishModal = ({ isOpen, setIsOpen }) => {
   const [media, setMedia] = useState([]);
 
   const [isUploading, setIsUploading] = useState(false);
-  const dispatch = useDispatch();
 
   const mediaUpload = (acceptedFiles, rejectedFiles) => {
     const config = {

@@ -21,6 +21,5 @@ function createAxiosAuthMiddleware() {
     };
 }
 
-const axiosAuth = createAxiosAuthMiddleware();
 
-export default axiosAuth;
+export default createAxiosAuthMiddleware;
