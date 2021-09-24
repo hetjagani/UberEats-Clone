@@ -53,7 +53,7 @@ const RestaurantsGrid = () => {
   const history = useHistory();
 
   const gotoDetails = (id) => {
-    history.push(`/restaurants/${id}`)
+    history.push(`/restaurants/${id}`);
   };
 
   return (
@@ -84,7 +84,11 @@ const RestaurantsGrid = () => {
                       <BiTime size="20" className={logoStyle} /> {res.time_open} - {res.time_close}
                     </Paragraph1>
                     <Paragraph1 className={paraStyle}>
-                      <BiFoodTag size="20" color="red" className={logoStyle} />{' '}
+                      <BiFoodTag
+                        size="20"
+                        color={res.food_type == 'veg' ? 'green' : 'red'}
+                        className={logoStyle}
+                      />
                       <strong>{res.restaurant_type}</strong>
                     </Paragraph1>
                   </StyledBody>
