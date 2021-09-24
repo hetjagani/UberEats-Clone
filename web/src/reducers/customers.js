@@ -2,8 +2,8 @@ import { CREATE_CUSTOMER, CREATE_CUSTOMER_MEDIUM, FETCH_AUTH_CUSTOMER } from '..
 
 const initialState = {
   loginCustomer: {},
-  customer: {},
   medium: {},
+  addresses: [],
 };
 
 export default (state = initialState, action) => {
@@ -12,13 +12,16 @@ export default (state = initialState, action) => {
       return {
         ...state,
         loginCustomer: action.payload,
+        medium: action.payload.medium,
+        addresses: action.payload.addresses,
       };
 
     case CREATE_CUSTOMER:
       return {
         ...state,
         loginCustomer: action.payload,
-        customer: action.payload,
+        medium: action.payload.medium,
+        addresses: action.payload.addresses,
       };
 
     case CREATE_CUSTOMER_MEDIUM:

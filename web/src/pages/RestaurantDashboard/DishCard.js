@@ -97,7 +97,16 @@ const DishCard = ({ dish, editable, resID }) => {
 
   return (
     <>
-      <Card overrides={{ Root: { style: { width: '100%', margin: '10px' } } }} title={dish.name}>
+      <Card
+        overrides={{
+          Root: { style: { width: '450px', height: 'fit-content' } },
+          HeaderImage: {
+            style: { height: '150px', width: '500px', objectFit: 'cover' },
+          },
+          // Body: { style: { height: 'fit-content' } },
+        }}
+        title={dish.name}
+      >
         <StyledThumbnail src={featuredMediaURL} />
         <StyledBody>
           <Paragraph1>{dish.description} </Paragraph1>

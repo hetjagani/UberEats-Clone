@@ -11,7 +11,7 @@ import { ANCHOR, Drawer } from 'baseui/drawer';
 import Menu from 'baseui/icon/menu';
 import { Radio, RadioGroup } from 'baseui/radio';
 import { FaShoppingCart } from 'react-icons/fa';
-import { Button, SIZE, SHAPE } from 'baseui/button';
+import { Button, SIZE, SHAPE, KIND } from 'baseui/button';
 import { useStyletron } from 'baseui';
 import { useSelector } from 'react-redux';
 import { Avatar } from 'baseui/avatar';
@@ -44,9 +44,10 @@ const NavBar = () => {
   const [resType, setResType] = useState('delivery');
   const [city, setCity] = useState([]);
 
-  const { loginCustomer } = useSelector((state) => {
+  const { loginCustomer, medium } = useSelector((state) => {
     return {
       loginCustomer: state.customers.loginCustomer,
+      medium: state.customers.medium,
     };
   });
 
@@ -68,7 +69,7 @@ const NavBar = () => {
             }}
           >
             <div>
-              <Avatar name={loginCustomer.name} size="scale1600" />
+              <Avatar name={loginCustomer.name} size="scale1600" src={medium && medium.url} />
             </div>
             <div>
               <div>
@@ -81,13 +82,41 @@ const NavBar = () => {
               </div>
             </div>
           </div>
-          <div style={{ display: 'flex', flexDirection:'column', alignItems: 'center', width: '100%' }}>
-            <ListItem artwork={(props) => <RiFileList3Fill size={25} />}>
-              <ListItemLabel>Orders</ListItemLabel>
-            </ListItem>
-            <ListItem artwork={(props) => <MdFavorite size={25} />}>
-              <ListItemLabel>Favourites</ListItemLabel>
-            </ListItem>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: '100%',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                width: '100%',
+                height: '70vh',
+              }}
+            >
+              <ListItem artwork={(props) => <RiFileList3Fill size={25} />}>
+                <ListItemLabel>Orders</ListItemLabel>
+              </ListItem>
+              <ListItem artwork={(props) => <MdFavorite size={25} />}>
+                <ListItemLabel>Favourites</ListItemLabel>
+              </ListItem>
+            </div>
+            <div style={{ width: '100%' }}>
+              <Button
+                className={css({ width: '100%' })}
+                onClick={() => alert('click')}
+                kind={KIND.primary}
+                size={SIZE.large}
+              >
+                Sign Out
+              </Button>
+            </div>
           </div>
         </div>
       </Drawer>

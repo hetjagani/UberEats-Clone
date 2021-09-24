@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import 'react-toastify/dist/ReactToastify.css';
 import RestaurantDashboard from './pages/RestaurantDashboard/RestaurantDashboard';
 import RestaurantsPage from './pages/RestaurantsPage/RestaurantsPage';
+import RestaurantDetails from './pages/RestaurantsPage/RestaurantDetails';
 
 function App() {
   const { role, id } = getLoginDetails();
@@ -42,6 +43,7 @@ function App() {
               <DetailsPage {...props} loginDetails={{ id, role }} update={true} />
             )}
           />
+          <Route exact path="/restaurants/:id" component={(props) => <RestaurantDetails />} />
           <Route exact path="/restaurants" component={(props) => <RestaurantsPage />} />
           <Route exact path="/dashboard" component={(props) => <RestaurantDashboard />} />
         </Switch>

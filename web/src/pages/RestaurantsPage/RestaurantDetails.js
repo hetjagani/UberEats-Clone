@@ -1,23 +1,25 @@
-import React, { useMemo, useState } from 'react';
-import withAuth from '../AuthPage/withAuth';
-import Header from './Header';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router';
 import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a loader
 import './carousel_override.css';
 import { Carousel } from 'react-responsive-carousel';
 import { useStyletron } from 'baseui';
 import { H5, Paragraph2 } from 'baseui/typography';
-import { useSelector } from 'react-redux';
 import { FlexGrid, FlexGridItem } from 'baseui/flex-grid';
 import { Button } from 'baseui/button';
-import DishCard from './DishCard';
-import AddDishModal from './AddDishModal';
+import DishCard from './../RestaurantDashboard/DishCard';
+import axios from 'axios';
+import notify from '../../utils/notify';
+import NavBar from './NavBar';
 
-const RestaurantDashboard = () => {
+const RestaurantDetails = () => {
+  const { id } = useParams();
+
   const [css] = useStyletron();
   const imgContainer = css({
     display: 'flex',
     justifyContent: 'center',
-    marginTop: '80px',
+    marginTop: '30px',
   });
 
   const mainContainer = css({
@@ -34,21 +36,28 @@ const RestaurantDashboard = () => {
     justifyContent: 'center',
   };
 
-  const { loginRestaurant, media, dishes } = useSelector((state) => {
-    return {
-      loginRestaurant: state.restaurants.loginRestaurant,
-      media: state.restaurants.media,
-      dishes: state.restaurants.dishes,
-    };
-  });
+  const [restaurant, setRestaurant] = useState({});
+  const [media, setMedia] = useState({});
+  const [dishes, setDishes] = useState({});
 
-  const [isOpen, setIsOpen] = useState(false);
+  useEffect(() => {
+    axios
+      .get(`/restaurants/${id}`)
+      .then((res) => {
+        setRestaurant(res.data);
+        setMedia(res.data.media);
+        setDishes(res.data.dishes);
+      })
+      .catch((err) => {
+        console.error(err);
+        notify({ type: 'error', description: 'Error fetching restaurant' });
+      });
+  }, []);
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
       <div className={mainContainer}>
-        <Header />
-
+        <NavBar />
         <div className={imgContainer}>
           <Carousel
             autoPlay={true}
@@ -80,16 +89,13 @@ const RestaurantDashboard = () => {
         >
           <div className={css({ width: '80vw' })}>
             <H5>
-              {loginRestaurant.name} ({loginRestaurant.restaurant_type.toUpperCase()})
+              {restaurant.name} ({restaurant.restaurant_type})
             </H5>
-            <Paragraph2>{loginRestaurant.description}</Paragraph2>
-            <Paragraph2>{loginRestaurant.address}</Paragraph2>
+            <Paragraph2>{restaurant.description}</Paragraph2>
+            <Paragraph2>{restaurant.address}</Paragraph2>
             <Paragraph2>
-              {loginRestaurant.city} | {loginRestaurant.state} | {loginRestaurant.country}
+              {restaurant.city} | {restaurant.state} | {restaurant.country}
             </Paragraph2>
-          </div>
-          <div>
-            <Button onClick={() => setIsOpen(true)}>Add Dish</Button>
           </div>
         </div>
       </div>
@@ -98,16 +104,21 @@ const RestaurantDashboard = () => {
           {dishes.length > 0 &&
             dishes.map((dish) => {
               return (
-                <FlexGridItem {...itemProps} key={dish.id}>
-                  <DishCard dish={dish} editable={true} resID={loginRestaurant.id} />
+                <FlexGridItem
+                  onClick={() => {
+                    alert(`open dish modal for ${dish.id} ${dish.name}`);
+                  }}
+                  {...itemProps}
+                  key={dish.id}
+                >
+                  <DishCard dish={dish} editable={false} resID={restaurant.id} />
                 </FlexGridItem>
               );
             })}
         </FlexGrid>
       </div>
-      <AddDishModal isOpen={isOpen} setIsOpen={setIsOpen} />
     </div>
   );
 };
 
-export default withAuth(React.memo(RestaurantDashboard), 'restaurant');
+export default RestaurantDetails;
