@@ -11,6 +11,8 @@ import DishCard from './../RestaurantDashboard/DishCard';
 import axios from 'axios';
 import notify from '../../utils/notify';
 import NavBar from './NavBar';
+import DishDetails from './DishDetails';
+import withAuth from '../AuthPage/withAuth';
 
 const RestaurantDetails = () => {
   const { id } = useParams();
@@ -105,13 +107,10 @@ const RestaurantDetails = () => {
             dishes.map((dish) => {
               return (
                 <FlexGridItem
-                  onClick={() => {
-                    alert(`open dish modal for ${dish.id} ${dish.name}`);
-                  }}
                   {...itemProps}
                   key={dish.id}
                 >
-                  <DishCard dish={dish} editable={false} resID={restaurant.id} />
+                  <DishDetails dish={dish} resId={restaurant.id} />
                 </FlexGridItem>
               );
             })}
@@ -121,4 +120,4 @@ const RestaurantDetails = () => {
   );
 };
 
-export default RestaurantDetails;
+export default withAuth(RestaurantDetails, "customer");

@@ -18,6 +18,7 @@ import { Avatar } from 'baseui/avatar';
 import { ListItem, ListItemLabel, ARTWORK_SIZES } from 'baseui/list';
 import { RiFileList3Fill } from 'react-icons/ri';
 import { MdFavorite } from 'react-icons/md';
+import { useHistory } from 'react-router';
 
 const NavBar = () => {
   const [css] = useStyletron();
@@ -44,12 +45,15 @@ const NavBar = () => {
   const [resType, setResType] = useState('delivery');
   const [city, setCity] = useState([]);
 
-  const { loginCustomer, medium } = useSelector((state) => {
+  const { loginCustomer, medium, cartDishes } = useSelector((state) => {
     return {
       loginCustomer: state.customers.loginCustomer,
       medium: state.customers.medium,
+      cartDishes: state.cart.dishes,
     };
   });
+
+  const history = useHistory();
 
   return (
     <div>
@@ -186,9 +190,8 @@ const NavBar = () => {
             />
           </NavigationItem>
           <NavigationItem>
-            <Button onClick={() => alert('show cart')} size={SIZE.compact} shape={SHAPE.pill}>
-              {' '}
-              <FaShoppingCart style={{ marginRight: '10px' }} /> 0{' '}
+            <Button onClick={() => {history.push("/cart")}} size={SIZE.compact} shape={SHAPE.pill}>
+              <FaShoppingCart style={{ marginRight: '10px' }} /> {cartDishes.length}
             </Button>
           </NavigationItem>
         </NavigationList>
