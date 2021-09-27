@@ -6,8 +6,6 @@ import { Carousel } from 'react-responsive-carousel';
 import { useStyletron } from 'baseui';
 import { H5, Paragraph2 } from 'baseui/typography';
 import { FlexGrid, FlexGridItem } from 'baseui/flex-grid';
-import { Button } from 'baseui/button';
-import DishCard from './../RestaurantDashboard/DishCard';
 import axios from 'axios';
 import notify from '../../utils/notify';
 import NavBar from './NavBar';

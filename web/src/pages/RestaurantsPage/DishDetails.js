@@ -31,7 +31,9 @@ const DishDetails = ({ dish, resId }) => {
       notes,
     };
 
-    dispatch(addDishToCart(data));
+    dispatch(addDishToCart(data)).then(() => {
+      setIsOpen(false);
+    });
   };
 
   function close() {
@@ -49,7 +51,7 @@ const DishDetails = ({ dish, resId }) => {
         overrides={{
           Dialog: {
             style: {
-              width: '80vw',
+              width: '60vw',
               display: 'flex',
               flexDirection: 'column',
             },

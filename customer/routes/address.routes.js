@@ -20,7 +20,6 @@ const bodyValidators = () => [
   body('zipcode').isInt(),
   body('city').exists().isString(),
   body('country').exists().isString(),
-  body('customerId').exists().isNumeric(),
 ];
 
 /**

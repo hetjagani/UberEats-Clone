@@ -258,7 +258,7 @@ const placeOrder = async (req, res) => {
 
   const { orderId, addressId } = req.body;
 
-  const order = await Order.findOne({ where: { id: orderId, customerId: user } });
+  const order = await Order.findOne({ where: { id: orderId, customerId: user, status: 'INIT' } });
   if (!order) {
     res.status(404).json(errors.notFound);
     return;

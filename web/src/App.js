@@ -10,6 +10,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import RestaurantDashboard from './pages/RestaurantDashboard/RestaurantDashboard';
 import RestaurantsPage from './pages/RestaurantsPage/RestaurantsPage';
 import RestaurantDetails from './pages/RestaurantsPage/RestaurantDetails';
+import MyCartPage from './pages/MyCartPage/MyCartPage';
+import CheckoutPage from './pages/CheckoutPage/CheckoutPage';
 
 function App() {
   const { role, id } = getLoginDetails();
@@ -45,6 +47,8 @@ function App() {
           />
           <Route exact path="/restaurants/:id" component={(props) => <RestaurantDetails />} />
           <Route exact path="/restaurants" component={(props) => <RestaurantsPage />} />
+          <Route exact path="/orders/:id" component={(props) => <CheckoutPage />} />
+          <Route exact path="/cart" component={(props) => <MyCartPage />} />
           <Route exact path="/dashboard" component={(props) => <RestaurantDashboard />} />
         </Switch>
       </Router>
