@@ -11,8 +11,10 @@ import { useStyletron } from 'baseui';
 import { Button } from 'baseui/button';
 import axios from 'axios';
 import notify from '../../utils/notify';
+import { useDispatch } from 'react-redux';
+import { createRestaurantDish } from '../../actions/restaurants';
 
-const AddDishModal = ({ isOpen, setIsOpen }) => {
+const AddDishModal = ({ isOpen, setIsOpen, resID }) => {
   const [css] = useStyletron();
   const imgContainer = css({
     display: 'flex',
@@ -77,6 +79,8 @@ const AddDishModal = ({ isOpen, setIsOpen }) => {
     setMedia([]);
   };
 
+  const dispatch = useDispatch();
+
   const saveDish = () => {
     let mediaArr = [];
     media.forEach((m) => {
@@ -90,7 +94,16 @@ const AddDishModal = ({ isOpen, setIsOpen }) => {
       category: category[0] && category[0].id,
       media: mediaArr,
     };
-    console.log(data);
+
+    dispatch(createRestaurantDish(data, resID)).then(() => {
+      setName('');
+      setDescription('');
+      setPrice(0);
+      setFoodType([]);
+      setCategory([]);
+      setMedia([]);
+      setIsOpen(false);
+    });
   };
 
   return (

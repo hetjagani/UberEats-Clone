@@ -80,10 +80,11 @@ const RestaurantDashboard = () => {
         >
           <div className={css({ width: '80vw' })}>
             <H5>
-              {loginRestaurant.name} ({loginRestaurant.restaurant_type.toUpperCase()})
+              {loginRestaurant.name} (
+              {loginRestaurant.restaurant_type && loginRestaurant.restaurant_type.toUpperCase()})
             </H5>
             <Paragraph2>{loginRestaurant.description}</Paragraph2>
-            <Paragraph2>{loginRestaurant.address}</Paragraph2>
+            <Paragraph2><strong>Address:</strong> {loginRestaurant.address}</Paragraph2>
             <Paragraph2>
               {loginRestaurant.city} | {loginRestaurant.state} | {loginRestaurant.country}
             </Paragraph2>
@@ -105,7 +106,7 @@ const RestaurantDashboard = () => {
             })}
         </FlexGrid>
       </div>
-      <AddDishModal isOpen={isOpen} setIsOpen={setIsOpen} />
+      <AddDishModal isOpen={isOpen} setIsOpen={setIsOpen} resID={loginRestaurant.id} />
     </div>
   );
 };

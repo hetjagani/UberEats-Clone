@@ -3,8 +3,9 @@ import React from 'react';
 import CustomerDetails from './CustomerDetails';
 import RestaurantDetails from './RestaurantDetails';
 import withAuth from '../AuthPage/withAuth';
+import getLoginDetails from '../../utils/getLoginDetails';
 
-const DetailsPage = ({ loginDetails, update }) => {
+const DetailsPage = ({ update }) => {
   const [css, theme] = useStyletron();
   const container = css({
     display: 'flex',
@@ -14,6 +15,8 @@ const DetailsPage = ({ loginDetails, update }) => {
     margin: '50px',
     width: '80vw',
   });
+
+  const loginDetails = getLoginDetails();
 
   return (
     <div className={container}>

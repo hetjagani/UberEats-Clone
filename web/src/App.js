@@ -14,8 +14,6 @@ import MyCartPage from './pages/MyCartPage/MyCartPage';
 import CheckoutPage from './pages/CheckoutPage/CheckoutPage';
 
 function App() {
-  const { role, id } = getLoginDetails();
-
   return (
     <div>
       <ToastContainer />
@@ -34,16 +32,12 @@ function App() {
           <Route
             exact
             path="/details"
-            component={(props) => (
-              <DetailsPage {...props} loginDetails={{ id, role }} update={false} />
-            )}
+            component={(props) => <DetailsPage {...props} update={false} />}
           />
           <Route
             exact
             path="/details/update"
-            component={(props) => (
-              <DetailsPage {...props} loginDetails={{ id, role }} update={true} />
-            )}
+            component={(props) => <DetailsPage {...props} update={true} />}
           />
           <Route exact path="/restaurants/:id" component={(props) => <RestaurantDetails />} />
           <Route exact path="/restaurants" component={(props) => <RestaurantsPage />} />

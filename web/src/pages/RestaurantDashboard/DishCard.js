@@ -77,6 +77,7 @@ const DishCard = ({ dish, editable, resID }) => {
     dispatch(clearDishMedia(dish.id));
   };
 
+  // TODO: delete dish
   const saveDish = () => {
     let mediaArr = [];
     dish.media.forEach((m) => {
@@ -113,7 +114,7 @@ const DishCard = ({ dish, editable, resID }) => {
           <Paragraph1>
             <strong>Price: </strong> ${dish.price} <br />
             <strong>Food Type: </strong> {dish.food_type} <br />
-            <strong>Category: </strong> {dish.category.replace('_', ' ')}
+            <strong>Category: </strong> {dish.category && dish.category.replace('_', ' ')}
           </Paragraph1>
         </StyledBody>
         {editable && (

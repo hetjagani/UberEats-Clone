@@ -142,7 +142,7 @@ const MyCartPage = () => {
             <strong>Timing:</strong> {restaurant.time_open} - {restaurant.time_close}
           </Label1>
           <Label1>
-            <strong>Type:</strong> {restaurant.restaurant_type.toUpperCase()}
+            <strong>Type:</strong> {restaurant.restaurant_type && restaurant.restaurant_type.toUpperCase()}
           </Label1>
         </div>
       </div>

@@ -3,6 +3,7 @@ import {
   CLEAR_RESTAURANT_MEDIA,
   CREATE_DISH_MEDIA,
   CREATE_RESTAURANT,
+  CREATE_RESTAURANT_DISH,
   CREATE_RESTAURANT_MEDIA,
   FETCH_AUTH_RESTAURANT,
   UPDATE_RESTAURANT,
@@ -58,6 +59,12 @@ export default (state = initialState, action) => {
       return {
         ...state,
         dishes: [...filteredDishes, action.payload.dish],
+      };
+
+    case CREATE_RESTAURANT_DISH:
+      return {
+        ...state,
+        dishes: [...state.dishes, action.payload.dish],
       };
 
     case CREATE_DISH_MEDIA:

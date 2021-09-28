@@ -5,6 +5,7 @@ import {
   CLEAR_RESTAURANT_MEDIA,
   CREATE_DISH_MEDIA,
   CREATE_RESTAURANT,
+  CREATE_RESTAURANT_DISH,
   CREATE_RESTAURANT_MEDIA,
   FETCH_AUTH_RESTAURANT,
   UPDATE_RESTAURANT,
@@ -84,6 +85,23 @@ export const clearRestaurantMedia = () => {
       type: CLEAR_RESTAURANT_MEDIA,
       payload: [],
     });
+  };
+};
+
+export const createRestaurantDish = (data, resID) => {
+  return (dispatch) => {
+    return axios
+      .post(`/restaurants/${resID}/dishes`, data)
+      .then((res) => {
+        dispatch({
+          type: CREATE_RESTAURANT_DISH,
+          payload: { dish: res.data },
+        });
+        notify({ type: 'info', description: 'Created Restaurant Dish' });
+      })
+      .catch((err) => {
+        notify({ type: 'error', description: JSON.stringify(err.response.data.message) });
+      });
   };
 };
 

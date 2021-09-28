@@ -10,7 +10,7 @@ const Restaurant = global.DB.define('restaurants', {
     type: DataTypes.STRING,
   },
   description: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
   },
   address: {
     type: DataTypes.STRING,
