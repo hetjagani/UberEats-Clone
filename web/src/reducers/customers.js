@@ -1,4 +1,10 @@
-import { CREATE_CUSTOMER, CREATE_CUSTOMER_MEDIUM, FETCH_AUTH_CUSTOMER } from '../actions/types';
+import {
+  CLEAR_CUSTOMER_MEDIUM,
+  CREATE_CUSTOMER,
+  CREATE_CUSTOMER_MEDIUM,
+  FETCH_AUTH_CUSTOMER,
+  UPDATE_CUSTOMER,
+} from '../actions/types';
 
 const initialState = {
   loginCustomer: {},
@@ -24,10 +30,24 @@ export default (state = initialState, action) => {
         addresses: action.payload.addresses,
       };
 
+    case UPDATE_CUSTOMER:
+      return {
+        ...state,
+        loginCustomer: action.payload,
+        medium: action.payload.medium,
+        addresses: action.payload.addresses,
+      };
+
     case CREATE_CUSTOMER_MEDIUM:
       return {
         ...state,
         medium: action.payload,
+      };
+
+    case CLEAR_CUSTOMER_MEDIUM:
+      return {
+        ...state,
+        medium: {},
       };
 
     default:

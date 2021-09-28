@@ -16,7 +16,7 @@ import { useStyletron } from 'baseui';
 import { useSelector } from 'react-redux';
 import { Avatar } from 'baseui/avatar';
 import { ListItem, ListItemLabel, ARTWORK_SIZES } from 'baseui/list';
-import { RiFileList3Fill } from 'react-icons/ri';
+import { RiFileList3Fill, RiMap2Line } from 'react-icons/ri';
 import { MdFavorite } from 'react-icons/md';
 import { useHistory } from 'react-router';
 import { NavLink } from 'react-router-dom';
@@ -88,7 +88,7 @@ const NavBar = () => {
               </div>
               <div>
                 <strong style={{ fontSize: 18, margin: 40 }}>
-                  <Link href="/customers/account">View account</Link>
+                  <Link href="/details/update">View account</Link>
                 </strong>
               </div>
             </div>
@@ -116,6 +116,9 @@ const NavBar = () => {
               </ListItem>
               <ListItem artwork={(props) => <MdFavorite size={25} />}>
                 <ListItemLabel>Favourites</ListItemLabel>
+              </ListItem>
+              <ListItem artwork={(props) => <RiMap2Line size={25} />}>
+                <ListItemLabel>Addresses</ListItemLabel>
               </ListItem>
             </div>
             <div style={{ width: '100%' }}>

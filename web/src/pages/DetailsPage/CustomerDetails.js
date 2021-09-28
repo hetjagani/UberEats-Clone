@@ -6,14 +6,19 @@ import { useStyletron } from 'baseui';
 import { Select, StatefulSelect } from 'baseui/select';
 import { Button, SIZE } from 'baseui/button';
 import { useDispatch, useSelector } from 'react-redux';
-import { createCustomer, createCustomerMedium } from '../../actions/customers';
+import {
+  clearCustomerMedium,
+  createCustomer,
+  createCustomerMedium,
+  updateCustomer,
+} from '../../actions/customers';
 import { Display4 } from 'baseui/typography';
 import { Card } from 'baseui/card';
 import { FileUploader } from 'baseui/file-uploader';
 import S3 from 'react-aws-s3';
 import notify from '../../utils/notify';
 
-function CustomerDetails({ loginDetails }) {
+function CustomerDetails({ loginDetails, update }) {
   const [css, theme] = useStyletron();
   const formContainer = css({
     display: 'flex',
@@ -49,8 +54,8 @@ function CustomerDetails({ loginDetails }) {
 
   const countryOpts = [{ id: 'United States', country: 'United States' }];
 
-  const medium = useSelector((state) => {
-    return state.customers.medium;
+  const { medium, loginCustomer } = useSelector((state) => {
+    return { medium: state.customers.medium, loginCustomer: state.customers.loginCustomer };
   });
 
   const [name, setName] = useState('');
@@ -62,6 +67,18 @@ function CustomerDetails({ loginDetails }) {
   const [contactNo, setContactNo] = useState('');
 
   const [isUploading, setIsUploading] = React.useState(false);
+
+  useEffect(() => {
+    if (update) {
+      setName(loginCustomer.name);
+      setNickName(loginCustomer.nickname);
+      setAbout(loginCustomer.about);
+      setCity([{ city: loginCustomer.city }]);
+      setState([{ state: loginCustomer.state }]);
+      setCountry([{ country: loginCustomer.country }]);
+      setContactNo(loginCustomer.contact_no);
+    }
+  }, []);
 
   const dispatch = useDispatch();
 
@@ -77,7 +94,15 @@ function CustomerDetails({ loginDetails }) {
       contact_no: contactNo,
       mediumId: medium && medium.id,
     };
-    dispatch(createCustomer(data));
+    if (update) {
+      dispatch(updateCustomer(data, data.id));
+    } else {
+      dispatch(createCustomer(data));
+    }
+  };
+
+  const clearMedia = () => {
+    dispatch(clearCustomerMedium());
   };
 
   const mediaUpload = (acceptedFiles, rejectedFiles) => {
@@ -96,7 +121,7 @@ function CustomerDetails({ loginDetails }) {
     if (acceptedFiles.length > 0) {
       s3.uploadFile(acceptedFiles[0], acceptedFiles[0].name)
         .then((res) => {
-          notify({type: 'info', description: `File ${res.key} uploded...`})
+          notify({ type: 'info', description: `File ${res.key} uploded...` });
 
           if (res.status == 204) {
             dispatch(createCustomerMedium({ alt_text: res.key, url: res.location }));
@@ -105,7 +130,7 @@ function CustomerDetails({ loginDetails }) {
         })
         .catch((err) => {
           console.log(err);
-          notify({type: 'error', description: `Uploading File Failed`})
+          notify({ type: 'error', description: `Uploading File Failed` });
         });
     }
   };
@@ -176,14 +201,24 @@ function CustomerDetails({ loginDetails }) {
           Save
         </Button>
       </div>
-      {/* TODO: after upload the form fields are set to NULL */}
       <div className={imgContainer}>
         {medium && medium.id && medium.id !== 0 ? (
-          <Card
-            overrides={{ Root: { style: { width: '512px' } } }}
-            headerImage={medium.url}
-            title="Profile Picture"
-          ></Card>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <Card
+              overrides={{ Root: { style: { width: '512px' } } }}
+              headerImage={medium.url}
+              title="Profile Picture"
+            ></Card>
+            <Button className={css({ margin: '40px' })} onClick={clearMedia}>
+              Clear Profile Picture
+            </Button>
+          </div>
         ) : (
           <FileUploader
             onCancel={() => setIsUploading(false)}

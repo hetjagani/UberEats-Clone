@@ -54,7 +54,7 @@ export const updateRestaurant = (data, id) => {
           type: UPDATE_RESTAURANT,
           payload: res.data,
         });
-        notify({ type: 'info', description: 'Updated Restaurant' });
+        notify({ type: 'info', description: 'Updated Restaurant Details' });
       })
       .catch((err) => {
         notify({ type: 'error', description: JSON.stringify(err.response.data.message) });

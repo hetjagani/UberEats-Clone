@@ -1,6 +1,12 @@
 import axios from 'axios';
 import notify from '../utils/notify';
-import { CREATE_CUSTOMER, CREATE_CUSTOMER_MEDIUM, FETCH_AUTH_CUSTOMER } from './types';
+import {
+  CLEAR_CUSTOMER_MEDIUM,
+  CREATE_CUSTOMER,
+  CREATE_CUSTOMER_MEDIUM,
+  FETCH_AUTH_CUSTOMER,
+  UPDATE_CUSTOMER,
+} from './types';
 
 export const fetchAuthCustomer = (id, token) => {
   return (dispatch) => {
@@ -45,6 +51,32 @@ export const createCustomerMedium = (data) => {
           payload: res.data,
         });
         notify({ type: 'info', description: 'Created Customer Media' });
+      })
+      .catch((err) => {
+        notify({ type: 'error', description: JSON.stringify(err.response.data.message) });
+      });
+  };
+};
+
+export const clearCustomerMedium = (data) => {
+  return (dispatch) => {
+    dispatch({
+      type: CLEAR_CUSTOMER_MEDIUM,
+      payload: null,
+    });
+  };
+};
+
+export const updateCustomer = (data, id) => {
+  return (dispatch) => {
+    return axios
+      .put(`/customers/${id}`, data)
+      .then((res) => {
+        dispatch({
+          type: UPDATE_CUSTOMER,
+          payload: res.data,
+        });
+        notify({ type: 'info', description: 'Update Customer Details' });
       })
       .catch((err) => {
         notify({ type: 'error', description: JSON.stringify(err.response.data.message) });
