@@ -1,6 +1,8 @@
 /* eslint-disable eqeqeq */
 const { validationResult } = require('express-validator');
-const { Customer, Media, Address } = require('../model');
+const {
+  Customer, Media, Address, Favourite,
+} = require('../model');
 const errors = require('../util/errors');
 const getPaiganation = require('../util/paiganation');
 
@@ -32,7 +34,7 @@ const getCustomerByID = async (req, res) => {
     return;
   }
 
-  const customer = await Customer.findOne({ where: { id }, include: [Media, Address] });
+  const customer = await Customer.findOne({ where: { id }, include: [Media, Address, Favourite] });
   if (!customer) {
     res.status(404).send(errors.notFound);
     return;

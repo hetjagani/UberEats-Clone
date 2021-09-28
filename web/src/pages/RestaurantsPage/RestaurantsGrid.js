@@ -8,6 +8,9 @@ import { BiFoodTag, BiMap, BiTime } from 'react-icons/bi';
 import { Paragraph1 } from 'baseui/typography';
 import { Button } from 'baseui/button';
 import { useHistory } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { MdFavouriteBorder, MdFavorite, MdFavoriteBorder } from 'react-icons/md';
+import { addCustomerFavourite, deleteCustomerFavourite } from '../../actions/customers';
 
 const RestaurantsGrid = () => {
   const [css] = useStyletron();
@@ -36,6 +39,11 @@ const RestaurantsGrid = () => {
   });
 
   const [restaurants, setRestaurants] = useState([]);
+  const [favMap, setFavMap] = useState({});
+
+  const { favourites } = useSelector((state) => {
+    return { favourites: state.customers.favourites };
+  });
 
   useEffect(() => {
     axios
@@ -50,10 +58,35 @@ const RestaurantsGrid = () => {
       });
   }, []);
 
+  useEffect(() => {
+    const fm = {};
+    restaurants.forEach((res) => {
+      fm[res.id] = false;
+    });
+    favourites.forEach((fav) => {
+      fm[fav.restaurantId] = true;
+    });
+    setFavMap(fm);
+  }, [favourites]);
+
   const history = useHistory();
+  const favouriteIcon = <MdFavorite size={40} />;
+  const notFavouriteIcon = <MdFavoriteBorder size={40} />;
 
   const gotoDetails = (id) => {
     history.push(`/restaurants/${id}`);
+  };
+
+  const dispatch = useDispatch();
+
+  const toggleFavourite = (id) => {
+    if (favMap[id] == true) {
+      // delete favourite
+      dispatch(deleteCustomerFavourite(id));
+    } else {
+      // add favourite
+      dispatch(addCustomerFavourite({ restaurantId: id }));
+    }
   };
 
   return (
@@ -93,8 +126,18 @@ const RestaurantsGrid = () => {
                     </Paragraph1>
                   </StyledBody>
                   <StyledAction>
-                    <Button>Add To Favourites</Button>
-                    <Button onClick={() => gotoDetails(res.id)}>Details</Button>
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Button kind="minimal" onClick={() => toggleFavourite(res.id)}>
+                        {favMap[res.id] ? favouriteIcon : notFavouriteIcon}
+                      </Button>
+                      <Button onClick={() => gotoDetails(res.id)}>Details</Button>
+                    </div>
                   </StyledAction>
                 </Card>
               </FlexGridItem>

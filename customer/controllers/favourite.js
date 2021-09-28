@@ -101,7 +101,7 @@ const deleteCustomerFavourite = async (req, res) => {
   const { user } = req.headers;
   const { favID } = req.params;
 
-  const favourite = await Favourite.findOne({ where: { id: favID, customerId: user } });
+  const favourite = await Favourite.findOne({ where: { restaurantId: favID, customerId: user } });
 
   try {
     await favourite.destroy();

@@ -1,11 +1,14 @@
 import axios from 'axios';
+import { bindActionCreators } from 'redux';
 import notify from '../utils/notify';
 import {
+  ADD_CUSTOMER_FAVOURITE,
   CLEAR_CUSTOMER_MEDIUM,
   CREATE_CUSTOMER,
   CREATE_CUSTOMER_ADDRESS,
   CREATE_CUSTOMER_MEDIUM,
   DELETE_CUSTOMER_ADDRESS,
+  DELETE_CUSTOMER_FAVOURITE,
   FETCH_AUTH_CUSTOMER,
   UPDATE_CUSTOMER,
   UPDATE_CUSTOMER_ADDRESS,
@@ -131,6 +134,40 @@ export const deleteCustomerAddress = (addID) => {
           payload: addID,
         });
         notify({ type: 'info', description: `Deleted customer address` });
+      })
+      .catch((err) => {
+        notify({ type: 'error', description: JSON.stringify(err.response.data.message) });
+      });
+  };
+};
+
+export const addCustomerFavourite = (data) => {
+  return (dispatch) => {
+    return axios
+      .post(`/customers/favourites`, data)
+      .then((res) => {
+        dispatch({
+          type: ADD_CUSTOMER_FAVOURITE,
+          payload: res.data,
+        });
+        notify({ type: 'info', description: `Added ${res.data.restaurant.name} to favourites` });
+      })
+      .catch((err) => {
+        notify({ type: 'error', description: JSON.stringify(err.response.data.message) });
+      });
+  };
+};
+
+export const deleteCustomerFavourite = (id) => {
+  return (dispatch) => {
+    return axios
+      .delete(`/customers/favourites/${id}`)
+      .then((res) => {
+        dispatch({
+          type: DELETE_CUSTOMER_FAVOURITE,
+          payload: id,
+        });
+        notify({ type: 'info', description: `Deleted from favourites` });
       })
       .catch((err) => {
         notify({ type: 'error', description: JSON.stringify(err.response.data.message) });
