@@ -75,6 +75,9 @@ const Address = global.DB.define('addresses', {
   city: {
     type: DataTypes.STRING,
   },
+  state: {
+    type: DataTypes.STRING,
+  },
   country: {
     type: DataTypes.STRING,
   },

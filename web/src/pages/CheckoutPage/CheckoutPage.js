@@ -37,20 +37,20 @@ const CheckoutPage = () => {
   const [address, setAddress] = useState([]);
   const [addressOpts, setAddressOpts] = useState([]);
 
-  const { loginCustomer } = useSelector((state) => {
-    return { loginCustomer: state.customers.loginCustomer };
+  const { loginCustomer, addresses } = useSelector((state) => {
+    return { loginCustomer: state.customers.loginCustomer, addresses: state.customers.addresses };
   });
 
   useEffect(() => {
     const opts = [];
-    loginCustomer.addresses.forEach((add) => {
+    addresses & addresses.forEach((add) => {
       opts.push({
         id: add.id,
         address: `${add.firstLine}, ${add.secondLine}, ${add.zipcode}, ${add.city}, ${add.country}`,
       });
     });
     setAddressOpts(opts);
-  }, [loginCustomer.addresses]);
+  }, [addresses]);
 
   useEffect(() => {
     axios

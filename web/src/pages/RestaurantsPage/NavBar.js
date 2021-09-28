@@ -112,13 +112,19 @@ const NavBar = () => {
               }}
             >
               <ListItem artwork={(props) => <RiFileList3Fill size={25} />}>
-                <ListItemLabel>Orders</ListItemLabel>
+                <ListItemLabel>
+                  <Link href="/restaurants">Orders</Link>
+                </ListItemLabel>
               </ListItem>
               <ListItem artwork={(props) => <MdFavorite size={25} />}>
-                <ListItemLabel>Favourites</ListItemLabel>
+                <ListItemLabel>
+                  <Link>Favourites</Link>
+                </ListItemLabel>
               </ListItem>
               <ListItem artwork={(props) => <RiMap2Line size={25} />}>
-                <ListItemLabel>Addresses</ListItemLabel>
+                <ListItemLabel>
+                  <Link href='/addresses'>Addresses</Link>
+                </ListItemLabel>
               </ListItem>
             </div>
             <div style={{ width: '100%' }}>

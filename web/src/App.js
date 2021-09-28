@@ -12,6 +12,7 @@ import RestaurantsPage from './pages/RestaurantsPage/RestaurantsPage';
 import RestaurantDetails from './pages/RestaurantsPage/RestaurantDetails';
 import MyCartPage from './pages/MyCartPage/MyCartPage';
 import CheckoutPage from './pages/CheckoutPage/CheckoutPage';
+import AddressesPage from './pages/AddressesPage/AddressesPage';
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
           <Route exact path="/restaurants" component={(props) => <RestaurantsPage />} />
           <Route exact path="/orders/:id" component={(props) => <CheckoutPage />} />
           <Route exact path="/cart" component={(props) => <MyCartPage />} />
+          <Route exact path="/addresses" component={(props) => <AddressesPage />} />
           <Route exact path="/dashboard" component={(props) => <RestaurantDashboard />} />
         </Switch>
       </Router>

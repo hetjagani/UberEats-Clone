@@ -82,11 +82,12 @@ const updateAddress = async (req, res) => {
     dbRes.secondLine = address.secondLine;
     dbRes.zipcode = address.zipcode;
     dbRes.city = address.city;
+    dbRes.state = address.state;
     dbRes.country = address.country;
 
     const updatedRes = await dbRes.save();
 
-    res.status(201).json(updatedRes);
+    res.status(200).json(updatedRes);
     return;
   } catch (err) {
     console.error(err);

@@ -3,9 +3,12 @@ import notify from '../utils/notify';
 import {
   CLEAR_CUSTOMER_MEDIUM,
   CREATE_CUSTOMER,
+  CREATE_CUSTOMER_ADDRESS,
   CREATE_CUSTOMER_MEDIUM,
+  DELETE_CUSTOMER_ADDRESS,
   FETCH_AUTH_CUSTOMER,
   UPDATE_CUSTOMER,
+  UPDATE_CUSTOMER_ADDRESS,
 } from './types';
 
 export const fetchAuthCustomer = (id, token) => {
@@ -77,6 +80,57 @@ export const updateCustomer = (data, id) => {
           payload: res.data,
         });
         notify({ type: 'info', description: 'Update Customer Details' });
+      })
+      .catch((err) => {
+        notify({ type: 'error', description: JSON.stringify(err.response.data.message) });
+      });
+  };
+};
+
+export const createCustomerAddress = (data) => {
+  return (dispatch) => {
+    return axios
+      .post(`/customers/addresses`, data)
+      .then((res) => {
+        dispatch({
+          type: CREATE_CUSTOMER_ADDRESS,
+          payload: res.data,
+        });
+        notify({ type: 'info', description: `Added Customer address of ${res.data.city} city` });
+      })
+      .catch((err) => {
+        notify({ type: 'error', description: JSON.stringify(err.response.data.message) });
+      });
+  };
+};
+
+export const updateCustomerAddress = (data, addID) => {
+  return (dispatch) => {
+    return axios
+      .put(`/customers/addresses/${addID}`, data)
+      .then((res) => {
+        dispatch({
+          type: UPDATE_CUSTOMER_ADDRESS,
+          payload: res.data,
+        });
+        notify({ type: 'info', description: `Updated Customer address of ${res.data.city} city` });
+      })
+      .catch((err) => {
+        notify({ type: 'error', description: JSON.stringify(err.response.data.message) });
+      });
+  };
+};
+
+export const deleteCustomerAddress = (addID) => {
+  return (dispatch) => {
+    return axios
+      .delete(`/customers/addresses/${addID}`)
+      .then((res) => {
+        dispatch({
+          type: DELETE_CUSTOMER_ADDRESS,
+          payload: addID,
+        });
+        notify({ type: 'info', description: `Deleted customer address` });
       })
       .catch((err) => {
         notify({ type: 'error', description: JSON.stringify(err.response.data.message) });

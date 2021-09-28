@@ -8,7 +8,6 @@ import createStore from './store';
 import { Provider } from 'react-redux';
 import { LightTheme, BaseProvider, DarkTheme } from 'baseui';
 import reportWebVitals from './reportWebVitals';
-import axios from 'axios';
 import { PersistGate } from 'redux-persist/es/integration/react';
 
 const engine = new Styletron();

@@ -10,6 +10,7 @@ const router = express.Router();
  * @property {string} secondLine.required
  * @property {integer} zipcode.required
  * @property {string} city.required
+ * @property {string} state.required
  * @property {string} country.required
  * @property {integer} customerId.required
  */
@@ -19,6 +20,7 @@ const bodyValidators = () => [
   body('secondLine').isString(),
   body('zipcode').isInt(),
   body('city').exists().isString(),
+  body('state').exists().isString(),
   body('country').exists().isString(),
 ];
 
