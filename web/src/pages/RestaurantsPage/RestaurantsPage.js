@@ -5,16 +5,14 @@ import withAuth from '../AuthPage/withAuth';
 import NavBar from './NavBar';
 import RestaurantsGrid from './RestaurantsGrid';
 
-const RestaurantsPage = () => {
-  const [favs, setFavs] = useState(false);
-
+const RestaurantsPage = ({ favs }) => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchAllCartItems());
   }, []);
   return (
     <div>
-      <NavBar setFavs={setFavs} favs={favs} />
+      <NavBar />
       <RestaurantsGrid favs={favs} />
     </div>
   );

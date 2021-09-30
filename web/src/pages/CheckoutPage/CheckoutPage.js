@@ -5,9 +5,10 @@ import { Select } from 'baseui/select';
 import { Table, SIZE } from 'baseui/table-semantic';
 import { H2, Label1 } from 'baseui/typography';
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Carousel } from 'react-responsive-carousel';
 import { useHistory, useParams } from 'react-router';
+import { placedOrder } from '../../actions/cart';
 import notify from '../../utils/notify';
 import withAuth from '../AuthPage/withAuth';
 import NavBar from '../RestaurantsPage/NavBar';
@@ -43,12 +44,13 @@ const CheckoutPage = () => {
 
   useEffect(() => {
     const opts = [];
-    addresses & addresses.forEach((add) => {
-      opts.push({
-        id: add.id,
-        address: `${add.firstLine}, ${add.secondLine}, ${add.zipcode}, ${add.city}, ${add.country}`,
+    addresses &
+      addresses.forEach((add) => {
+        opts.push({
+          id: add.id,
+          address: `${add.firstLine}, ${add.secondLine}, ${add.zipcode}, ${add.city}, ${add.country}`,
+        });
       });
-    });
     setAddressOpts(opts);
   }, [addresses]);
 
@@ -81,12 +83,15 @@ const CheckoutPage = () => {
     setTableData(td);
   }, [order.orderitems]);
 
+  const dispatch = useDispatch();
+
   const placeOrder = () => {
     const data = { orderId: order.id, addressId: address[0] && address[0].id };
 
     axios
       .post(`/orders/place`, data)
       .then((res) => {
+        dispatch(placedOrder());
         notify({ type: 'info', description: `Order placed successfully` });
         history.push('/restaurants');
       })

@@ -22,7 +22,7 @@ import { useHistory } from 'react-router';
 import { NavLink } from 'react-router-dom';
 import { clearData } from '../../utils/clearData';
 
-const NavBar = ({ favs, setFavs }) => {
+const NavBar = () => {
   const [css] = useStyletron();
 
   const drawerContainer = css({
@@ -118,14 +118,12 @@ const NavBar = ({ favs, setFavs }) => {
             >
               <ListItem artwork={(props) => <RiFileList3Fill size={25} />}>
                 <ListItemLabel>
-                  <Link href="/restaurants">Orders</Link>
+                  <Link href="/orders/customers">Orders</Link>
                 </ListItemLabel>
               </ListItem>
               <ListItem artwork={(props) => <MdFavorite size={25} />}>
                 <ListItemLabel>
-                  <Link href="#" onClick={toggleFavourites}>
-                    {favs ? 'Show All Restaurants' : 'Favourites'}
-                  </Link>
+                  <Link href="/restaurants/favourites">Show Favourites</Link>
                 </ListItemLabel>
               </ListItem>
               <ListItem artwork={(props) => <RiMap2Line size={25} />}>

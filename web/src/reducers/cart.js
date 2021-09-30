@@ -1,4 +1,9 @@
-import { ADD_DISH_TO_CART, FETCH_CART_ITEMS, REMOVE_DISH_FROM_CART } from '../actions/types';
+import {
+  ADD_DISH_TO_CART,
+  FETCH_CART_ITEMS,
+  PLACE_ORDER,
+  REMOVE_DISH_FROM_CART,
+} from '../actions/types';
 
 const initialState = {
   restaurant: {},
@@ -43,6 +48,13 @@ export default (state = initialState, action) => {
       return {
         ...state,
         dishes: afterRemove,
+      };
+
+    case PLACE_ORDER:
+      return {
+        ...state,
+        dishes: [],
+        restaurant: {},
       };
     default:
       return state;

@@ -166,6 +166,7 @@ const AddressesPage = () => {
       <div className={mainContainer}>
         <H2>{loginCustomer.name}'s Addresses</H2>
         <Table
+          className={css({ width: '100vw' })}
           size={SIZE.spacious}
           columns={[
             'First Line',
