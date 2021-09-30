@@ -6,14 +6,16 @@ import NavBar from './NavBar';
 import RestaurantsGrid from './RestaurantsGrid';
 
 const RestaurantsPage = () => {
+  const [favs, setFavs] = useState(false);
+
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchAllCartItems());
   }, []);
   return (
     <div>
-      <NavBar />
-      <RestaurantsGrid />
+      <NavBar setFavs={setFavs} favs={favs} />
+      <RestaurantsGrid favs={favs} />
     </div>
   );
 };

@@ -20,7 +20,7 @@ const DetailsPage = ({ update }) => {
 
   return (
     <div className={container}>
-      <a href='/restaurants'>
+      <a href={loginDetails.role == 'customer' ? '/restaurants' : '/dashboard'}>
         <div>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1052 170" height="48" width="200">
             <path
