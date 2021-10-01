@@ -14,6 +14,7 @@ import MyCartPage from './pages/MyCartPage/MyCartPage';
 import CheckoutPage from './pages/CheckoutPage/CheckoutPage';
 import AddressesPage from './pages/AddressesPage/AddressesPage';
 import CustomerOrdersPage from './pages/CustomerOrdersPage/CustomerOrdersPage';
+import RestaurantOrdersPage from './pages/RestaurantOrdersPage/RestaurantOrdersPage';
 
 function App() {
   return (
@@ -49,6 +50,7 @@ function App() {
           <Route exact path="/restaurants/:id" component={(props) => <RestaurantDetails />} />
           <Route exact path="/restaurants" component={(props) => <RestaurantsPage />} />
           <Route exact path="/orders/customers" component={(props) => <CustomerOrdersPage />} />
+          <Route exact path="/orders/restaurants" component={(props) => <RestaurantOrdersPage />} />
           <Route exact path="/orders/:id" component={(props) => <CheckoutPage />} />
           <Route exact path="/cart" component={(props) => <MyCartPage />} />
           <Route exact path="/addresses" component={(props) => <AddressesPage />} />

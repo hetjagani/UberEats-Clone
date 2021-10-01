@@ -2,21 +2,24 @@ import axios from 'axios';
 import { useStyletron } from 'baseui';
 import { Button } from 'baseui/button';
 import { Modal, ModalBody, ModalButton, ModalFooter, ModalHeader } from 'baseui/modal';
+import { Select } from 'baseui/select';
 import { Table, SIZE } from 'baseui/table-semantic';
 import { H2, H4, Paragraph1 } from 'baseui/typography';
 import React, { useEffect, useState } from 'react';
 import notify from '../../utils/notify';
 import withAuth from '../AuthPage/withAuth';
-import NavBar from '../RestaurantsPage/NavBar';
+import Header from '../RestaurantDashboard/Header';
 
-const CustomerOrdersPage = () => {
+const RestaurantOrdersPage = () => {
   const [css] = useStyletron();
   const mainContainer = css({
+    marginTop: '100px',
     margin: '50px',
     width: '95vw',
   });
 
   const [orders, setOrders] = useState([]);
+  const [statusMap, setStatusMap] = useState({});
   const [tableData, setTableData] = useState([]);
   const [detailModal, setDetailModal] = useState(false);
   const [detailOrder, setDetailOrder] = useState({});
@@ -40,36 +43,69 @@ const CustomerOrdersPage = () => {
     setDetailOrderTable(td);
   };
 
+  const statusOpts = [
+    { id: 'PLACED', status: 'PLACED' },
+    { id: 'PREPARING', status: 'PREPARING' },
+    { id: 'PICKUP_READY', status: 'PICKUP_READY' },
+    { id: 'COMPLETE', status: 'COMPLETE' },
+    { id: 'CANCEL', status: 'CANCEL' },
+  ];
+
+  const updateStatus = (value, id) => {
+    console.log(value);
+    console.log(id);
+    const sm = statusMap;
+    sm[id] = value;
+    setStatusMap(sm);
+    console.log(statusMap);
+  };
+
   useEffect(() => {
     axios
       .get(`/orders`)
       .then((res) => {
         setOrders(res.data);
-        const ords = orders.map((o) => {
-          return [
-            <Paragraph1>{o.restaurant && o.restaurant.name}</Paragraph1>,
-            <Paragraph1>
-              {o.address && o.address.firstLine} {o.address && o.address.secondLine}
-            </Paragraph1>,
-            <Paragraph1>{o.type && o.type.toUpperCase()}</Paragraph1>,
-            <Paragraph1>${o.amount}</Paragraph1>,
-            <Paragraph1>{o.status}</Paragraph1>,
-            <Button onClick={() => seeOrderDetails(o)}>Details</Button>,
-          ];
+        const sm = {};
+        res.data.forEach((o) => {
+          sm[o.id] = [{ id: o.status, status: o.status }];
         });
-        setTableData(ords);
+        setStatusMap(sm);
       })
       .catch((err) => {
         notify({ type: 'info', description: 'Error fetching orders.' });
       });
   }, []);
 
+  useEffect(() => {
+    const ords = orders.map((o) => {
+      return [
+        <Paragraph1>{o.restaurant && o.restaurant.name}</Paragraph1>,
+        <Paragraph1>
+          {o.address && o.address.firstLine} {o.address && o.address.secondLine}
+        </Paragraph1>,
+        <Paragraph1>{o.type && o.type.toUpperCase()}</Paragraph1>,
+        <Paragraph1>${o.amount}</Paragraph1>,
+        <Paragraph1>{o.status}</Paragraph1>,
+        <Select
+          options={statusOpts}
+          valueKey="id"
+          labelKey="status"
+          onChange={({ value }) => updateStatus(value, o.id)}
+          value={statusMap[o.id]}
+        />,
+        <Button onClick={() => seeOrderDetails(o)}>Details</Button>,
+      ];
+    });
+    setTableData(ords);
+  }, [orders]);
+
   return (
     <div>
-      <NavBar />
+      <div>
+        <Header />
+      </div>
       <div className={mainContainer}>
         <H2>Your Orders</H2>
-        <H4>Current Orders</H4>
 
         <Table
           className={css({ width: '100%' })}
@@ -132,4 +168,4 @@ const CustomerOrdersPage = () => {
   );
 };
 
-export default withAuth(CustomerOrdersPage, 'customer');
+export default withAuth(RestaurantOrdersPage, 'restaurant');

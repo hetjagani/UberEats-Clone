@@ -18,9 +18,9 @@ const getRestaurants = async (auth) => {
   return map;
 };
 
-const getAddresses = async (auth) => {
-  const res = await axios.get(`${global.gConfig.customer_url}/customers/addresses`, {
-    headers: { Authorization: auth },
+const getAddresses = async () => {
+  const res = await axios.get(`${global.gConfig.customer_url}/customers/addresses/all`, {
+    headers: { Authorization: 'admin' },
   });
 
   const map = {};
@@ -31,19 +31,23 @@ const getAddresses = async (auth) => {
   return map;
 };
 
-// TODO: get all restaurant's orders
-const getAllCustomersOrders = async (req, res) => {
-  const { user } = req.headers;
+const getAllOrders = async (req, res) => {
+  const { user, role } = req.headers;
+
+  let whereQ = { customerId: user };
+  if (role == 'restaurant') {
+    whereQ = { restaurantId: user };
+  }
 
   const orders = await Order.findAll({
-    where: { customerId: user },
+    where: whereQ,
     include: [OrderItem],
   });
 
   try {
     // get all restaurants
     const restaurantMap = await getRestaurants(req.headers.authorization);
-    const addressMap = await getAddresses(req.headers.authorization);
+    const addressMap = await getAddresses();
 
     // map each order with restaurant and dishes
     const result = orders.map((order) => {
@@ -409,7 +413,7 @@ const updateOrderStatus = async (req, res) => {
 };
 
 module.exports = {
-  getAllCustomersOrders,
+  getAllOrders,
   getOrderById,
   createOrder,
   placeOrder,

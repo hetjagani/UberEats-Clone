@@ -27,7 +27,12 @@ const router = express.Router();
  * @property {string} status.required
  */
 
-const bodyValidators = () => [body('status').exists().isString().isIn(['PLACED', 'PREPARING', 'COMPLETE', 'PICKUP_READY', 'CANCEL'])];
+const bodyValidators = () => [
+  body('status')
+    .exists()
+    .isString()
+    .isIn(['PLACED', 'PREPARING', 'COMPLETE', 'PICKUP_READY', 'CANCEL']),
+];
 const placeOrderValidators = () => [
   body('orderId').exists().isInt().not().isIn([0]),
   body('addressId').exists().isInt().not().isIn([0]),
@@ -40,7 +45,7 @@ const placeOrderValidators = () => [
  * @param {string} authorization.header.require
  * @returns {Array.<Order>} 200 - List of orders info
  */
-router.get('/', orderController.getAllCustomersOrders);
+router.get('/', orderController.getAllOrders);
 
 /**
  * Place Order

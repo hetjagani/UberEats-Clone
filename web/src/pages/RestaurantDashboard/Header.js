@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { RiEdit2Line, RiLogoutBoxRLine } from 'react-icons/ri';
 import { CgColorPicker, CgList } from 'react-icons/cg';
 import { AiOutlineUser } from 'react-icons/ai';
-import { Redirect } from 'react-router';
+import { Redirect, useHistory } from 'react-router';
 import { useState } from 'react';
 import { clearData } from '../../utils/clearData';
 
@@ -27,12 +27,15 @@ const Header = () => {
   const imgURL =
     loginRestaurant.media && loginRestaurant.media.length > 0 && loginRestaurant.media[0].url;
 
-  const [gotoUpdate, setGotoUpdate] = useState(false);
+  const history = useHistory();
 
   const handelNavItem = (item) => {
     switch (item.label) {
       case 'Edit Profile':
-        setGotoUpdate(true);
+        history.push('/details/update');
+        break;
+      case 'Orders':
+        history.push('/orders/restaurants');
         break;
       case 'Logout':
         clearData();
@@ -40,10 +43,6 @@ const Header = () => {
         break;
     }
   };
-
-  if (gotoUpdate) {
-    return <Redirect to="/details/update" />;
-  }
 
   return (
     <div>

@@ -36,6 +36,18 @@ const bodyValidators = () => [
 router.get('/', addressController.getAllAddresses);
 
 /**
+ * Get list of All Addresses for customer (for restaurant)
+ * @route GET /customers/addresses/all
+ * @group Addresses
+ * @param {string} authorization.header.require
+ * @param {string} cusID.path.require
+ * @param {integer} page.query.require
+ * @param {integer} limit.query.require
+ * @returns {Array.<Address>} 200 - List of address info
+ */
+router.get('/all', addressController.getAllAddressesForRestaurant);
+
+/**
  * Create Address
  * @route POST /customers/addresses
  * @group Addresses

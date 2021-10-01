@@ -11,6 +11,13 @@ const getAllAddresses = async (req, res) => {
   res.status(200).json(customer.addresses);
 };
 
+// admin endpoint
+const getAllAddressesForRestaurant = async (req, res) => {
+  const addresses = await Address.findAll();
+
+  res.status(200).json(addresses);
+};
+
 const getAddressByID = async (req, res) => {
   const id = req.params.addID;
   if (!id || id == 0) {
@@ -133,4 +140,5 @@ module.exports = {
   createAddress,
   updateAddress,
   deleteAddress,
+  getAllAddressesForRestaurant,
 };

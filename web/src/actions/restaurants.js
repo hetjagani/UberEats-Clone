@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getCookie, setCookie } from 'react-use-cookie';
 import notify from '../utils/notify';
 import {
   CLEAR_DISH_MEDIA,
@@ -30,8 +31,9 @@ export const fetchAuthRestaurant = (id, token) => {
 
 export const createRestaurant = (data) => {
   return (dispatch) => {
+    const token = getCookie('auth');
     return axios
-      .post('/restaurants', data)
+      .post('/restaurants', data, { headers: { Authorization: token } })
       .then((res) => {
         dispatch({
           type: CREATE_RESTAURANT,

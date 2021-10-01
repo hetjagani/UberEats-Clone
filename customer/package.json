@@ -24,7 +24,7 @@
     "mysql2": "^2.3.0",
     "password-validator": "^5.1.1",
     "sequelize": "^6.6.5",
-    "u-server-utils": "^1.0.9"
+    "u-server-utils": "^1.0.13"
   },
   "devDependencies": {
     "eslint": "^7.2.0",

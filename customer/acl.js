@@ -1,4 +1,5 @@
 module.exports = {
+  'GET /customers/addresses/all': ['admin'],
   'GET /customers/addresses?(.+)': ['customer'],
   'POST /customers/addresses': ['customer'],
   'PUT /customers/addresses?(.+)': ['customer'],

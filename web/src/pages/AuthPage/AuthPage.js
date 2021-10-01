@@ -1,7 +1,7 @@
 import { useStyletron } from 'baseui';
 import { H2, H6, Label1 } from 'baseui/typography';
 import React, { useEffect, useRef, useState } from 'react';
-import { Redirect, useLocation } from 'react-router-dom';
+import { Redirect, useHistory, useLocation } from 'react-router-dom';
 import { Input } from 'baseui/input';
 import { Button } from 'baseui/button';
 import { Notification, KIND } from 'baseui/notification';
@@ -11,6 +11,7 @@ import getLoginDetails from '../../utils/getLoginDetails';
 import { useDispatch } from 'react-redux';
 import { fetchAuthCustomer } from '../../actions/customers';
 import { fetchAuthRestaurant } from '../../actions/restaurants';
+import { setCookie } from 'react-use-cookie';
 
 const AuthPage = ({ flow, role, ...props }) => {
   const [css, theme] = useStyletron();
@@ -63,6 +64,8 @@ const AuthPage = ({ flow, role, ...props }) => {
     return re.test(String(email).toLowerCase());
   };
 
+  const history = useHistory();
+
   const submitHandler = () => {
     if (flow === 'login' && (email == '' || password == '')) {
       setErrorMessage('Any field cannot be empty');
@@ -91,7 +94,7 @@ const AuthPage = ({ flow, role, ...props }) => {
       .post(`${window.BACKEND_API_URL}${authURL}`, { email, password, role: inprole[0].id })
       .then((res) => {
         const { token } = res.data;
-        document.cookie = `auth=${token};path=/`;
+        setCookie('auth', token);
         const tokenData = getLoginDetails();
 
         setLoginRole(tokenData.role);
@@ -100,12 +103,12 @@ const AuthPage = ({ flow, role, ...props }) => {
           if (tokenData.role === 'customer') {
             // show restaurants page after login
             dispatch(fetchAuthCustomer(tokenData.id, token)).then(() => {
-              setIsAuthenticated(true);
+              history.push('/restaurants');
             });
           } else {
             // show user's restaurant details page
             dispatch(fetchAuthRestaurant(tokenData.id, token)).then(() => {
-              setIsAuthenticated(true);
+              history.push('/dashboard');
             });
           }
         } else {

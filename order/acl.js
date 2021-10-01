@@ -1,5 +1,5 @@
 module.exports = {
-  'GET /orders?(.+)': ['customer'],
+  'GET /orders?(.+)': ['customer', 'restaurant'],
   'POST /orders?(.+)': ['customer'],
   'PUT /orders?(.+)': ['restaurant'],
   'GET /cartitems': ['customer'],

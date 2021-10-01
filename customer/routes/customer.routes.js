@@ -29,7 +29,7 @@ const bodyValidators = () => [
   body('state').exists().isString().not().isIn(['']),
   body('country').exists().isString().not().isIn(['']),
   body('contact_no').exists().isString().not().isIn(['']),
-  body('mediumId').isInt().not().isIn([0]),
+  body('mediumId').optional({ nullable: true }).isInt().not().isIn([0]),
 ];
 
 const [, ...updateValidators] = bodyValidators();

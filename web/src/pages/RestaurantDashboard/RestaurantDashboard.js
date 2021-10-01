@@ -24,7 +24,7 @@ const RestaurantDashboard = () => {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    width: '100vw',
+    width: '90vw',
   });
 
   const itemProps = {
@@ -73,7 +73,7 @@ const RestaurantDashboard = () => {
         <div
           className={css({
             alignSelf: 'baseline',
-            margin: '30px',
+            margin: '50px',
             display: 'flex',
             justifyContent: 'space-between',
           })}
@@ -83,14 +83,14 @@ const RestaurantDashboard = () => {
               {loginRestaurant.name} (
               {loginRestaurant.restaurant_type && loginRestaurant.restaurant_type.toUpperCase()})
             </H5>
-            <Paragraph2>{loginRestaurant.description}</Paragraph2>
+            <Paragraph2><strong>Description: </strong>{loginRestaurant.description}</Paragraph2>
             <Paragraph2><strong>Address:</strong> {loginRestaurant.address}</Paragraph2>
             <Paragraph2>
-              {loginRestaurant.city} | {loginRestaurant.state} | {loginRestaurant.country}
+              <strong>Location: </strong>{loginRestaurant.city} | {loginRestaurant.state} | {loginRestaurant.country}
             </Paragraph2>
           </div>
-          <div>
-            <Button onClick={() => setIsOpen(true)}>Add Dish</Button>
+          <div className={css({width:'100px'})}>
+            <Button  onClick={() => setIsOpen(true)}>Add Dish</Button>
           </div>
         </div>
       </div>

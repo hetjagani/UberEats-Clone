@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getCookie } from 'react-use-cookie';
 import { bindActionCreators } from 'redux';
 import notify from '../utils/notify';
 import {
@@ -32,8 +33,9 @@ export const fetchAuthCustomer = (id, token) => {
 
 export const createCustomer = (data) => {
   return (dispatch) => {
+    const token = getCookie('auth');
     return axios
-      .post('/customers', data)
+      .post('/customers', data, { headers: { Authorization: token } })
       .then((res) => {
         dispatch({
           type: CREATE_CUSTOMER,
