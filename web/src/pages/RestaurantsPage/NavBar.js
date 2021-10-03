@@ -21,6 +21,7 @@ import { MdFavorite } from 'react-icons/md';
 import { useHistory } from 'react-router';
 import { NavLink } from 'react-router-dom';
 import { clearData } from '../../utils/clearData';
+import { ButtonGroup, SIZE as btnGrpSize, SHAPE as btnGrpShp, MODE } from 'baseui/button-group';
 
 const NavBar = () => {
   const [css] = useStyletron();
@@ -44,7 +45,7 @@ const NavBar = () => {
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchQ, setSearchQ] = useState([]);
-  const [resType, setResType] = useState('delivery');
+  const [deliveryTypeselected, setDeliveryTypeselected] = useState(0);
   const [city, setCity] = useState([]);
 
   const { loginCustomer, medium, cartDishes } = useSelector((state) => {
@@ -174,10 +175,39 @@ const NavBar = () => {
             </NavLink>
           </NavigationItem>
           <NavigationItem>
-            <RadioGroup value={resType} onChange={(e) => setResType(e.target.value)}>
-              <Radio value="delivery">Delivery</Radio>
-              <Radio value="pickup">Pickup</Radio>
-            </RadioGroup>
+            <div
+              style={{
+                backgroundColor: '#EEEEEE',
+                borderRadius: '100px',
+                padding: '5px',
+                height: '60px',
+                boxSizing: 'border-box',
+              }}
+            >
+              <ButtonGroup
+                mode={MODE.radio}
+                shape={btnGrpShp.pill}
+                selected={deliveryTypeselected}
+                onClick={(event, index) => {
+                  setDeliveryTypeselected(index);
+                }}
+              >
+                <Button
+                  style={
+                    deliveryTypeselected === 0 ? { backgroundColor: 'white', color: 'black' } : {}
+                  }
+                >
+                  Delivery
+                </Button>
+                <Button
+                  style={
+                    deliveryTypeselected === 1 ? { backgroundColor: 'white', color: 'black' } : {}
+                  }
+                >
+                  Pickup
+                </Button>
+              </ButtonGroup>
+            </div>
           </NavigationItem>
           <NavigationItem style={{ width: '20vw', margin: '10px' }}>
             <Search

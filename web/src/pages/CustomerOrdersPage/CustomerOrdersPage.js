@@ -2,6 +2,7 @@ import axios from 'axios';
 import { useStyletron } from 'baseui';
 import { Button } from 'baseui/button';
 import { Modal, ModalBody, ModalButton, ModalFooter, ModalHeader } from 'baseui/modal';
+import { Select } from 'baseui/select';
 import { Table, SIZE } from 'baseui/table-semantic';
 import { H2, H4, Paragraph1 } from 'baseui/typography';
 import React, { useEffect, useState } from 'react';
@@ -21,6 +22,16 @@ const CustomerOrdersPage = () => {
   const [detailModal, setDetailModal] = useState(false);
   const [detailOrder, setDetailOrder] = useState({});
   const [detailOrderTable, setDetailOrderTable] = useState([]);
+  const [status, setStatus] = useState([]);
+
+  const statusOpts = [
+    { id: '', status: 'ALL' },
+    { id: 'PLACED', status: 'PLACED' },
+    { id: 'PREPARING', status: 'PREPARING' },
+    { id: 'PICKUP_READY', status: 'PICKUP_READY' },
+    { id: 'COMPLETE', status: 'COMPLETE' },
+    { id: 'CANCEL', status: 'CANCEL' },
+  ];
 
   const seeOrderDetails = (o) => {
     setDetailModal(true);
@@ -42,7 +53,7 @@ const CustomerOrdersPage = () => {
 
   useEffect(() => {
     axios
-      .get(`/orders`)
+      .get(`/orders`, { params: { status: status[0] && status[0].id } })
       .then((res) => {
         setOrders(res.data);
         const ords = res.data.map((o) => {
@@ -62,14 +73,25 @@ const CustomerOrdersPage = () => {
       .catch((err) => {
         notify({ type: 'info', description: 'Error fetching orders.' });
       });
-  }, []);
+  }, [status]);
 
   return (
     <div>
       <NavBar />
       <div className={mainContainer}>
-        <H2>Your Orders</H2>
-        <H4>Current Orders</H4>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <H2>Your Orders</H2>
+          <div style={{ width: '20%' }}>
+            <Select
+              placeholder="Select Order Status"
+              options={statusOpts}
+              valueKey="id"
+              labelKey="status"
+              onChange={({ value }) => setStatus(value)}
+              value={status}
+            />
+          </div>
+        </div>
 
         <Table
           className={css({ width: '100%' })}

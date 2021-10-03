@@ -34,9 +34,15 @@ const getAddresses = async () => {
 const getAllOrders = async (req, res) => {
   const { user, role } = req.headers;
 
+  const { status } = req.query;
+
   let whereQ = { customerId: user };
   if (role == 'restaurant') {
     whereQ = { restaurantId: user };
+  }
+
+  if (status && status != '') {
+    whereQ.status = status;
   }
 
   const orders = await Order.findAll({
