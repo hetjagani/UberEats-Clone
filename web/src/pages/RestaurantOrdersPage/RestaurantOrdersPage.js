@@ -13,9 +13,8 @@ import Header from '../RestaurantDashboard/Header';
 const RestaurantOrdersPage = () => {
   const [css] = useStyletron();
   const mainContainer = css({
-    marginTop: '100px',
-    margin: '50px',
-    width: '95vw',
+    margin: '100px',
+    width: '90vw',
   });
 
   const [orders, setOrders] = useState([]);
@@ -24,6 +23,8 @@ const RestaurantOrdersPage = () => {
   const [detailModal, setDetailModal] = useState(false);
   const [detailOrder, setDetailOrder] = useState({});
   const [detailOrderTable, setDetailOrderTable] = useState([]);
+  const [modalMap, setModalMap] = useState({});
+  const [statusOrder, setStatusOrder] = useState(0);
 
   const seeOrderDetails = (o) => {
     setDetailModal(true);
@@ -51,13 +52,33 @@ const RestaurantOrdersPage = () => {
     { id: 'CANCEL', status: 'CANCEL' },
   ];
 
+  const openStatus = (id) => {
+    setStatusOrder(id);
+    const mm = modalMap;
+    mm[id] = true;
+    setModalMap(mm);
+  };
+
+  const closeStatus = () => {
+    const mm = modalMap;
+    mm[statusOrder] = false;
+    setModalMap(mm);
+    setStatusOrder(0);
+  };
+
   const updateStatus = (value, id) => {
-    console.log(value);
-    console.log(id);
+    const data = {
+      status: value[0] && value[0].id,
+    };
+
+    axios.put(`/orders/${id}`, data).then((res) => {
+      notify({ type: 'info', description: `Updated order status to ${data.status}` });
+    });
+
     const sm = statusMap;
     sm[id] = value;
     setStatusMap(sm);
-    console.log(statusMap);
+    closeStatus();
   };
 
   useEffect(() => {
@@ -66,38 +87,34 @@ const RestaurantOrdersPage = () => {
       .then((res) => {
         setOrders(res.data);
         const sm = {};
+        const mm = {};
         res.data.forEach((o) => {
           sm[o.id] = [{ id: o.status, status: o.status }];
+          mm[o.id] = false;
         });
         setStatusMap(sm);
+        setModalMap(mm);
+
+        const ords = res.data.map((o) => {
+          return [
+            <Paragraph1>{o.restaurant && o.restaurant.name}</Paragraph1>,
+            <Paragraph1>
+              {o.address && o.address.firstLine} {o.address && o.address.secondLine}
+            </Paragraph1>,
+            <Paragraph1>{o.type && o.type.toUpperCase()}</Paragraph1>,
+            <Paragraph1>${o.amount}</Paragraph1>,
+            <Button onClick={() => openStatus(o.id)}>Status</Button>,
+            <Button onClick={() => seeOrderDetails(o)}>Details</Button>,
+          ];
+        });
+        setTableData(ords);
       })
       .catch((err) => {
         notify({ type: 'info', description: 'Error fetching orders.' });
       });
   }, []);
 
-  useEffect(() => {
-    const ords = orders.map((o) => {
-      return [
-        <Paragraph1>{o.restaurant && o.restaurant.name}</Paragraph1>,
-        <Paragraph1>
-          {o.address && o.address.firstLine} {o.address && o.address.secondLine}
-        </Paragraph1>,
-        <Paragraph1>{o.type && o.type.toUpperCase()}</Paragraph1>,
-        <Paragraph1>${o.amount}</Paragraph1>,
-        <Paragraph1>{o.status}</Paragraph1>,
-        <Select
-          options={statusOpts}
-          valueKey="id"
-          labelKey="status"
-          onChange={({ value }) => updateStatus(value, o.id)}
-          value={statusMap[o.id]}
-        />,
-        <Button onClick={() => seeOrderDetails(o)}>Details</Button>,
-      ];
-    });
-    setTableData(ords);
-  }, [orders]);
+  useEffect(() => {}, [statusMap]);
 
   return (
     <div>
@@ -159,6 +176,24 @@ const RestaurantOrdersPage = () => {
                 setDetailOrder({});
               }}
             >
+              Cancel
+            </ModalButton>
+          </ModalFooter>
+        </Modal>
+
+        <Modal onClose={closeStatus} isOpen={modalMap[statusOrder]}>
+          <ModalHeader>Change Order Status</ModalHeader>
+          <ModalBody>
+            <Select
+              options={statusOpts}
+              valueKey="id"
+              labelKey="status"
+              onChange={({ value }) => updateStatus(value, statusOrder)}
+              value={statusMap[statusOrder]}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <ModalButton kind="tertiary" onClick={closeStatus}>
               Cancel
             </ModalButton>
           </ModalFooter>

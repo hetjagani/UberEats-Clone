@@ -382,16 +382,10 @@ const updateOrderStatus = async (req, res) => {
       restaurant: resResp.data,
     };
 
+    const addressMap = getAddresses();
+
     if (order.addressId) {
-      const addResp = await axios(
-        `${global.gConfig.customer_url}/customers/addresses/${order.addressId}`,
-        { headers: { Authorization: req.headers.authorization } },
-      );
-      if (resResp.status != 200) {
-        res.status(500).json(errors.serverError);
-        return;
-      }
-      result.address = addResp.data;
+      result.address = addressMap[order.addressId];
     }
 
     res.status(200).json(result);
@@ -399,7 +393,7 @@ const updateOrderStatus = async (req, res) => {
   } catch (err) {
     console.error(err);
     if (err.isAxiosError) {
-      if (err.response.status == 404) {
+      if (err.status == 404) {
         res.status(404).json({ ...errors.notFound, message: err.message });
       } else {
         res.status(500).json({ ...errors.serverError, message: err.message });

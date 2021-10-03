@@ -32,7 +32,7 @@ const CustomerOrdersPage = () => {
           oi.dish && oi.dish.name,
           oi.notes,
           oi.quantity,
-          `$${oi.dish.price} x ${oi.quantity}`,
+          `$${oi.dish && oi.dish.price} x ${oi.quantity}`,
         ];
       });
     td.push(['', '', 'Total', `$${o.amount}`]);
@@ -45,7 +45,7 @@ const CustomerOrdersPage = () => {
       .get(`/orders`)
       .then((res) => {
         setOrders(res.data);
-        const ords = orders.map((o) => {
+        const ords = res.data.map((o) => {
           return [
             <Paragraph1>{o.restaurant && o.restaurant.name}</Paragraph1>,
             <Paragraph1>
