@@ -1,5 +1,7 @@
 import {
   ADD_DISH_TO_CART,
+  CLEAR_CART,
+  DIFF_RESTAURANT_ERROR,
   FETCH_CART_ITEMS,
   PLACE_ORDER,
   REMOVE_DISH_FROM_CART,
@@ -8,6 +10,7 @@ import {
 const initialState = {
   restaurant: {},
   dishes: [], //{dish, quantity, notes}
+  diffRestaurantError: {},
 };
 
 export default (state = initialState, action) => {
@@ -55,6 +58,19 @@ export default (state = initialState, action) => {
         ...state,
         dishes: [],
         restaurant: {},
+      };
+
+    case CLEAR_CART:
+      return {
+        ...state,
+        dishes: [],
+        restaurant: {},
+      };
+
+    case DIFF_RESTAURANT_ERROR:
+      return {
+        ...state,
+        diffRestaurantError: action.payload,
       };
     default:
       return state;

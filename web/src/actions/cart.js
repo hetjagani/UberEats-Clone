@@ -1,6 +1,13 @@
 import axios from 'axios';
 import notify from '../utils/notify';
-import { ADD_DISH_TO_CART, FETCH_CART_ITEMS, PLACE_ORDER, REMOVE_DISH_FROM_CART } from './types';
+import {
+  ADD_DISH_TO_CART,
+  CLEAR_CART,
+  DIFF_RESTAURANT_ERROR,
+  FETCH_CART_ITEMS,
+  PLACE_ORDER,
+  REMOVE_DISH_FROM_CART,
+} from './types';
 
 export const fetchAllCartItems = (data) => {
   return (dispatch) => {
@@ -32,6 +39,12 @@ export const addDishToCart = (data) => {
       })
       .catch((err) => {
         notify({ type: 'error', description: JSON.stringify(err.response.data.message) });
+        if (err.response.data.type && err.response.data.type == 'diff_restaurant') {
+          dispatch({
+            type: DIFF_RESTAURANT_ERROR,
+            payload: err.response.data,
+          });
+        }
       });
   };
 };
@@ -57,6 +70,15 @@ export const placedOrder = () => {
   return (dispatch) => {
     dispatch({
       type: PLACE_ORDER,
+      payload: null,
+    });
+  };
+};
+
+export const clearCart = () => {
+  return (dispatch) => {
+    dispatch({
+      type: CLEAR_CART,
       payload: null,
     });
   };

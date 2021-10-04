@@ -24,5 +24,7 @@ export const FETCH_CART_ITEMS = 'FETCH_CART_ITEMS';
 export const ADD_DISH_TO_CART = 'ADD_DISH_TO_CART';
 export const REMOVE_DISH_FROM_CART = 'REMOVE_DISH_FROM_CART';
 export const PLACE_ORDER = 'PLACE_ORDER';
+export const CLEAR_CART = 'CLEAR_CART';
+export const DIFF_RESTAURANT_ERROR = 'DIFF_RESTAURANT_ERROR';
 
 export const NOTIFY = 'NOTIFY';

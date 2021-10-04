@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, ModalHeader, ModalBody, ModalFooter, ModalButton } from 'baseui/modal';
-import axios from 'axios';
+import { Modal, ModalHeader, ModalBody, ModalFooter } from 'baseui/modal';
 import DishCard from '../RestaurantDashboard/DishCard';
 import { Carousel } from 'react-responsive-carousel';
 import { useStyletron } from 'baseui';
@@ -11,7 +10,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addDishToCart } from '../../actions/cart';
 
 const DishDetails = ({ dish, resId }) => {
-  const [isOpen, setIsOpen] = useState(false);
   const [css] = useStyletron();
   const footerStyle = css({
     display: 'flex',
@@ -20,7 +18,7 @@ const DishDetails = ({ dish, resId }) => {
 
   const [quantity, setQuantity] = useState(1);
   const [notes, setNotes] = useState('');
-
+  const [isOpen, setIsOpen] = useState(false);
   const dispatch = useDispatch();
 
   const addDish = () => {

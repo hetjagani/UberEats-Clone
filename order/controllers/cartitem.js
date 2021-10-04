@@ -4,6 +4,19 @@ const { validationResult } = require('express-validator');
 const { CartItem } = require('../model');
 const errors = require('../util/errors');
 
+const getRestaurants = async (auth) => {
+  const res = await axios.get(`${global.gConfig.restaurant_url}/restaurants/all`, {
+    headers: { Authorization: auth },
+  });
+
+  const map = {};
+  res.data.forEach((ele) => {
+    map[ele.id] = ele;
+  });
+
+  return map;
+};
+
 const getAllCartItems = async (req, res) => {
   const { user } = req.headers;
 
@@ -62,18 +75,24 @@ const addCartItem = async (req, res) => {
     return;
   }
 
-  const cartItem = await CartItem.findOne({ where: { customerId: user } });
-
-  if (cartItem && cartItem.restaurantId != req.body.restaurantId) {
-    res.status(400).json({
-      status: 400,
-      message: `trying to add ${req.body.restaurantId} but cart has dishes for ${cartItem.restaurantId}`,
-    });
-    return;
-  }
-
   // fetch that restaurant and check if the dish is present
   try {
+    const restaurants = await getRestaurants(req.headers.authorization);
+
+    const cartItem = await CartItem.findOne({ where: { customerId: user } });
+
+    if (cartItem && cartItem.restaurantId != req.body.restaurantId) {
+      res.status(400).json({
+        status: 400,
+        type: 'diff_restaurant',
+        message: `Trying to add dish from <strong>${
+          restaurants[req.body.restaurantId].name
+        }</strong> but cart has dishes for <strong>${restaurants[cartItem.restaurantId].name}</strong>`,
+        time: Date.now(),
+      });
+      return;
+    }
+
     const response = await axios.get(
       `${global.gConfig.restaurant_url}/restaurants/${req.body.restaurantId}`,
       { headers: { authorization: req.headers.authorization } },
