@@ -4,10 +4,10 @@ import { Layer } from 'baseui/layer';
 import { AppNavBar, setItemActive } from 'baseui/app-nav-bar';
 import { useSelector } from 'react-redux';
 import { RiEdit2Line, RiLogoutBoxRLine } from 'react-icons/ri';
-import { CgColorPicker, CgList } from 'react-icons/cg';
+import { CgList } from 'react-icons/cg';
 import { AiOutlineUser } from 'react-icons/ai';
-import { Redirect, useHistory } from 'react-router';
-import { useState } from 'react';
+import { GrHome } from 'react-icons/gr';
+import { useHistory } from 'react-router';
 import { clearData } from '../../utils/clearData';
 
 const Header = () => {
@@ -18,6 +18,7 @@ const Header = () => {
   });
 
   const [userItems, setUserItems] = React.useState([
+    { icon: GrHome, label: 'Home' },
     { icon: AiOutlineUser, label: 'Customers' },
     { icon: CgList, label: 'Orders' },
     { icon: RiEdit2Line, label: 'Edit Profile' },
@@ -31,6 +32,9 @@ const Header = () => {
 
   const handelNavItem = (item) => {
     switch (item.label) {
+      case 'Home':
+        history.push('/dashboard');
+        break;
       case 'Edit Profile':
         history.push('/details/update');
         break;
@@ -57,6 +61,7 @@ const Header = () => {
           })}
         >
           <AppNavBar
+            onMainItemSelect={() => alert(1)}
             title={loginRestaurant.name}
             userItems={userItems}
             onUserItemSelect={handelNavItem}

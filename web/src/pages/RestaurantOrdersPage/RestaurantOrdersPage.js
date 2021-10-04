@@ -25,6 +25,7 @@ const RestaurantOrdersPage = () => {
   const [detailOrderTable, setDetailOrderTable] = useState([]);
   const [modalMap, setModalMap] = useState({});
   const [statusOrder, setStatusOrder] = useState(0);
+  const [status, setStatus] = useState([]);
 
   const seeOrderDetails = (o) => {
     setDetailModal(true);
@@ -83,7 +84,7 @@ const RestaurantOrdersPage = () => {
 
   useEffect(() => {
     axios
-      .get(`/orders`)
+      .get(`/orders`, { params: { status: status[0] && status[0].id } })
       .then((res) => {
         setOrders(res.data);
         const sm = {};
@@ -112,7 +113,7 @@ const RestaurantOrdersPage = () => {
       .catch((err) => {
         notify({ type: 'info', description: 'Error fetching orders.' });
       });
-  }, []);
+  }, [status]);
 
   useEffect(() => {}, [statusMap]);
 
@@ -122,7 +123,19 @@ const RestaurantOrdersPage = () => {
         <Header />
       </div>
       <div className={mainContainer}>
-        <H2>Your Orders</H2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <H2>Your Orders</H2>
+          <div style={{ width: '20%' }}>
+            <Select
+              placeholder="Select Order Status"
+              options={[{ id: '', status: 'ALL' }, ...statusOpts]}
+              valueKey="id"
+              labelKey="status"
+              onChange={({ value }) => setStatus(value)}
+              value={status}
+            />
+          </div>
+        </div>
 
         <Table
           className={css({ width: '100%' })}
