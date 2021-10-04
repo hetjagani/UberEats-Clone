@@ -87,19 +87,19 @@ const RestaurantDetails = () => {
             justifyContent: 'space-between',
           })}
         >
-          <div className={css({ width: '80vw' })}>
+          <div className={css({ width: '80vw', marginLeft:'130px' })}>
             <H5>
               {restaurant.name} ({restaurant.restaurant_type})
             </H5>
-            <Paragraph2>{restaurant.description}</Paragraph2>
-            <Paragraph2>{restaurant.address}</Paragraph2>
+            <Paragraph2><strong>Description: </strong>{restaurant.description}</Paragraph2>
+            <Paragraph2><strong>Address: </strong>{restaurant.address}</Paragraph2>
             <Paragraph2>
-              {restaurant.city} | {restaurant.state} | {restaurant.country}
+              <strong>Location: </strong>{restaurant.city} | {restaurant.state} | {restaurant.country}
             </Paragraph2>
           </div>
         </div>
       </div>
-      <div style={{ width: '90vw' }}>
+      <div style={{ width: '90vw', margin:'20px' }}>
         <FlexGrid flexGridColumnCount={3} flexGridColumnGap="scale800" flexGridRowGap="scale800">
           {dishes.length > 0 &&
             dishes.map((dish) => {

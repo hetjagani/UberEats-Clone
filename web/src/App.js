@@ -15,6 +15,7 @@ import CheckoutPage from './pages/CheckoutPage/CheckoutPage';
 import AddressesPage from './pages/AddressesPage/AddressesPage';
 import CustomerOrdersPage from './pages/CustomerOrdersPage/CustomerOrdersPage';
 import RestaurantOrdersPage from './pages/RestaurantOrdersPage/RestaurantOrdersPage';
+import CustomersPage from './pages/CustomersPage/CustomersPage';
 
 function App() {
   return (
@@ -55,6 +56,7 @@ function App() {
           <Route exact path="/cart" component={(props) => <MyCartPage />} />
           <Route exact path="/addresses" component={(props) => <AddressesPage />} />
           <Route exact path="/dashboard" component={(props) => <RestaurantDashboard />} />
+          <Route exact path="/customers" component={(props) => <CustomersPage />} />
         </Switch>
       </Router>
     </div>

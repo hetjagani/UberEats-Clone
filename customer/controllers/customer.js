@@ -1,23 +1,54 @@
 /* eslint-disable eqeqeq */
+const { default: axios } = require('axios');
 const { validationResult } = require('express-validator');
-const {
-  Customer, Media, Address, Favourite,
-} = require('../model');
+const { Op } = require('sequelize');
+const { Customer, Media, Address, Favourite } = require('../model');
 const errors = require('../util/errors');
 const getPaiganation = require('../util/paiganation');
 
-// TODO: only for restaurants
+// get customers of a restaurant
 const getAllCustomers = async (req, res) => {
-  const { limit, offset } = getPaiganation(req.query.page, req.query.limit);
+  const { authorization } = req.headers;
+  const { q } = req.query;
+  try {
+    // fetch all restaurant's orders from orders service
+    const orderRes = await axios.get(`${global.gConfig.order_url}/orders`, {
+      headers: { Authorization: authorization },
+    });
 
-  const cusCount = await Customer.count();
-  const customers = await Customer.findAll({
-    limit,
-    offset,
-    include: [Media, Address],
-  });
+    // get all customer ids from all orders and return those customers
+    const customerIds = orderRes.data.map((order) => {
+      if (order.status != 'INIT') return order.customerId;
+      return 0;
+    });
 
-  res.status(200).json({ total: cusCount, nodes: customers });
+    const { limit, offset } = getPaiganation(req.query.page, req.query.limit);
+
+    const cusCount = await Customer.count({ where: { id: customerIds } });
+    const customers = await Customer.findAll({
+      where: {
+        [Op.and]: [{ id: customerIds }, { name: { [Op.like]: `%${q}%` } }],
+      },
+      limit,
+      offset,
+      include: [Media, Address],
+    });
+
+    res.status(200).json({ total: cusCount, nodes: customers });
+  } catch (err) {
+    console.error(err);
+    if (err.isAxiosError) {
+      if (err.response.status == 404) {
+        res.status(404).json({ ...errors.notFound, message: err.message });
+      } else {
+        res.status(500).json({ ...errors.serverError, message: err.message });
+      }
+    } else if (err.original) {
+      res.status(500).json({ status: 500, message: err.original.sqlMessage });
+    } else {
+      res.status(500).json(errors.serverError);
+    }
+  }
 };
 
 // TODO: restaurant should be able to get info of his/her customer

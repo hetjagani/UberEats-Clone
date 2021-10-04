@@ -35,6 +35,9 @@ const Header = () => {
       case 'Home':
         history.push('/dashboard');
         break;
+      case 'Customers':
+        history.push('/customers');
+        break;
       case 'Edit Profile':
         history.push('/details/update');
         break;

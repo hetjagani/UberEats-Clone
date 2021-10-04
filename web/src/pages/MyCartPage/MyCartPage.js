@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import NavBar from '../RestaurantsPage/NavBar';
 import { Table, SIZE } from 'baseui/table-semantic';
 import { Button } from 'baseui/button';
-import { removeDishFromCart } from '../../actions/cart';
+import { placedOrder, removeDishFromCart } from '../../actions/cart';
 import { Carousel } from 'react-responsive-carousel';
 import axios from 'axios';
 import { useHistory } from 'react-router';
@@ -72,6 +72,7 @@ const MyCartPage = () => {
       .post(`/orders/${restaurant.restaurant_type}`)
       .then((res) => {
         console.log(res.data);
+        dispatch(placedOrder())
         history.push(`/orders/${res.data.id}`);
       })
       .catch((err) => {
