@@ -21,11 +21,11 @@ const User = global.DB.define('users', {
   },
 });
 
-const runMigration = async () => {
+const runMigration = async (force) => {
   if (!global.DB) {
     return Promise.reject(new Error('please initialize DB'));
   }
-  await User.sync();
+  await User.sync({ force });
   return Promise.resolve(global.DB);
 };
 
