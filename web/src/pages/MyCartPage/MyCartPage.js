@@ -1,5 +1,5 @@
 import { useStyletron } from 'baseui';
-import { H2, Label1 } from 'baseui/typography';
+import { H2, Paragraph2 } from 'baseui/typography';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import NavBar from '../RestaurantsPage/NavBar';
@@ -127,24 +127,24 @@ const MyCartPage = () => {
                 );
               })}
           </Carousel>
-          <Label1>
+          <Paragraph2>
             <strong>Name:</strong> {restaurant.name}
-          </Label1>
-          <Label1>
+          </Paragraph2>
+          <Paragraph2>
             <strong>Description:</strong> {restaurant.description}
-          </Label1>
-          <Label1>
+          </Paragraph2>
+          <Paragraph2>
             <strong>Address:</strong> {restaurant.address}
-          </Label1>
-          <Label1>
+          </Paragraph2>
+          <Paragraph2>
             <strong>Contact No:</strong> {restaurant.contact_no}
-          </Label1>
-          <Label1>
+          </Paragraph2>
+          <Paragraph2>
             <strong>Timing:</strong> {restaurant.time_open} - {restaurant.time_close}
-          </Label1>
-          <Label1>
+          </Paragraph2>
+          <Paragraph2>
             <strong>Type:</strong> {restaurant.restaurant_type && restaurant.restaurant_type.toUpperCase()}
-          </Label1>
+          </Paragraph2>
         </div>
       </div>
     </div>

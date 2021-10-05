@@ -3,7 +3,7 @@ import { useStyletron } from 'baseui';
 import { Button, SIZE as btnSize } from 'baseui/button';
 import { Select } from 'baseui/select';
 import { Table, SIZE } from 'baseui/table-semantic';
-import { H2, Label1 } from 'baseui/typography';
+import { H2, Paragraph2 } from 'baseui/typography';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Carousel } from 'react-responsive-carousel';
@@ -12,6 +12,10 @@ import { placedOrder } from '../../actions/cart';
 import notify from '../../utils/notify';
 import withAuth from '../AuthPage/withAuth';
 import NavBar from '../RestaurantsPage/NavBar';
+import { Modal, ModalHeader, ModalBody, ModalFooter, ModalButton, ROLE } from 'baseui/modal';
+import { FormControl } from 'baseui/form-control';
+import { Input } from 'baseui/input';
+import { createCustomerAddress } from '../../actions/customers';
 
 const CheckoutPage = () => {
   const [css] = useStyletron();
@@ -30,6 +34,24 @@ const CheckoutPage = () => {
     alignItems: 'baseline',
   });
 
+  const cityOpts = [
+    { id: 'San Jose', city: 'San Jose' },
+    { id: 'Berkely', city: 'Berkely' },
+    { id: 'Los Angeles', city: 'Los Angeles' },
+    { id: 'San Diego', city: 'San Diego' },
+    { id: 'San Francisco', city: 'San Francisco' },
+    { id: 'Fresno', city: 'Fresno' },
+    { id: 'Sacremento', city: 'Sacremento' },
+  ];
+
+  const stateOpts = [
+    { id: 'California', state: 'California' },
+    { id: 'Arizona', state: 'Arizona' },
+    { id: 'Colorado', state: 'Colorado' },
+  ];
+
+  const countryOpts = [{ id: 'United States', country: 'United States' }];
+
   const { id } = useParams();
   const history = useHistory();
 
@@ -37,6 +59,14 @@ const CheckoutPage = () => {
   const [tableData, setTableData] = useState([]);
   const [address, setAddress] = useState([]);
   const [addressOpts, setAddressOpts] = useState([]);
+
+  const [firstLine, setFirstLine] = useState('');
+  const [secondLine, setSecondLine] = useState('');
+  const [zipcode, setZipcode] = useState(0);
+  const [city, setCity] = useState([]);
+  const [state, setState] = useState([]);
+  const [country, setCountry] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
 
   const { loginCustomer, addresses } = useSelector((state) => {
     return { loginCustomer: state.customers.loginCustomer, addresses: state.customers.addresses };
@@ -105,6 +135,22 @@ const CheckoutPage = () => {
       });
   };
 
+  const saveAddress = () => {
+    const data = {
+      firstLine,
+      secondLine,
+      zipcode,
+      city: city[0] && city[0].id,
+      state: state[0] && state[0].id,
+      country: country[0] && country[0].id,
+      customerId: loginCustomer.id,
+    };
+
+    dispatch(createCustomerAddress(data)).then(() => {
+      setOpenModal(false);
+    });
+  };
+
   return (
     <div>
       <NavBar />
@@ -148,6 +194,15 @@ const CheckoutPage = () => {
                 onChange={({ value }) => setAddress(value)}
                 value={address}
               />
+              <Button
+                size="compact"
+                className={css({ width: '100%' })}
+                onClick={() => {
+                  setOpenModal(true);
+                }}
+              >
+                Add Address
+              </Button>
             </div>
             <Button onClick={placeOrder}>Place Order</Button>
           </div>
@@ -173,27 +228,103 @@ const CheckoutPage = () => {
                 );
               })}
           </Carousel>
-          <Label1>
+          <Paragraph2>
             <strong>Name:</strong> {order.restaurant && order.restaurant.name}
-          </Label1>
-          <Label1>
+          </Paragraph2>
+          <Paragraph2>
             <strong>Description:</strong> {order.restaurant && order.restaurant.description}
-          </Label1>
-          <Label1>
+          </Paragraph2>
+          <Paragraph2>
             <strong>Address:</strong> {order.restaurant && order.restaurant.address}
-          </Label1>
-          <Label1>
+          </Paragraph2>
+          <Paragraph2>
             <strong>Contact No:</strong> {order.restaurant && order.restaurant.contact_no}
-          </Label1>
-          <Label1>
+          </Paragraph2>
+          <Paragraph2>
             <strong>Timing:</strong> {order.restaurant && order.restaurant.time_open} -
             {order.restaurant && order.restaurant.time_close}
-          </Label1>
-          <Label1>
+          </Paragraph2>
+          <Paragraph2>
             <strong>Type:</strong>
             {order.restaurant && order.restaurant.restaurant_type.toUpperCase()}
-          </Label1>
+          </Paragraph2>
         </div>
+
+        <Modal
+          onClose={() => {
+            setOpenModal(false);
+          }}
+          isOpen={openModal}
+          overrides={{
+            Dialog: {
+              style: {
+                width: '50vw',
+                height: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+              },
+            },
+          }}
+        >
+          <ModalHeader>Add Address</ModalHeader>
+          <ModalBody style={{ flex: '1 1 0' }}>
+            <FormControl label={() => 'First Line'}>
+              <Input value={firstLine} onChange={(e) => setFirstLine(e.target.value)} required />
+            </FormControl>
+            <FormControl label={() => 'Second Line'}>
+              <Input value={secondLine} onChange={(e) => setSecondLine(e.target.value)} required />
+            </FormControl>
+            <FormControl label={() => 'Zipcode'}>
+              <Input
+                type="number"
+                value={zipcode}
+                onChange={(e) => setZipcode(e.target.value)}
+                required
+              />
+            </FormControl>
+            <FormControl label="City">
+              <Select
+                value={city}
+                onChange={({ value }) => setCity(value)}
+                options={cityOpts}
+                labelKey="city"
+                valueKey="id"
+                required
+              />
+            </FormControl>
+            <FormControl label="State">
+              <Select
+                value={state}
+                onChange={({ value }) => setState(value)}
+                options={stateOpts}
+                labelKey="state"
+                valueKey="id"
+                required
+              />
+            </FormControl>
+            <FormControl label="Country">
+              <Select
+                value={country}
+                onChange={({ value }) => setCountry(value)}
+                options={countryOpts}
+                labelKey="country"
+                valueKey="id"
+                required
+              />
+            </FormControl>
+          </ModalBody>
+          <ModalFooter>
+            <ModalButton
+              kind="minimal"
+              onClick={(e) => {
+                setOpenModal(false);
+              }}
+            >
+              CANCEL
+            </ModalButton>
+            <ModalButton onClick={saveAddress}>SAVE</ModalButton>
+          </ModalFooter>
+        </Modal>
       </div>
     </div>
   );

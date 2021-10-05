@@ -6,6 +6,7 @@ import { Select } from 'baseui/select';
 import { Table, SIZE } from 'baseui/table-semantic';
 import { H2, H4, Paragraph1 } from 'baseui/typography';
 import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router';
 import notify from '../../utils/notify';
 import withAuth from '../AuthPage/withAuth';
 import NavBar from '../RestaurantsPage/NavBar';
@@ -16,6 +17,8 @@ const CustomerOrdersPage = () => {
     margin: '50px',
     width: '95vw',
   });
+
+  const history = useHistory();
 
   const [orders, setOrders] = useState([]);
   const [tableData, setTableData] = useState([]);
@@ -138,6 +141,11 @@ const CustomerOrdersPage = () => {
             />
           </ModalBody>
           <ModalFooter>
+            {detailOrder.status === 'INIT' && (
+              <ModalButton onClick={() => history.push(`/orders/${detailOrder.id}`)}>
+                Complete Order
+              </ModalButton>
+            )}
             <ModalButton
               kind="tertiary"
               onClick={() => {

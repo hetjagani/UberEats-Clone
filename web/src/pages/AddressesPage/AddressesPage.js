@@ -144,7 +144,6 @@ const AddressesPage = () => {
       country: country[0] && country[0].id,
       customerId: loginCustomer.id,
     };
-    console.log(data);
     if (update) {
       dispatch(updateCustomerAddress(data, updateId)).then(() => {
         setOpenModal(false);
