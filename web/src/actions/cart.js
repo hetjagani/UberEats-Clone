@@ -77,9 +77,17 @@ export const placedOrder = () => {
 
 export const clearCart = () => {
   return (dispatch) => {
-    dispatch({
-      type: CLEAR_CART,
-      payload: null,
-    });
+    return axios
+      .delete(`/cartitems/reset`)
+      .then((res) => {
+        dispatch({
+          type: CLEAR_CART,
+          payload: null,
+        });
+        notify({ type: 'info', description: 'Cleared Cart' });
+      })
+      .catch((err) => {
+        notify({ type: 'error', description: JSON.stringify(err.response.data.message) });
+      });
   };
 };
