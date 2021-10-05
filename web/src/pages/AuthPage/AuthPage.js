@@ -49,10 +49,21 @@ const AuthPage = ({ flow, role, ...props }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginRole, setLoginRole] = useState('');
 
+  const history = useHistory();
+
   useEffect(() => {
     const email = query.get('email');
     if (email && email != '') {
       setEmail(email);
+    }
+
+    const loginDetails = getLoginDetails();
+    if (loginDetails.role) {
+      if (loginDetails.role == 'customer') {
+        history.push('/restaurants');
+      } else if (loginDetails.role == 'restaurant') {
+        history.push('/dashboard');
+      }
     }
   }, []);
 
@@ -63,8 +74,6 @@ const AuthPage = ({ flow, role, ...props }) => {
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(String(email).toLowerCase());
   };
-
-  const history = useHistory();
 
   const submitHandler = () => {
     if (flow === 'login' && (email == '' || password == '')) {

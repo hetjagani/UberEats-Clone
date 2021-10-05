@@ -1,11 +1,12 @@
 import { useStyletron } from 'baseui';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { H1 } from 'baseui/typography';
 import Header from './Header';
 import { Drawer, ANCHOR, SIZE } from 'baseui/drawer';
 import { Button, SIZE as BSIZE } from 'baseui/button';
 import { Input, SIZE as ISIZE, ADJOINED } from 'baseui/input';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
+import getLoginDetails from '../../utils/getLoginDetails';
 
 const LandingPage = () => {
   const [css, theme] = useStyletron();
@@ -36,6 +37,18 @@ const LandingPage = () => {
     marginTop: '20px',
   });
 
+  const history = useHistory();
+  useEffect(() => {
+    const loginDetails = getLoginDetails();
+    if (loginDetails.role) {
+      if (loginDetails.role == 'customer') {
+        history.push('/restaurants');
+      } else if (loginDetails.role == 'restaurant') {
+        history.push('/dashboard');
+      }
+    }
+  }, []);
+
   const [isOpen, setIsOpen] = useState(false);
   const [email, setEmail] = useState('');
 
@@ -56,7 +69,8 @@ const LandingPage = () => {
             </span>
           </Link>
         </div>
-        <span className={css({fontWeight:'bold', margin:'5px'})} >Click Here to <Link to={'/auth/registerres'}>add your restaurant</Link>
+        <span className={css({ fontWeight: 'bold', margin: '5px' })}>
+          Click Here to <Link to={'/auth/registerres'}>add your restaurant</Link>
         </span>
       </div>
       <Drawer
