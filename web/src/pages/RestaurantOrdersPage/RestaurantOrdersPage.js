@@ -84,31 +84,41 @@ const RestaurantOrdersPage = () => {
 
   useEffect(() => {
     axios
-      .get(`/orders`, { params: { status: status[0] && status[0].id } })
+      .get('/customers')
       .then((res) => {
-        setOrders(res.data);
-        const sm = {};
-        const mm = {};
-        res.data.forEach((o) => {
-          sm[o.id] = [{ id: o.status, status: o.status }];
-          mm[o.id] = false;
-        });
-        setStatusMap(sm);
-        setModalMap(mm);
+        const cusMap = {};
+        res.data.nodes &&
+          res.data.nodes.forEach((cus) => {
+            cusMap[cus.id] = cus;
+          });
 
-        const ords = res.data.map((o) => {
-          return [
-            <Paragraph1>{o.restaurant && o.restaurant.name}</Paragraph1>,
-            <Paragraph1>
-              {o.address && o.address.firstLine} {o.address && o.address.secondLine}
-            </Paragraph1>,
-            <Paragraph1>{o.type && o.type.toUpperCase()}</Paragraph1>,
-            <Paragraph1>${o.amount}</Paragraph1>,
-            <Button onClick={() => openStatus(o.id)}>Status</Button>,
-            <Button onClick={() => seeOrderDetails(o)}>Details</Button>,
-          ];
-        });
-        setTableData(ords);
+        return axios
+          .get(`/orders`, { params: { status: status[0] && status[0].id } })
+          .then((res) => {
+            const sm = {};
+            const mm = {};
+            res.data.forEach((o) => {
+              sm[o.id] = [{ id: o.status, status: o.status }];
+              mm[o.id] = false;
+            });
+            setStatusMap(sm);
+            setModalMap(mm);
+
+            const ords = res.data.map((o) => {
+              return [
+                <Paragraph1>{cusMap[o.customerId].name}</Paragraph1>,
+                <Paragraph1>
+                  {o.address && o.address.firstLine} {o.address && o.address.secondLine}
+                </Paragraph1>,
+                <Paragraph1>{o.type && o.type.toUpperCase()}</Paragraph1>,
+                <Paragraph1>${o.amount}</Paragraph1>,
+                <Button onClick={() => openStatus(o.id)}>Status</Button>,
+                <Button onClick={() => seeOrderDetails(o)}>Details</Button>,
+              ];
+            });
+            setTableData(ords);
+            setOrders(res.data);
+          });
       })
       .catch((err) => {
         notify({ type: 'info', description: 'Error fetching orders.' });
@@ -140,7 +150,7 @@ const RestaurantOrdersPage = () => {
         <Table
           className={css({ width: '100%' })}
           size={SIZE.spacious}
-          columns={['Restaurant', 'Address', 'Type', 'Price', 'Status', 'Details']}
+          columns={['Customer', 'Address', 'Type', 'Price', 'Status', 'Details']}
           data={tableData}
         />
         <Modal

@@ -9,7 +9,10 @@ const getPaiganation = require('../util/paiganation');
 // get customers of a restaurant
 const getAllCustomers = async (req, res) => {
   const { authorization } = req.headers;
-  const { q } = req.query;
+  let { q } = req.query;
+  if (!q) {
+    q = '';
+  }
   try {
     // fetch all restaurant's orders from orders service
     const orderRes = await axios.get(`${global.gConfig.order_url}/orders`, {

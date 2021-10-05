@@ -48,6 +48,7 @@ const getAllOrders = async (req, res) => {
   const orders = await Order.findAll({
     where: whereQ,
     include: [OrderItem],
+    order: [['id', 'DESC']],
   });
 
   try {
