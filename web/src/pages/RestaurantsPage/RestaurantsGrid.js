@@ -13,7 +13,7 @@ import { MdFavouriteBorder, MdFavorite, MdFavoriteBorder } from 'react-icons/md'
 import { addCustomerFavourite, deleteCustomerFavourite } from '../../actions/customers';
 import { Pagination, SIZE } from 'baseui/pagination';
 
-const RestaurantsGrid = ({ favs }) => {
+const RestaurantsGrid = ({ favs, address, city, restaurant_type, food_type, searchQ }) => {
   const [css] = useStyletron();
   const mainContainer = css({
     display: 'flex',
@@ -45,16 +45,21 @@ const RestaurantsGrid = ({ favs }) => {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
 
-  const { favourites } = useSelector((state) => {
-    return { favourites: state.customers.favourites };
+  const { favourites, loginCustomer } = useSelector((state) => {
+    return { favourites: state.customers.favourites, loginCustomer: state.customers.loginCustomer };
   });
 
   useEffect(() => {
     axios
       .get(`/restaurants`, {
         params: {
+          city: loginCustomer.city,
+          restaurant_type,
+          food_type,
+          q: searchQ,
           page,
           limit: 8,
+          address: address,
         },
       })
       .then((res) => {
@@ -66,7 +71,7 @@ const RestaurantsGrid = ({ favs }) => {
       .catch((err) => {
         notify({ type: 'error', description: 'Error fetching restaurants' });
       });
-  }, [page]);
+  }, [page, address, restaurant_type, food_type, searchQ]);
 
   useEffect(() => {
     const fm = {};

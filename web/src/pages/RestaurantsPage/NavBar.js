@@ -6,7 +6,7 @@ import {
   StyledNavigationList as NavigationList,
 } from 'baseui/header-navigation';
 import { StyledLink as Link } from 'baseui/link';
-import { StatefulSelect as Search, TYPE } from 'baseui/select';
+import { Select, StatefulSelect as Search, TYPE } from 'baseui/select';
 import { ANCHOR, Drawer } from 'baseui/drawer';
 import Menu from 'baseui/icon/menu';
 import { Radio, RadioGroup } from 'baseui/radio';
@@ -22,8 +22,19 @@ import { useHistory } from 'react-router';
 import { NavLink } from 'react-router-dom';
 import { clearData } from '../../utils/clearData';
 import { ButtonGroup, SIZE as btnGrpSize, SHAPE as btnGrpShp, MODE } from 'baseui/button-group';
+import { Input } from 'baseui/input';
+import { BiFoodTag } from 'react-icons/bi';
 
-const NavBar = () => {
+const NavBar = ({
+  address,
+  setAddress,
+  restaurantType,
+  setRestaurantType,
+  foodType,
+  setFoodType,
+  searchQ,
+  setSearchQ,
+}) => {
   const [css] = useStyletron();
 
   const drawerContainer = css({
@@ -32,21 +43,15 @@ const NavBar = () => {
     alignItems: 'center',
   });
 
-  const searchOpts = [
-    { id: 'AliceBlue', color: '#F0F8FF' },
-    { id: 'AntiqueWhite', color: '#FAEBD7' },
-    { id: 'Aqua', color: '#00FFFF' },
-    { id: 'Aquamarine', color: '#7FFFD4' },
-    { id: 'Azure', color: '#F0FFFF' },
-    { id: 'Beige', color: '#F5F5DC' },
-    { id: 'Bisque', color: '#FFE4C4' },
-    { id: 'Black', color: '#000000' },
+  const foodTypeOpts = [
+    { id: '', foodType: 'All' },
+    { id: 'veg', foodType: 'Vegitarian' },
+    { id: 'non-veg', foodType: 'Non Vegitarian' },
+    { id: 'vegan', foodType: 'Vegan' },
   ];
 
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [searchQ, setSearchQ] = useState([]);
   const [deliveryTypeselected, setDeliveryTypeselected] = useState(0);
-  const [city, setCity] = useState([]);
 
   const { loginCustomer, medium, cartDishes } = useSelector((state) => {
     return {
@@ -61,11 +66,6 @@ const NavBar = () => {
   const signOutUser = () => {
     clearData();
     window.location.href = '/auth/login';
-  };
-
-  const toggleFavourites = () => {
-    setFavs(!favs);
-    setDrawerOpen(false);
   };
 
   return (
@@ -132,6 +132,18 @@ const NavBar = () => {
                   <Link href="/addresses">Addresses</Link>
                 </ListItemLabel>
               </ListItem>
+              <ListItem artwork={(props) => <BiFoodTag size={25} />}>
+                <Search
+                  options={foodTypeOpts}
+                  labelKey="foodType"
+                  valueKey="id"
+                  placeholder="Filter By Food Type"
+                  onChange={({ value }) => {
+                    setFoodType(value);
+                  }}
+                  value={foodType}
+                />
+              </ListItem>
             </div>
             <div style={{ width: '100%' }}>
               <Button
@@ -190,6 +202,7 @@ const NavBar = () => {
                 selected={deliveryTypeselected}
                 onClick={(event, index) => {
                   setDeliveryTypeselected(index);
+                  index == 0 ? setRestaurantType('delivery') : setRestaurantType('pickup');
                 }}
               >
                 <Button
@@ -210,34 +223,22 @@ const NavBar = () => {
             </div>
           </NavigationItem>
           <NavigationItem style={{ width: '20vw', margin: '10px' }}>
-            <Search
-              options={searchOpts}
-              labelKey="id"
-              valueKey="color"
-              placeholder="Search city"
-              maxDropdownHeight="300px"
-              type={TYPE.search}
-              getOptionLabel={(props) => props.option.id || null}
-              onChange={({ value }) => {
-                setCity(value);
+            <Input
+              placeholder="Search Address"
+              onChange={(e) => {
+                setAddress(e.target.value);
               }}
-              value={city}
+              value={address}
             />
           </NavigationItem>
         </NavigationList>
         <NavigationList $align={ALIGN.center} />
         <NavigationList $align={ALIGN.right} style={{ margin: '20px' }}>
           <NavigationItem style={{ width: '40vw' }}>
-            <Search
-              options={searchOpts}
-              labelKey="id"
-              valueKey="color"
-              placeholder="What are you craving?"
-              maxDropdownHeight="300px"
-              type={TYPE.search}
-              getOptionLabel={(props) => props.option.id || null}
-              onChange={({ value }) => {
-                setSearchQ(value);
+            <Input
+              placeholder="Search Restaurants"
+              onChange={(e) => {
+                setSearchQ(e.target.value);
               }}
               value={searchQ}
             />

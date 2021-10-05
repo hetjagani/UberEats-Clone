@@ -17,6 +17,7 @@ import { Card } from 'baseui/card';
 import { FileUploader } from 'baseui/file-uploader';
 import S3 from 'react-aws-s3';
 import notify from '../../utils/notify';
+import { useHistory } from 'react-router';
 
 function CustomerDetails({ loginDetails, update }) {
   const [css, theme] = useStyletron();
@@ -81,6 +82,7 @@ function CustomerDetails({ loginDetails, update }) {
   }, []);
 
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const saveCustomerDetails = () => {
     const data = {
@@ -95,9 +97,13 @@ function CustomerDetails({ loginDetails, update }) {
       mediumId: medium && medium.id,
     };
     if (update) {
-      dispatch(updateCustomer(data, data.id));
+      dispatch(updateCustomer(data, data.id)).then(() => {
+        history.push('/restaurants');
+      });
     } else {
-      dispatch(createCustomer(data));
+      dispatch(createCustomer(data)).then(() => {
+        history.push('/restaurants');
+      });
     }
   };
 

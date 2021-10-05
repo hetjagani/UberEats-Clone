@@ -1,5 +1,7 @@
+/* eslint-disable camelcase */
 /* eslint-disable eqeqeq */
 const { validationResult } = require('express-validator');
+const { Op } = require('sequelize');
 const { Restaurant, Media, Dish } = require('../model');
 const errors = require('../util/errors');
 const getPaiganation = require('../util/paiganation');
@@ -11,10 +13,37 @@ const allRestaurants = async (req, res) => {
 };
 
 const getAllRestaurants = async (req, res) => {
+  const whereOpts = [];
+  const { address, city, restaurant_type, food_type, q } = req.query;
+  if (address && address != '') {
+    whereOpts.push({ address: { [Op.like]: `%${address}%` } });
+  }
+
+  if (city && city != '') {
+    whereOpts.push({ city });
+  }
+
+  if (restaurant_type && restaurant_type != '') {
+    whereOpts.push({ restaurant_type });
+  }
+
+  if (food_type && food_type != '') {
+    whereOpts.push({ food_type });
+  }
+
+  if (q && q != '') {
+    whereOpts.push({
+      [Op.or]: [{ name: { [Op.like]: `%${q}%` } }, { description: { [Op.like]: `%${q}%` } }],
+    });
+  }
+
   const { limit, offset } = getPaiganation(req.query.page, req.query.limit);
 
   const resCount = await Restaurant.count();
   const restaurants = await Restaurant.findAll({
+    where: {
+      [Op.and]: whereOpts,
+    },
     limit,
     offset,
     include: [Media, Dish],
