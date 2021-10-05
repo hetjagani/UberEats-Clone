@@ -55,9 +55,7 @@ const RestaurantDetails = () => {
   };
 
   useEffect(() => {
-    // alert(diffRestaurantError);
-    console.log(diffRestaurantError);
-    setErrDiffRes(true);
+    dsetErrDiffRes(true);
   }, [diffRestaurantError.time]);
 
   const closeErrDiff = () => {

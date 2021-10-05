@@ -1,11 +1,10 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 import { Redirect, Route } from 'react-router';
 import getLoginDetails from '../../utils/getLoginDetails';
 
 const withAuth = (WrappedComponent, ar) => {
   return (props) => {
-    const { role, id } = getLoginDetails();
+    const { role } = getLoginDetails();
 
     if (!role) {
       return <Redirect to={'/auth/login'} />;
@@ -16,7 +15,11 @@ const withAuth = (WrappedComponent, ar) => {
     } else if (ar === 'any') {
       return <WrappedComponent {...props} />;
     } else {
-      return <div>Unauthorized</div>;
+      return role === 'customer' ? (
+        <Redirect to={'/restaurants'} />
+      ) : (
+        <Redirect to={'/dashboard'} />
+      );
     }
   };
 };

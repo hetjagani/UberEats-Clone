@@ -94,7 +94,7 @@ const AuthPage = ({ flow, role, ...props }) => {
       .post(`${window.BACKEND_API_URL}${authURL}`, { email, password, role: inprole[0].id })
       .then((res) => {
         const { token } = res.data;
-        setCookie('auth', token);
+        setCookie('auth', token, { path: '/' });
         const tokenData = getLoginDetails();
 
         setLoginRole(tokenData.role);

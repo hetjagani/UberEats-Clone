@@ -11,6 +11,7 @@ import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { MdFavouriteBorder, MdFavorite, MdFavoriteBorder } from 'react-icons/md';
 import { addCustomerFavourite, deleteCustomerFavourite } from '../../actions/customers';
+import { Pagination, SIZE } from 'baseui/pagination';
 
 const RestaurantsGrid = ({ favs }) => {
   const [css] = useStyletron();
@@ -19,6 +20,7 @@ const RestaurantsGrid = ({ favs }) => {
     justifyContent: 'center',
     alignItems: 'center',
     margin: '20px',
+    flexDirection: 'column',
   });
 
   const itemProps = {
@@ -40,6 +42,8 @@ const RestaurantsGrid = ({ favs }) => {
 
   const [restaurants, setRestaurants] = useState([]);
   const [favMap, setFavMap] = useState({});
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
 
   const { favourites } = useSelector((state) => {
     return { favourites: state.customers.favourites };
@@ -47,16 +51,22 @@ const RestaurantsGrid = ({ favs }) => {
 
   useEffect(() => {
     axios
-      .get(`/restaurants`)
+      .get(`/restaurants`, {
+        params: {
+          page,
+          limit: 8,
+        },
+      })
       .then((res) => {
         if (res.data.total > 0) {
           setRestaurants(res.data.nodes);
+          setTotal(Math.floor(res.data.total / 8) + 1);
         }
       })
       .catch((err) => {
         notify({ type: 'error', description: 'Error fetching restaurants' });
       });
-  }, []);
+  }, [page]);
 
   useEffect(() => {
     const fm = {};
@@ -96,12 +106,13 @@ const RestaurantsGrid = ({ favs }) => {
         width="100%"
         flexGridColumnGap="scale800"
         flexGridRowGap="scale800"
+        className={css({ margin: '20px' })}
       >
         {restaurants &&
           restaurants.map((res) => {
             return favs ? (
               favMap[res.id] && (
-                <FlexGridItem {...itemProps}>
+                <FlexGridItem key={res.id} {...itemProps}>
                   <Card
                     overrides={{
                       Root: { style: { width: '450px', height: 'fit-content' } },
@@ -150,7 +161,7 @@ const RestaurantsGrid = ({ favs }) => {
                 </FlexGridItem>
               )
             ) : (
-              <FlexGridItem {...itemProps}>
+              <FlexGridItem key={res.id} {...itemProps}>
                 <Card
                   overrides={{
                     Root: { style: { width: '450px', height: 'fit-content' } },
@@ -199,6 +210,13 @@ const RestaurantsGrid = ({ favs }) => {
             );
           })}
       </FlexGrid>
+      <Pagination
+        numPages={total}
+        currentPage={page}
+        onPageChange={({ nextPage }) => {
+          setPage(Math.min(Math.max(nextPage, 1), 20));
+        }}
+      />
     </div>
   );
 };
