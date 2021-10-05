@@ -94,7 +94,7 @@ const RestaurantDashboard = () => {
           </div>
         </div>
       </div>
-      <div style={{ width: '90vw' }}>
+      <div style={{ width: '90vw', margin:'40px' }}>
         <FlexGrid flexGridColumnCount={3} flexGridColumnGap="scale800" flexGridRowGap="scale800">
           {dishes.length > 0 &&
             dishes.map((dish) => {

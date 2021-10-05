@@ -5,6 +5,7 @@ import {
   CREATE_RESTAURANT,
   CREATE_RESTAURANT_DISH,
   CREATE_RESTAURANT_MEDIA,
+  DELETE_RESTAURANT_DISH,
   FETCH_AUTH_RESTAURANT,
   UPDATE_RESTAURANT,
   UPDATE_RESTAURANT_DISH,
@@ -59,6 +60,13 @@ export default (state = initialState, action) => {
       return {
         ...state,
         dishes: [...filteredDishes, action.payload.dish],
+      };
+
+    case DELETE_RESTAURANT_DISH:
+      let afterDeleteDishes = state.dishes.filter((d) => d.id != action.payload);
+      return {
+        ...state,
+        dishes: afterDeleteDishes,
       };
 
     case CREATE_RESTAURANT_DISH:

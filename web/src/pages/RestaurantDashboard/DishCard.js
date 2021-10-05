@@ -11,7 +11,12 @@ import { FileUploader } from 'baseui/file-uploader';
 import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a loader
 import { Carousel } from 'react-responsive-carousel';
 import S3 from 'react-aws-s3';
-import { clearDishMedia, createDishMedia, updateRestaurantDish } from '../../actions/restaurants';
+import {
+  clearDishMedia,
+  createDishMedia,
+  deleteRestaurantDish,
+  updateRestaurantDish,
+} from '../../actions/restaurants';
 import { useDispatch } from 'react-redux';
 import notify from '../../utils/notify';
 
@@ -96,6 +101,10 @@ const DishCard = ({ dish, editable, resID }) => {
     });
   };
 
+  const deleteDish = () => {
+    dispatch(deleteRestaurantDish(resID, dish.id));
+  };
+
   return (
     <>
       <Card
@@ -118,9 +127,13 @@ const DishCard = ({ dish, editable, resID }) => {
           </Paragraph1>
         </StyledBody>
         {editable && (
-          <StyledAction>
+          <StyledAction className={css({ display: 'flex', justifyContent: 'flex-end' })}>
+            <Button className={css({ margin: '10px' })} kind="secondary" onClick={deleteDish}>
+              Delete
+            </Button>
             <Button
-              overrides={{ BaseButton: { style: { width: '100%' } } }}
+              className={css({ margin: '10px' })}
+              // overrides={{ BaseButton: { style: { width: '100%' } } }}
               onClick={() => setIsOpen(true)}
             >
               Edit

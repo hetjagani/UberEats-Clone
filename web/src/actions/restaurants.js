@@ -8,6 +8,7 @@ import {
   CREATE_RESTAURANT,
   CREATE_RESTAURANT_DISH,
   CREATE_RESTAURANT_MEDIA,
+  DELETE_RESTAURANT_DISH,
   FETCH_AUTH_RESTAURANT,
   UPDATE_RESTAURANT,
   UPDATE_RESTAURANT_DISH,
@@ -123,6 +124,24 @@ export const updateRestaurantDish = (data, resID, dishID) => {
       });
   };
 };
+
+export const deleteRestaurantDish = (resID, dishID) => {
+  return (dispatch) => {
+    return axios
+      .delete(`/restaurants/${resID}/dishes/${dishID}`)
+      .then((res) => {
+        dispatch({
+          type: DELETE_RESTAURANT_DISH,
+          payload: dishID,
+        });
+        notify({ type: 'info', description: 'Deleted Restaurant Dish' });
+      })
+      .catch((err) => {
+        notify({ type: 'error', description: JSON.stringify(err.response.data.message) });
+      });
+  };
+};
+
 
 export const createDishMedia = (data, dishID) => {
   return (dispatch) => {
