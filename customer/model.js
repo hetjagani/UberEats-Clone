@@ -100,11 +100,15 @@ Customer.hasMany(Favourite, {
 });
 Favourite.belongsTo(Customer);
 
-const runMigration = async () => {
+const runMigration = async (force) => {
   if (!global.DB) {
     return Promise.reject(new Error('please initialize DB'));
   }
-  await global.DB.sync({ alter: true });
+  if (force) {
+    await global.DB.sync({ force });
+  } else {
+    await global.DB.sync({ alter: true });
+  }
   return Promise.resolve(global.DB);
 };
 

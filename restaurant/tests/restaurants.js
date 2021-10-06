@@ -10,7 +10,7 @@ chai.should();
 chai.use(chaiHttp);
 
 let app;
-describe('POST /auth/signup', () => {
+describe('Restaurant Testcases', () => {
   before((done) => {
     require('../config');
     const { initDB } = require('../db');

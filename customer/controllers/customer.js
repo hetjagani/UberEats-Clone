@@ -2,7 +2,9 @@
 const { default: axios } = require('axios');
 const { validationResult } = require('express-validator');
 const { Op } = require('sequelize');
-const { Customer, Media, Address, Favourite } = require('../model');
+const {
+  Customer, Media, Address, Favourite,
+} = require('../model');
 const errors = require('../util/errors');
 const getPaiganation = require('../util/paiganation');
 
