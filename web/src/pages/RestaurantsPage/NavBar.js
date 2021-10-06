@@ -139,7 +139,7 @@ const NavBar = ({
                   valueKey="id"
                   placeholder="Filter By Food Type"
                   onChange={({ value }) => {
-                    setFoodType(value);
+                    setFoodType && setFoodType(value);
                   }}
                   value={foodType}
                 />
@@ -202,7 +202,9 @@ const NavBar = ({
                 selected={deliveryTypeselected}
                 onClick={(event, index) => {
                   setDeliveryTypeselected(index);
-                  index == 0 ? setRestaurantType('delivery') : setRestaurantType('pickup');
+                  index == 0
+                    ? setRestaurantType && setRestaurantType('delivery')
+                    : setRestaurantType && setRestaurantType('pickup');
                 }}
               >
                 <Button
@@ -226,7 +228,7 @@ const NavBar = ({
             <Input
               placeholder="Search Address"
               onChange={(e) => {
-                setAddress(e.target.value);
+                setAddress && setAddress(e.target.value);
               }}
               value={address}
             />
@@ -238,7 +240,7 @@ const NavBar = ({
             <Input
               placeholder="Search Restaurants"
               onChange={(e) => {
-                setSearchQ(e.target.value);
+                setSearchQ && setSearchQ(e.target.value);
               }}
               value={searchQ}
             />

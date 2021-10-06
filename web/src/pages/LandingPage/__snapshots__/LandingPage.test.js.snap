@@ -1,0 +1,121 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Landing Page Test should render Landing page 1`] = `
+Array [
+  <div
+    className=""
+  >
+    <Header
+      setIsOpen={[Function]}
+    />
+    <div
+      className=""
+    >
+      <HeadingXXLarge
+        className=""
+      >
+        Order food to your door
+      </HeadingXXLarge>
+      <div
+        className=""
+      >
+        <Input
+          autoComplete="on"
+          autoFocus={false}
+          clearable={false}
+          disabled={false}
+          endEnhancer={null}
+          name=""
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          overrides={Object {}}
+          placeholder="Enter your email address"
+          required={false}
+          size="default"
+          startEnhancer={null}
+          type="text"
+          value=""
+        />
+        <Link
+          to="/auth/registeruser?email="
+        >
+          <span
+            style={
+              Object {
+                "marginLeft": "20px",
+                "width": 500,
+              }
+            }
+          >
+            <Button
+              size="large"
+            >
+              Sign up
+            </Button>
+          </span>
+        </Link>
+      </div>
+      <span
+        className=""
+      >
+        Click Here to 
+        <Link
+          to="/auth/registerres"
+        >
+          add your restaurant
+        </Link>
+      </span>
+    </div>
+    <Drawer
+      anchor="left"
+      animate={true}
+      autoFocus={true}
+      closeable={true}
+      isOpen={false}
+      onClose={[Function]}
+      overrides={Object {}}
+      renderAll={false}
+      showBackdrop={true}
+      size="auto"
+    >
+      <div
+        className=""
+      >
+        <Link
+          to="/auth/login"
+        >
+          <Button
+            className=""
+            size="large"
+          >
+            <span
+              className=""
+            >
+              Sign in
+            </span>
+          </Button>
+        </Link>
+      </div>
+      <div
+        className=""
+      >
+        <Link
+          to="/auth/registerres"
+        >
+          <Button
+            className=""
+            size="large"
+          >
+            <span
+              className=""
+            >
+              Add your restaurant
+            </span>
+          </Button>
+        </Link>
+      </div>
+    </Drawer>
+  </div>,
+]
+`;
