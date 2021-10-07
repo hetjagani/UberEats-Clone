@@ -89,7 +89,7 @@ const DishDetails = ({ dish, resId }) => {
           {dish.category.replace('_', ' ')} <br />
         </ModalBody>
         <ModalFooter className={footerStyle}>
-          <div>
+          <div style={{ display: 'flex' }}>
             <Input
               value={quantity}
               type="number"

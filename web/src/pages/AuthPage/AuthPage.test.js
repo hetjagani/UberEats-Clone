@@ -1,7 +1,6 @@
 import { shallow } from 'enzyme';
 import React from 'react';
 import '../../utils/testsetup';
-import { createBrowserHistory, createPath } from 'history';
 
 import * as redux from 'react-redux';
 import AuthPage from './AuthPage';
