@@ -1,0 +1,358 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Restaurant Details Page Test should render Restaurant Details page 1`] = `
+Array [
+  <div
+    className=""
+  >
+    <div
+      className=""
+    >
+      <DisplayXSmall>
+        Restaurant Profile
+      </DisplayXSmall>
+      <FormControl
+        caption={null}
+        disabled={false}
+        label={[Function]}
+        overrides={Object {}}
+      >
+        <Input
+          autoComplete="on"
+          autoFocus={false}
+          clearable={false}
+          disabled={false}
+          endEnhancer={null}
+          name=""
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          overrides={Object {}}
+          required={true}
+          size="default"
+          startEnhancer={null}
+          type="text"
+          value=""
+        />
+      </FormControl>
+      <FormControl
+        caption="Tell us something about your restaurant"
+        disabled={false}
+        label="Description"
+        overrides={Object {}}
+      >
+        <Textarea
+          autoFocus={false}
+          disabled={false}
+          error={false}
+          name=""
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyPress={[Function]}
+          onKeyUp={[Function]}
+          overrides={Object {}}
+          placeholder=""
+          required={false}
+          rows={3}
+          size="default"
+          value=""
+        />
+      </FormControl>
+      <FormControl
+        caption={null}
+        disabled={false}
+        label={[Function]}
+        overrides={Object {}}
+      >
+        <Input
+          autoComplete="on"
+          autoFocus={false}
+          clearable={false}
+          disabled={false}
+          endEnhancer={null}
+          name=""
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          overrides={Object {}}
+          required={true}
+          size="default"
+          startEnhancer={null}
+          type="text"
+          value=""
+        />
+      </FormControl>
+      <FormControl
+        caption={null}
+        disabled={false}
+        label="Type to search city"
+        overrides={Object {}}
+      >
+        <Select
+          labelKey="id"
+          onChange={[Function]}
+          options={
+            Array [
+              Object {
+                "city": "San Jose",
+                "id": "San Jose",
+              },
+              Object {
+                "city": "Berkely",
+                "id": "Berkely",
+              },
+              Object {
+                "city": "Los Angeles",
+                "id": "Los Angeles",
+              },
+              Object {
+                "city": "San Diego",
+                "id": "San Diego",
+              },
+              Object {
+                "city": "San Francisco",
+                "id": "San Francisco",
+              },
+              Object {
+                "city": "Fresno",
+                "id": "Fresno",
+              },
+              Object {
+                "city": "Sacremento",
+                "id": "Sacremento",
+              },
+            ]
+          }
+          required={true}
+          value={Array []}
+          valueKey="city"
+        />
+      </FormControl>
+      <FormControl
+        caption={null}
+        disabled={false}
+        label="Type to search state"
+        overrides={Object {}}
+      >
+        <Select
+          labelKey="id"
+          onChange={[Function]}
+          options={
+            Array [
+              Object {
+                "id": "California",
+                "state": "California",
+              },
+              Object {
+                "id": "Arizona",
+                "state": "Arizona",
+              },
+              Object {
+                "id": "Colorado",
+                "state": "Colorado",
+              },
+            ]
+          }
+          required={true}
+          value={Array []}
+          valueKey="state"
+        />
+      </FormControl>
+      <FormControl
+        caption={null}
+        disabled={false}
+        label="Type to search country"
+        overrides={Object {}}
+      >
+        <Select
+          labelKey="id"
+          onChange={[Function]}
+          options={
+            Array [
+              Object {
+                "country": "United States",
+                "id": "United States",
+              },
+            ]
+          }
+          required={true}
+          value={Array []}
+          valueKey="country"
+        />
+      </FormControl>
+      <FormControl
+        caption={null}
+        disabled={false}
+        label={[Function]}
+        overrides={Object {}}
+      >
+        <MaskedInput
+          mask="(999) 999-9999"
+          maskChar=" "
+          onChange={[Function]}
+          placeholder="Phone number"
+          value=""
+        />
+      </FormControl>
+      <FormControl
+        caption={null}
+        disabled={false}
+        label={[Function]}
+        overrides={Object {}}
+      >
+        <MaskedInput
+          mask="99:99"
+          maskChar=" "
+          onChange={[Function]}
+          placeholder="Opening Time"
+          value=""
+        />
+      </FormControl>
+      <FormControl
+        caption={null}
+        disabled={false}
+        label={[Function]}
+        overrides={Object {}}
+      >
+        <MaskedInput
+          mask="99:99"
+          maskChar=" "
+          onChange={[Function]}
+          placeholder="Closing Time"
+          value=""
+        />
+      </FormControl>
+      <FormControl
+        caption={null}
+        disabled={false}
+        label="Type of Food"
+        overrides={Object {}}
+      >
+        <Select
+          labelKey="type"
+          onChange={[Function]}
+          options={
+            Array [
+              Object {
+                "id": "veg",
+                "type": "Vegitarian",
+              },
+              Object {
+                "id": "non-veg",
+                "type": "Non Vegitarian",
+              },
+              Object {
+                "id": "vegan",
+                "type": "Vegan",
+              },
+            ]
+          }
+          required={true}
+          value={Array []}
+          valueKey="id"
+        />
+      </FormControl>
+      <FormControl
+        caption={null}
+        disabled={false}
+        label="Type of Restaurant"
+        overrides={Object {}}
+      >
+        <Select
+          labelKey="type"
+          onChange={[Function]}
+          options={
+            Array [
+              Object {
+                "id": "delivery",
+                "type": "Delivery",
+              },
+              Object {
+                "id": "pickup",
+                "type": "Pickup",
+              },
+            ]
+          }
+          required={true}
+          searchable={false}
+          value={Array []}
+          valueKey="id"
+        />
+      </FormControl>
+      <Button
+        $style={
+          Object {
+            "alignSelf": "baseline",
+            "width": "30%",
+          }
+        }
+        onClick={[Function]}
+        size="large"
+        type="submit"
+      >
+        Save
+      </Button>
+    </div>
+    <div
+      className=""
+    >
+      <Carousel
+        $style={
+          Object {
+            "width": "80%",
+          }
+        }
+        axis="horizontal"
+        centerSlidePercentage={80}
+        interval={3000}
+        labels={
+          Object {
+            "item": "slide item",
+            "leftArrow": "previous slide / item",
+            "rightArrow": "next slide / item",
+          }
+        }
+        onChange={[Function]}
+        onClickItem={[Function]}
+        onClickThumb={[Function]}
+        onSwipeEnd={[Function]}
+        onSwipeMove={[Function]}
+        onSwipeStart={[Function]}
+        preventMovementUntilSwipeScrollTolerance={false}
+        renderArrowNext={[Function]}
+        renderArrowPrev={[Function]}
+        renderIndicator={[Function]}
+        renderItem={[Function]}
+        renderThumbs={[Function]}
+        selectedItem={0}
+        showArrows={true}
+        showIndicators={true}
+        showStatus={true}
+        showThumbs={true}
+        statusFormatter={[Function]}
+        stopOnHover={true}
+        swipeScrollTolerance={5}
+        swipeable={true}
+        transitionTime={350}
+        verticalSwipe="standard"
+        width="100%"
+      />
+      <Button
+        className=""
+        onClick={[Function]}
+      >
+        Clear Images
+      </Button>
+      <FileUploader
+        disableClick={true}
+        onCancel={[Function]}
+        onDrop={[Function]}
+        overrides={Object {}}
+        progressMessage=""
+      />
+    </div>
+  </div>,
+]
+`;

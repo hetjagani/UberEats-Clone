@@ -9,6 +9,7 @@
     "axios": "^0.21.4",
     "babel-jest": "^27.2.4",
     "baseui": "^10.1.1",
+    "history": "^5.0.1",
     "jest": "^27.2.4",
     "jest-cli": "^27.2.4",
     "jsonwebtoken": "^8.5.1",
@@ -25,6 +26,7 @@
     "react-use-cookie": "^1.2.1",
     "redux": "^4.1.1",
     "redux-devtools-extension": "^2.13.9",
+    "redux-mock-store": "^1.5.4",
     "redux-persist": "^6.0.0",
     "redux-thunk": "^2.3.0",
     "styletron-engine-atomic": "^1.4.8",
@@ -34,8 +36,13 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "jest",
     "eject": "react-scripts eject"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "^.+\\.(css|less)$": "<rootDir>/config/CSSStub.js"
+    }
   },
   "eslintConfig": {
     "extends": [

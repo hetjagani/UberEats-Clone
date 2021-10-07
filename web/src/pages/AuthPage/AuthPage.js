@@ -1,6 +1,6 @@
 import { useStyletron } from 'baseui';
 import { H2, H6, Label1 } from 'baseui/typography';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Redirect, useHistory, useLocation } from 'react-router-dom';
 import { Input } from 'baseui/input';
 import { Button } from 'baseui/button';
