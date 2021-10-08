@@ -38,6 +38,7 @@ export const addDishToCart = (data) => {
         notify({ type: 'info', description: `Added dish ${res.data.dish.name} to cart.` });
       })
       .catch((err) => {
+        console.log(err);
         notify({ type: 'error', description: JSON.stringify(err.response.data.message) });
         if (err.response.data.type && err.response.data.type == 'diff_restaurant') {
           dispatch({

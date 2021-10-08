@@ -10,7 +10,7 @@ const router = express.Router();
  * @property {string} alt_text.required
  */
 
-const bodyValidators = () => [body('url').exists().isString().isURL(), body('alt_text').isString()];
+const bodyValidators = () => [body('url').exists().isString(), body('alt_text').isString()];
 
 /**
  * Get list of Media

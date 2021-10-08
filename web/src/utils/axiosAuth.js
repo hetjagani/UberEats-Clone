@@ -17,11 +17,12 @@ function createAxiosAuthMiddleware() {
       axios.interceptors.response.use(
         (res) => res,
         (err) => {
-          if (err.response.status == 401) {
+          if (err.response.status === 401) {
             setCookie('auth', null);
             window.location = '/auth/login';
             notify({ type: 'error', description: 'Unauthorized. Please Login.' });
           }
+          return err;
         },
       );
       return next(action);
