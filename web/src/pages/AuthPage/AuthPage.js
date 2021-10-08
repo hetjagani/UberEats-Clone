@@ -58,7 +58,7 @@ const AuthPage = ({ flow, role, ...props }) => {
     }
 
     const loginDetails = getLoginDetails();
-    if (loginDetails.role) {
+    if (loginDetails && loginDetails.role) {
       if (loginDetails.role == 'customer') {
         history.push('/restaurants');
       } else if (loginDetails.role == 'restaurant') {
