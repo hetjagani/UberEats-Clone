@@ -100,6 +100,22 @@ const RestaurantDetails = ({ loginDetails, update }) => {
   const dispatch = useDispatch();
 
   const saveRestaurantDetails = () => {
+    if (
+      name == '' ||
+      description == '' ||
+      address == '' ||
+      city == [] ||
+      state == [] ||
+      country == [] ||
+      contactNo == '' ||
+      timeOpen == '' ||
+      timeClose == '' ||
+      foodType == [] ||
+      resType == []
+    ) {
+      notify({ type: 'error', description: 'Invalid Values' });
+      return;
+    }
     let mediaArr = [];
     if (media.length > 0) {
       media.forEach((m) => {
@@ -303,7 +319,9 @@ const RestaurantDetails = ({ loginDetails, update }) => {
               );
             })}
         </Carousel>
-        <Button  className={css({margin: '20px'})} onClick={clearMedia}>Clear Images</Button>
+        <Button className={css({ margin: '20px' })} onClick={clearMedia}>
+          Clear Images
+        </Button>
         <FileUploader
           onCancel={() => setIsUploading(false)}
           onDrop={mediaUpload}

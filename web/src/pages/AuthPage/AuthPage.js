@@ -12,6 +12,7 @@ import { useDispatch } from 'react-redux';
 import { fetchAuthCustomer } from '../../actions/customers';
 import { fetchAuthRestaurant } from '../../actions/restaurants';
 import { setCookie } from 'react-use-cookie';
+import notify from '../../utils/notify';
 
 const AuthPage = ({ flow, role, ...props }) => {
   const [css, theme] = useStyletron();
@@ -125,7 +126,6 @@ const AuthPage = ({ flow, role, ...props }) => {
         }
       })
       .catch((err) => {
-        console.error(err);
         setErrorMessage(JSON.stringify(err.response.data));
       });
   };

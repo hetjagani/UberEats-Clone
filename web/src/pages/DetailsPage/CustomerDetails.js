@@ -85,6 +85,17 @@ function CustomerDetails({ loginDetails, update }) {
   const history = useHistory();
 
   const saveCustomerDetails = () => {
+    if (
+      name == '' ||
+      nickName == '' ||
+      city == [] ||
+      state == [] ||
+      country == [] ||
+      contactNo == ''
+    ) {
+      notify({ type: 'error', description: 'Invalid Values' });
+      return;
+    }
     const data = {
       id: loginDetails.id,
       name,

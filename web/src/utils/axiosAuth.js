@@ -22,7 +22,7 @@ function createAxiosAuthMiddleware() {
             window.location = '/auth/login';
             notify({ type: 'error', description: 'Unauthorized. Please Login.' });
           }
-          return err;
+          return Promise.reject(err);
         },
       );
       return next(action);
