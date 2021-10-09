@@ -40,7 +40,7 @@ const LandingPage = () => {
   const history = useHistory();
   useEffect(() => {
     const loginDetails = getLoginDetails();
-    if (loginDetails.role) {
+    if (loginDetails?.role) {
       if (loginDetails.role == 'customer') {
         history.push('/restaurants');
       } else if (loginDetails.role == 'restaurant') {
