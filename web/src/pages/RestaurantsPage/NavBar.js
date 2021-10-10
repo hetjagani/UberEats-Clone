@@ -23,7 +23,7 @@ import { NavLink } from 'react-router-dom';
 import { clearData } from '../../utils/clearData';
 import { ButtonGroup, SIZE as btnGrpSize, SHAPE as btnGrpShp, MODE } from 'baseui/button-group';
 import { Input } from 'baseui/input';
-import { BiFoodTag } from 'react-icons/bi';
+import { BiCurrentLocation, BiFoodTag } from 'react-icons/bi';
 
 const NavBar = ({
   address,
@@ -157,7 +157,7 @@ const NavBar = ({
                   value={foodType}
                 />
               </ListItem>
-              <ListItem artwork={(props) => <BiFoodTag size={25} />}>
+              <ListItem artwork={(props) => <BiCurrentLocation size={25} />}>
                 <Search
                   options={cityOpts}
                   labelKey="city"
