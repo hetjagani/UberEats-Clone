@@ -50,8 +50,9 @@ export const createCustomer = (data) => {
 
 export const createCustomerMedium = (data) => {
   return (dispatch) => {
+    const token = getCookie('auth');
     return axios
-      .post('/customers/media', data)
+      .post('/customers/media', data, { headers: { Authorization: token } })
       .then((res) => {
         dispatch({
           type: CREATE_CUSTOMER_MEDIUM,

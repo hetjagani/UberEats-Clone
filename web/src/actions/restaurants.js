@@ -67,8 +67,9 @@ export const updateRestaurant = (data, id) => {
 
 export const createRestaurantMedia = (data) => {
   return (dispatch) => {
+    const token = getCookie('auth');
     return axios
-      .post('/restaurants/media', data)
+      .post('/restaurants/media', data, { headers: { Authorization: token } })
       .then((res) => {
         dispatch({
           type: CREATE_RESTAURANT_MEDIA,
@@ -141,7 +142,6 @@ export const deleteRestaurantDish = (resID, dishID) => {
       });
   };
 };
-
 
 export const createDishMedia = (data, dishID) => {
   return (dispatch) => {
