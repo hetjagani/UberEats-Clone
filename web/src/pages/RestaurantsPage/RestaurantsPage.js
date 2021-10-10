@@ -12,6 +12,7 @@ const RestaurantsPage = ({ favs }) => {
   const [restaurantType, setRestaurantType] = useState('delivery');
   const [foodType, setFoodType] = useState([]);
   const [searchQ, setSearchQ] = useState('');
+  const [city, setCity] = useState('');
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -29,6 +30,8 @@ const RestaurantsPage = ({ favs }) => {
         setFoodType={setFoodType}
         searchQ={searchQ}
         setSearchQ={setSearchQ}
+        city={city}
+        setCity={setCity}
       />
       <RestaurantsGrid
         favs={favs}
@@ -36,6 +39,7 @@ const RestaurantsPage = ({ favs }) => {
         restaurant_type={restaurantType}
         food_type={foodType[0] && foodType[0].id}
         searchQ={searchQ}
+        city={city[0]?.id}
       />
     </div>
   );

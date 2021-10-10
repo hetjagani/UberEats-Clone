@@ -53,7 +53,7 @@ const RestaurantsGrid = ({ favs, address, city, restaurant_type, food_type, sear
     axios
       .get(`/restaurants`, {
         params: {
-          city: loginCustomer.city,
+          city,
           restaurant_type,
           food_type,
           q: searchQ,
@@ -63,7 +63,7 @@ const RestaurantsGrid = ({ favs, address, city, restaurant_type, food_type, sear
         },
       })
       .then((res) => {
-        if (res.data.total > 0) {
+        if (res.data.total >= 0) {
           setRestaurants(res.data.nodes);
           setTotal(Math.floor(res.data.total / 8) + 1);
         }
@@ -71,7 +71,7 @@ const RestaurantsGrid = ({ favs, address, city, restaurant_type, food_type, sear
       .catch((err) => {
         notify({ type: 'error', description: 'Error fetching restaurants' });
       });
-  }, [page, address, restaurant_type, food_type, searchQ]);
+  }, [page, address, restaurant_type, food_type, searchQ, city]);
 
   useEffect(() => {
     const fm = {};

@@ -14,9 +14,7 @@ const allRestaurants = async (req, res) => {
 
 const getAllRestaurants = async (req, res) => {
   const whereOpts = [];
-  const {
-    address, city, restaurant_type, food_type, q,
-  } = req.query;
+  const { address, city, restaurant_type, food_type, q } = req.query;
   if (address && address != '') {
     whereOpts.push({ address: { [Op.like]: `%${address}%` } });
   }
@@ -41,7 +39,11 @@ const getAllRestaurants = async (req, res) => {
 
   const { limit, offset } = getPaiganation(req.query.page, req.query.limit);
 
-  const resCount = await Restaurant.count();
+  const resCount = await Restaurant.count({
+    where: {
+      [Op.and]: whereOpts,
+    },
+  });
   const restaurants = await Restaurant.findAll({
     where: {
       [Op.and]: whereOpts,

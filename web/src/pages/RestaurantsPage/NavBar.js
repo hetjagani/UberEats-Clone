@@ -34,6 +34,8 @@ const NavBar = ({
   setFoodType,
   searchQ,
   setSearchQ,
+  city,
+  setCity,
 }) => {
   const [css] = useStyletron();
 
@@ -48,6 +50,17 @@ const NavBar = ({
     { id: 'veg', foodType: 'Vegitarian' },
     { id: 'non-veg', foodType: 'Non Vegitarian' },
     { id: 'vegan', foodType: 'Vegan' },
+  ];
+
+  const cityOpts = [
+    { id: '', city: 'All' },
+    { id: 'San Jose', city: 'San Jose' },
+    { id: 'Berkely', city: 'Berkely' },
+    { id: 'Los Angeles', city: 'Los Angeles' },
+    { id: 'San Diego', city: 'San Diego' },
+    { id: 'San Francisco', city: 'San Francisco' },
+    { id: 'Fresno', city: 'Fresno' },
+    { id: 'Sacremento', city: 'Sacremento' },
   ];
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -142,6 +155,18 @@ const NavBar = ({
                     setFoodType && setFoodType(value);
                   }}
                   value={foodType}
+                />
+              </ListItem>
+              <ListItem artwork={(props) => <BiFoodTag size={25} />}>
+                <Search
+                  options={cityOpts}
+                  labelKey="city"
+                  valueKey="id"
+                  placeholder="Filter By City"
+                  onChange={({ value }) => {
+                    setCity && setCity(value);
+                  }}
+                  value={city}
                 />
               </ListItem>
             </div>
