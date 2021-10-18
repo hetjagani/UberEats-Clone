@@ -89,10 +89,12 @@ const AuthPage = ({ flow, role, ...props }) => {
 
     if (!validateEmail(email)) {
       setErrorMessage('Invalid Email Address');
+      return;
     }
 
     if (flow === 'register' && password !== verifyPass) {
       setErrorMessage('Input passwords do not match');
+      return;
     }
 
     let authURL = '/auth/login';
