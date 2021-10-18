@@ -8,7 +8,7 @@ const router = express.Router();
 
 /**
  * @typedef Restaurant
- * @property {integer} id.required
+ * @property {string} id.required
  * @property {string} name.required
  * @property {string} description
  * @property {string} address.required
@@ -24,7 +24,7 @@ const router = express.Router();
  */
 
 const bodyValidators = () => [
-  body('id').exists().isInt().not().isIn([0]),
+  body('id').exists().isString(),
   body('name').exists().isString(),
   body('description').isString(),
   body('address').exists().isString(),
@@ -78,7 +78,7 @@ router.post('/', ...bodyValidators(), resController.createRestaurant);
  * @route GET /restaurants/{id}
  * @group Restaurants
  * @param {string} authorization.header.require
- * @param {integer} id.path.require
+ * @param {string} id.path.require
  * @returns {Restaurant.model} 200 - Restaurant for given ID
  */
 router.get('/:id', resController.getRestaurantByID);
@@ -88,7 +88,7 @@ router.get('/:id', resController.getRestaurantByID);
  * @route PUT /restaurants/{id}
  * @group Restaurants
  * @param {string} authorization.header.require
- * @param {integer} id.path.require
+ * @param {string} id.path.require
  * @param {Restaurant.model} Restaurant.body.require
  * @returns {Restaurant.model} 200 - Updated Restaurant
  */
@@ -99,7 +99,7 @@ router.put('/:id', ...updateValidators, resController.updateRestaurantByID);
  * @route DELETE /restaurants/{id}
  * @group Restaurants
  * @param {string} authorization.header.require
- * @param {integer} id.path.require
+ * @param {string} id.path.require
  * @returns {null} 200 - Delete Restaurant
  */
 router.delete('/:id', resController.deleteRestaurant);

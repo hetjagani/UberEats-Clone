@@ -1,16 +1,10 @@
 {
-    "development": {
-        "database_host": "mysqldb",
-        "database_user": "uberadmin",
-        "database_password": "uberadminpass",
-        "database_name": "restaurant",
-        "auth_url": "http://auth:3000"
-    },
-    "test": {
-        "database_host": "localhost",
-        "database_user": "uberadmin",
-        "database_password": "uberadminpass",
-        "database_name": "restaurant_test",
-        "auth_url": "http://auth:7000"
-    }
+  "development": {
+    "database_conn": "mongodb://uberadmin:uberadminpass@mongodb:27017/restaurant",
+    "auth_url": "http://auth:3000"
+  },
+  "test": {
+    "database_conn": "mongodb://uberadmin:uberadminpass@mongodb:27017/restaurant_test",
+    "auth_url": "http://auth:7000"
+  }
 }

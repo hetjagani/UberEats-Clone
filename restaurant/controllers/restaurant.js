@@ -1,3 +1,5 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-unused-expressions */
 /* eslint-disable camelcase */
 /* eslint-disable eqeqeq */
 const { validationResult } = require('express-validator');
@@ -16,7 +18,7 @@ const getAllRestaurants = async (req, res) => {
   const whereOpts = [];
   const { address, city, restaurant_type, food_type, q } = req.query;
   if (address && address != '') {
-    whereOpts.push({ address: { [Op.like]: `%${address}%` } });
+    whereOpts.push({ address: { $regex: `*${address}*` } });
   }
 
   if (city && city != '') {
@@ -31,27 +33,22 @@ const getAllRestaurants = async (req, res) => {
     whereOpts.push({ food_type });
   }
 
+  const orQuery = [];
   if (q && q != '') {
-    whereOpts.push({
-      [Op.or]: [{ name: { [Op.like]: `%${q}%` } }, { description: { [Op.like]: `%${q}%` } }],
-    });
+    orQuery.push({ name: { $regex: `*${q}*` } });
+    orQuery.push({ description: { $regex: `*${q}*` } });
+  }
+
+  orQuery.length && whereOpts.push(orQuery);
+
+  let query = {};
+  if (whereOpts.length > 0) {
+    query = { $and: whereOpts };
   }
 
   const { limit, offset } = getPaiganation(req.query.page, req.query.limit);
-
-  const resCount = await Restaurant.count({
-    where: {
-      [Op.and]: whereOpts,
-    },
-  });
-  const restaurants = await Restaurant.findAll({
-    where: {
-      [Op.and]: whereOpts,
-    },
-    limit,
-    offset,
-    include: [Media, Dish],
-  });
+  const resCount = await Restaurant.count(query).skip(offset).limit(limit);
+  const restaurants = await Restaurant.find(query).skip(offset).limit(limit);
 
   res.status(200).json({ total: resCount, nodes: restaurants });
 };
@@ -64,8 +61,7 @@ const getRestaurantByID = async (req, res) => {
   }
 
   const restaurant = await Restaurant.findOne({
-    where: { id },
-    include: [Media, { model: Dish, include: Media }],
+    _id: id,
   });
   if (!restaurant) {
     res.status(404).send(errors.notFound);
@@ -93,25 +89,14 @@ const createRestaurant = async (req, res) => {
   }
 
   const restaurant = req.body;
+  restaurant._id = restaurant.id;
 
-  const t = await global.DB.transaction();
   try {
-    const createdRes = await Restaurant.create(restaurant, { transaction: t });
+    const createdRes = await Restaurant.create(restaurant);
 
-    if (restaurant.media && restaurant.media.length > 0) {
-      await createdRes.setMedia(restaurant.media, { transaction: t });
-    }
-    await t.commit();
-
-    const result = await Restaurant.findOne(
-      { where: { id: createdRes.id }, include: Media },
-      { transaction: t },
-    );
-
-    res.status(201).json(result);
+    res.status(201).json(createdRes);
     return;
   } catch (err) {
-    await t.rollback();
     console.error(err);
     if (err.original) {
       res.status(500).json({ status: 500, message: err.original.sqlMessage });
@@ -145,53 +130,19 @@ const updateRestaurantByID = async (req, res) => {
   }
 
   const restaurant = req.body;
+  if (!restaurant.media || restaurant.media?.length == 0) {
+    restaurant.media = [];
+  }
 
-  const dbRes = await Restaurant.findOne({ where: { id }, include: [Media] });
+  const dbRes = await Restaurant.findOneAndUpdate({ _id: id }, restaurant);
   if (!dbRes) {
     res.status(404).json(errors.notFound);
     return;
   }
 
-  const t = await global.DB.transaction();
-  try {
-    dbRes.name = restaurant.name;
-    dbRes.description = restaurant.description;
-    dbRes.address = restaurant.address;
-    dbRes.city = restaurant.city;
-    dbRes.state = restaurant.state;
-    dbRes.country = restaurant.country;
-    dbRes.contact_no = restaurant.contact_no;
-    dbRes.time_open = restaurant.time_open;
-    dbRes.time_close = restaurant.time_close;
-    dbRes.food_type = restaurant.food_type;
-    dbRes.restaurant_type = restaurant.restaurant_type;
+  const result = await Restaurant.findOne({ _id: dbRes._id });
 
-    const updatedRes = await dbRes.save({ transaction: t });
-
-    if (restaurant.media && restaurant.media.length > 0) {
-      await updatedRes.setMedia(restaurant.media, { transaction: t });
-    } else {
-      await updatedRes.removeMedia(dbRes.media, { transaction: t });
-    }
-
-    await t.commit();
-
-    const result = await Restaurant.findOne(
-      { where: { id: updatedRes.id }, include: [Media, { model: Dish, include: Media }] },
-      { transaction: t },
-    );
-
-    res.status(200).json(result);
-    return;
-  } catch (err) {
-    t.rollback();
-    console.error(err);
-    if (err.original) {
-      res.status(500).json({ status: 500, message: err.original.sqlMessage });
-    } else {
-      res.status(500).json(errors.serverError);
-    }
-  }
+  res.status(200).json(result);
 };
 
 const deleteRestaurant = async (req, res) => {
@@ -201,24 +152,13 @@ const deleteRestaurant = async (req, res) => {
     return;
   }
 
-  const restaurant = await Restaurant.findOne({ where: { id } });
+  const restaurant = await Restaurant.findOneAndRemove({ _id: id });
   if (!restaurant) {
     res.status(401).send(errors.notFound);
     return;
   }
 
-  try {
-    await restaurant.destroy();
-    res.status(200).send(null);
-    return;
-  } catch (err) {
-    console.error(err);
-    if (err.original) {
-      res.status(500).json({ status: 500, message: err.original.sqlMessage });
-    } else {
-      res.status(500).json(errors.serverError);
-    }
-  }
+  res.status(200).send(null);
 };
 
 module.exports = {
