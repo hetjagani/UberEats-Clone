@@ -20,7 +20,7 @@ const bodyValidators = () => [
   body('price').exists().isFloat(),
   body('food_type').exists().matches('veg|non-veg|vegan').isString(),
   body('category').exists().matches('appetizer|salad|main_course|dessert|beverage').isString(),
-  body('media').isArray(),
+  body('media').optional({ nullable: true }).isArray(),
 ];
 
 /**
@@ -28,7 +28,7 @@ const bodyValidators = () => [
  * @route GET /restaurants/{resID}/dishes
  * @group Dishes
  * @param {string} authorization.header.require
- * @param {integer} resID.path.require
+ * @param {string} resID.path.require
  * @param {integer} page.query.require
  * @param {integer} limit.query.require
  * @returns {Array.<Dish>} 200 - List of dishes info
@@ -40,7 +40,7 @@ router.get('/', dishController.getDishesForRestaurant);
  * @route POST /restaurants/{resID}/dishes
  * @group Dishes
  * @param {string} authorization.header.require
- * @param {integer} resID.path.require
+ * @param {string} resID.path.require
  * @param {Dish.model} Dish.body.require
  * @returns {Dish.model} 201 - Created Dish
  */
@@ -51,8 +51,8 @@ router.post('/', ...bodyValidators(), dishController.createDishForRestaurant);
  * @route GET /restaurants/{resID}/dishes/{dishID}
  * @group Dishes
  * @param {string} authorization.header.require
- * @param {integer} resID.path.require
- * @param {integer} dishID.path.require
+ * @param {string} resID.path.require
+ * @param {string} dishID.path.require
  * @returns {Dish.model} 200 - Dish for given ID
  */
 router.get('/:dishID', dishController.getDishForRestaurantByID);
@@ -62,8 +62,8 @@ router.get('/:dishID', dishController.getDishForRestaurantByID);
  * @route PUT /restaurants/{resID}/dishes/{dishID}
  * @group Dishes
  * @param {string} authorization.header.require
- * @param {integer} resID.path.require
- * @param {integer} dishID.path.require
+ * @param {string} resID.path.require
+ * @param {string} dishID.path.require
  * @param {Dish.model} Dish.body.require
  * @returns {Dish.model} 200 - Updated Dish
  */
@@ -74,8 +74,8 @@ router.put('/:dishID', ...bodyValidators(), dishController.updateDishInRestauran
  * @route DELETE /restaurants/{resID}/dishes/{dishID}
  * @group Dishes
  * @param {string} authorization.header.require
- * @param {integer} resID.path.require
- * @param {integer} dishID.path.require
+ * @param {string} resID.path.require
+ * @param {string} dishID.path.require
  * @returns {null} 200 - Delete Dish
  */
 router.delete('/:dishID', dishController.deleteDishInRestaurant);

@@ -6,10 +6,9 @@ const MediaSchema = new Schema({
 });
 
 const DishSchema = new Schema({
-  _id: Types.ObjectId,
   name: String,
   description: String,
-  price: Types.Decimal128,
+  price: Number,
   food_type: {
     type: String,
     enum: ['veg', 'non-veg', 'vegan'],
@@ -18,6 +17,8 @@ const DishSchema = new Schema({
     type: String,
     enum: ['appetizer', 'salad', 'main_course', 'dessert', 'beverage'],
   },
+  restaurantId: Types.ObjectId,
+  media: [MediaSchema],
 });
 
 const RestaurantSchema = new Schema({

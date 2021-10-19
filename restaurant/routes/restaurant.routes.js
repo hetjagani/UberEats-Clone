@@ -59,6 +59,11 @@ router.get('/all', resController.allRestaurants);
  * @param {string} authorization.header.require
  * @param {integer} page.query.require
  * @param {integer} limit.query.require
+ * @param {string} address.query.require
+ * @param {string} city.query.require
+ * @param {string} restaurant_type.query.require
+ * @param {string} food_type.query.require
+ * @param {string} q.query.require
  * @returns {Array.<Restaurant>} 200 - List of restaurant info
  */
 router.get('/', resController.getAllRestaurants);

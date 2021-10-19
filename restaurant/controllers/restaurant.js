@@ -6,10 +6,13 @@ const { validationResult } = require('express-validator');
 const { Op } = require('sequelize');
 const { Restaurant, Media, Dish } = require('../model');
 const errors = require('../util/errors');
-const getPaiganation = require('../util/paiganation');
+const { getPaiganation } = require('u-server-utils');
+const { Types } = require('mongoose');
 
 const allRestaurants = async (req, res) => {
-  const restaurants = await Restaurant.findAll({ include: [Media, Dish] });
+  const restaurants = await Restaurant.aggregate([
+    { $lookup: { from: 'dishes', localField: 'dishes', foreignField: '_id', as: 'dishes' } },
+  ]);
 
   res.status(200).json(restaurants);
 };
@@ -18,7 +21,7 @@ const getAllRestaurants = async (req, res) => {
   const whereOpts = [];
   const { address, city, restaurant_type, food_type, q } = req.query;
   if (address && address != '') {
-    whereOpts.push({ address: { $regex: `*${address}*` } });
+    whereOpts.push({ address: { $regex: `(?i)(?<= |^)${address}(?= |$)` } });
   }
 
   if (city && city != '') {
@@ -35,11 +38,11 @@ const getAllRestaurants = async (req, res) => {
 
   const orQuery = [];
   if (q && q != '') {
-    orQuery.push({ name: { $regex: `*${q}*` } });
-    orQuery.push({ description: { $regex: `*${q}*` } });
+    orQuery.push({ name: { $regex: `(?i)(?<= |^)${q}(?= |$)` } });
+    orQuery.push({ description: { $regex: `(?i)(?<= |^)${q}(?= |$)` } });
   }
 
-  orQuery.length && whereOpts.push(orQuery);
+  orQuery.length && whereOpts.push({ $or: orQuery });
 
   let query = {};
   if (whereOpts.length > 0) {
@@ -47,8 +50,14 @@ const getAllRestaurants = async (req, res) => {
   }
 
   const { limit, offset } = getPaiganation(req.query.page, req.query.limit);
+
   const resCount = await Restaurant.count(query).skip(offset).limit(limit);
-  const restaurants = await Restaurant.find(query).skip(offset).limit(limit);
+  const restaurants = await Restaurant.aggregate([
+    { $lookup: { from: 'dishes', localField: 'dishes', foreignField: '_id', as: 'dishes' } },
+    { $match: query },
+  ])
+    .skip(offset)
+    .limit(limit);
 
   res.status(200).json({ total: resCount, nodes: restaurants });
 };
@@ -60,15 +69,16 @@ const getRestaurantByID = async (req, res) => {
     return;
   }
 
-  const restaurant = await Restaurant.findOne({
-    _id: id,
-  });
-  if (!restaurant) {
+  const restaurants = await Restaurant.aggregate([
+    { $match: { _id: Types.ObjectId(id) } },
+    { $lookup: { from: 'dishes', localField: 'dishes', foreignField: '_id', as: 'dishes' } },
+  ]);
+  if (!restaurants || restaurants?.length < 1) {
     res.status(404).send(errors.notFound);
     return;
   }
 
-  res.status(200).json(restaurant);
+  res.status(200).json(restaurants[0]);
 };
 
 const createRestaurant = async (req, res) => {

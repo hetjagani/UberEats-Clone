@@ -3,7 +3,7 @@ module.exports = {
   'POST /restaurants/(.+)/dishes': ['restaurant'],
   'PUT /restaurants/(.+)/dishes?(.+)': ['restaurant'],
   'DELETE /restaurants/(.+)/dishes?(.+)': ['restaurant'],
-  'GET /restaurants?(.+)': ['restaurant', 'customer'],
+  'GET /restaurants?(.+)': ['restaurant', 'customer', 'admin'],
   'POST /restaurants': ['restaurant'],
   'PUT /restaurants/(.+)': ['restaurant'],
   'DELETE /restaurants/(.+)': ['admin'],
