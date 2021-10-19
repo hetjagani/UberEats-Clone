@@ -4,7 +4,7 @@
     "auth_url": "http://auth:3000"
   },
   "test": {
-    "database_conn": "mongodb://uberadmin:uberadminpass@mongodb:27017/restaurant_test",
+    "database_conn": "mongodb://uberadmin:uberadminpass@localhost:27017/restaurant_test",
     "auth_url": "http://auth:7000"
   }
 }

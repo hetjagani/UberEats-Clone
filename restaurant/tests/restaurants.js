@@ -5,36 +5,32 @@ process.env.NODE_ENV = 'test';
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const nock = require('nock');
+require('../config');
+const { initDB } = require('../db');
+const app = require('../app');
+const { Restaurant } = require('../model');
 
 chai.should();
 chai.use(chaiHttp);
 
-let app;
 describe('Restaurant Testcases', () => {
   before((done) => {
-    require('../config');
-    const { initDB } = require('../db');
-    initDB()
-      .then(() => {
-        const { runMigration } = require('../model');
-        return runMigration(true);
-      })
-      .then(() => {
-        app = require('../app');
-        done();
-      });
+    initDB();
+    Restaurant.remove({}, () => {
+      done();
+    });
   });
 
   beforeEach(() => {
     nock(`${global.gConfig.auth_url}`)
       .get('/auth/validate')
-      .query({ token: 'admin' })
-      .reply(200, { valid: true, role: 'restaurant', user: 1 });
+      .query({ token: 'secrettoken' })
+      .reply(200, { valid: true, role: 'restaurant', user: '616eee906f354a1864dc650d' });
   });
 
   it('it should create a restaurant', (done) => {
     const data = {
-      id: 1,
+      id: '616eee906f354a1864dc650d',
       name: 'Test Restaurant',
       description: 'Test Description',
       address: 'Test Address',
@@ -51,7 +47,7 @@ describe('Restaurant Testcases', () => {
       .request(app)
       .post('/restaurants')
       .send(data)
-      .set('Authorization', 'admin')
+      .set('Authorization', 'secrettoken')
       .end((err, res) => {
         if (err) {
           console.log(err);
@@ -64,8 +60,8 @@ describe('Restaurant Testcases', () => {
           res.body.should.have.property('state').eql('California');
           res.body.should.have.property('country').eql('USA');
           res.body.should.have.property('contact_no').eql('89898989856');
-          res.body.should.have.property('time_open').eql('10:00:00');
-          res.body.should.have.property('time_close').eql('20:00:00');
+          res.body.should.have.property('time_open').eql('10:00');
+          res.body.should.have.property('time_close').eql('20:00');
           res.body.should.have.property('food_type').eql('veg');
           res.body.should.have.property('restaurant_type').eql('delivery');
         }
@@ -76,8 +72,8 @@ describe('Restaurant Testcases', () => {
   it('it should fetch the created restaurant', (done) => {
     chai
       .request(app)
-      .get('/restaurants/1')
-      .set('Authorization', 'admin')
+      .get('/restaurants/616eee906f354a1864dc650d')
+      .set('Authorization', 'secrettoken')
       .end((err, res) => {
         if (err) {
           console.log(err);
@@ -90,8 +86,8 @@ describe('Restaurant Testcases', () => {
           res.body.should.have.property('state').eql('California');
           res.body.should.have.property('country').eql('USA');
           res.body.should.have.property('contact_no').eql('89898989856');
-          res.body.should.have.property('time_open').eql('10:00:00');
-          res.body.should.have.property('time_close').eql('20:00:00');
+          res.body.should.have.property('time_open').eql('10:00');
+          res.body.should.have.property('time_close').eql('20:00');
           res.body.should.have.property('food_type').eql('veg');
           res.body.should.have.property('restaurant_type').eql('delivery');
         }
@@ -101,7 +97,7 @@ describe('Restaurant Testcases', () => {
 
   it('it should update the restaurant', (done) => {
     const data = {
-      id: 1,
+      id: '616eee906f354a1864dc650d',
       name: 'Test Updated Restaurant',
       description: 'Test Updated Description',
       address: 'Test Updated Address',
@@ -116,9 +112,9 @@ describe('Restaurant Testcases', () => {
     };
     chai
       .request(app)
-      .put('/restaurants/1')
+      .put('/restaurants/616eee906f354a1864dc650d')
       .send(data)
-      .set('Authorization', 'admin')
+      .set('Authorization', 'secrettoken')
       .end((err, res) => {
         if (err) {
           console.log(err);
@@ -131,8 +127,8 @@ describe('Restaurant Testcases', () => {
           res.body.should.have.property('state').eql('California');
           res.body.should.have.property('country').eql('USA');
           res.body.should.have.property('contact_no').eql('9898989898');
-          res.body.should.have.property('time_open').eql('08:00:00');
-          res.body.should.have.property('time_close').eql('22:00:00');
+          res.body.should.have.property('time_open').eql('08:00');
+          res.body.should.have.property('time_close').eql('22:00');
           res.body.should.have.property('food_type').eql('non-veg');
           res.body.should.have.property('restaurant_type').eql('pickup');
         }
