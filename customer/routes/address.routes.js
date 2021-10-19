@@ -41,8 +41,6 @@ router.get('/', addressController.getAllAddresses);
  * @group Addresses
  * @param {string} authorization.header.require
  * @param {string} cusID.path.require
- * @param {integer} page.query.require
- * @param {integer} limit.query.require
  * @returns {Array.<Address>} 200 - List of address info
  */
 router.get('/all', addressController.getAllAddressesForRestaurant);
@@ -62,7 +60,7 @@ router.post('/', ...bodyValidators(), addressController.createAddress);
  * @route GET /customers/addresses/{addID}
  * @group Addresses
  * @param {string} authorization.header.require
- * @param {integer} addID.path.require
+ * @param {string} addID.path.require
  * @returns {Media.model} 200 - Media for given ID
  */
 router.get('/:addID', addressController.getAddressByID);
@@ -72,7 +70,7 @@ router.get('/:addID', addressController.getAddressByID);
  * @route PUT /customers/addresses/{addID}
  * @group Addresses
  * @param {string} authorization.header.require
- * @param {integer} addID.path.require
+ * @param {string} addID.path.require
  * @param {Address.model} Address.body.require
  * @returns {Address.model} 200 - Updated Address
  */
@@ -83,7 +81,7 @@ router.put('/:addID', ...bodyValidators(), addressController.updateAddress);
  * @route DELETE /customers/addresses/{addID}
  * @group Addresses
  * @param {string} authorization.header.require
- * @param {integer} addID.path.require
+ * @param {string} addID.path.require
  * @returns {null} 200 - Delete Media
  */
 router.delete('/:addID', addressController.deleteAddress);

@@ -1,19 +1,21 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable eqeqeq */
 const { validationResult } = require('express-validator');
+const { Types } = require('mongoose');
 const { Address, Customer } = require('../model');
 const errors = require('../util/errors');
 
 // NOTE: not done paiganation for addresses
 const getAllAddresses = async (req, res) => {
   const { user } = req.headers;
-  const customer = await Customer.findOne({ where: { id: user }, include: Address });
+  const addresses = await Address.find({ customerId: Types.ObjectId(user) });
 
-  res.status(200).json(customer.addresses);
+  res.status(200).json(addresses);
 };
 
 // admin endpoint
 const getAllAddressesForRestaurant = async (req, res) => {
-  const addresses = await Address.findAll();
+  const addresses = await Address.find({});
 
   res.status(200).json(addresses);
 };
@@ -27,13 +29,18 @@ const getAddressByID = async (req, res) => {
 
   const { user } = req.headers;
 
-  const address = await Address.findOne({ where: { customerId: user, id } });
-  if (!address) {
-    res.status(404).json(errors.notFound);
-    return;
-  }
+  try {
+    const address = await Address.findOne({ customerId: user, _id: id });
+    if (!address) {
+      res.status(404).json(errors.notFound);
+      return;
+    }
 
-  res.status(200).json(address);
+    res.status(200).json(address);
+  } catch (e) {
+    console.log(e);
+    res.status(500).json(errors.serverError);
+  }
 };
 
 const createAddress = async (req, res) => {
@@ -49,15 +56,14 @@ const createAddress = async (req, res) => {
 
   try {
     const createdRes = await Address.create({ ...address, customerId: user });
+
+    await Customer.update({ _id: Types.ObjectId(user) }, { $push: { addresses: createdRes._id } });
+
     res.status(201).json(createdRes);
     return;
   } catch (err) {
     console.error(err);
-    if (err.original) {
-      res.status(500).json({ status: 500, message: err.original.sqlMessage });
-    } else {
-      res.status(500).json(errors.serverError);
-    }
+    res.status(500).json(errors.serverError);
   }
 };
 
@@ -78,31 +84,22 @@ const updateAddress = async (req, res) => {
   const { user } = req.headers;
   const address = req.body;
 
-  const dbRes = await Address.findOne({ where: { id, customerId: user } });
-  if (!dbRes) {
-    res.status(404).json(errors.notFound);
-    return;
-  }
-
   try {
-    dbRes.firstLine = address.firstLine;
-    dbRes.secondLine = address.secondLine;
-    dbRes.zipcode = address.zipcode;
-    dbRes.city = address.city;
-    dbRes.state = address.state;
-    dbRes.country = address.country;
+    const dbRes = await Address.findOneAndUpdate(
+      { _id: id, customerId: user },
+      { ...address, customerId: Types.ObjectId(user) },
+      { returnOriginal: false },
+    );
+    if (!dbRes) {
+      res.status(404).json(errors.notFound);
+      return;
+    }
 
-    const updatedRes = await dbRes.save();
-
-    res.status(200).json(updatedRes);
+    res.status(200).json(dbRes);
     return;
   } catch (err) {
     console.error(err);
-    if (err.original) {
-      res.status(500).json({ status: 500, message: err.original.sqlMessage });
-    } else {
-      res.status(500).json(errors.serverError);
-    }
+    res.status(500).json(errors.serverError);
   }
 };
 
@@ -113,24 +110,21 @@ const deleteAddress = async (req, res) => {
     return;
   }
 
-  const { user } = req.headers;
-  const address = await Address.findOne({ where: { id, customerId: user } });
-  if (!address) {
-    res.status(404).json(errors.notFound);
-    return;
-  }
-
   try {
-    await address.destroy();
+    const { user } = req.headers;
+    const address = await Address.findOneAndDelete({ _id: id, customerId: Types.ObjectId(user) });
+    if (!address) {
+      res.status(404).json(errors.notFound);
+      return;
+    }
+
+    await Customer.update({ _id: Types.ObjectId(user) }, { $pull: { addresses: address._id } });
+
     res.status(200).send(null);
     return;
   } catch (err) {
     console.error(err);
-    if (err.original) {
-      res.status(500).json({ status: 500, message: err.original.sqlMessage });
-    } else {
-      res.status(500).json(errors.serverError);
-    }
+    res.status(500).json(errors.serverError);
   }
 };
 

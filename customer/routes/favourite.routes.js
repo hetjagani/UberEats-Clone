@@ -9,7 +9,7 @@ const router = express.Router();
  * @property {integer} restaurantId.required
  */
 
-const bodyValidators = () => [body('restaurantId').exists().isNumeric()];
+const bodyValidators = () => [body('restaurantId').exists().isString()];
 
 /**
  * Get list of Favourites for Customer
@@ -33,21 +33,11 @@ router.get('/', favouriteController.getCustomerFavourites);
 router.post('/', ...bodyValidators(), favouriteController.createCustomerFavourite);
 
 /**
- * Get Favourite by ID
- * @route GET /customers/favourites/{favID}
- * @group Favourites
- * @param {string} authorization.header.require
- * @param {integer} favID.path.require
- * @returns {Favourite.model} 200 - Favourite for given ID
- */
-router.get('/:favID', favouriteController.getCustomerFavouriteByID);
-
-/**
  * Delete Favourite by ID
  * @route DELETE /customers/favourites/{favID}
  * @group Favourites
  * @param {string} authorization.header.require
- * @param {integer} favID.path.require
+ * @param {string} favID.path.require
  * @returns {null} 200 - Delete Favourite
  */
 router.delete('/:favID', favouriteController.deleteCustomerFavourite);

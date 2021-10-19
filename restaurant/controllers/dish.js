@@ -148,6 +148,8 @@ const deleteDishInRestaurant = async (req, res) => {
       return;
     }
 
+    await Restaurant.update({ _id: resID }, { $pull: { dishes: dish._id } });
+
     res.status(200).send(null);
   } catch (e) {
     console.error(e);

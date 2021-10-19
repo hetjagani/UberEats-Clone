@@ -1,7 +1,9 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable eqeqeq */
 const { default: axios } = require('axios');
 const { validationResult } = require('express-validator');
-const { Favourite } = require('../model');
+const { Types } = require('mongoose');
+const { Customer } = require('../model');
 const errors = require('../util/errors');
 
 const getRestaurants = async (favs, auth) => {
@@ -11,40 +13,27 @@ const getRestaurants = async (favs, auth) => {
 
   const map = {};
   res.data.forEach((ele) => {
-    map[ele.id] = ele;
+    map[ele._id] = ele;
   });
 
   const restaurants = favs.map((ele) => ({
-    id: ele.id,
-    restaurantId: ele.restaurantId,
-    restaurant: map[ele.restaurantId],
-    customerId: ele.customerId,
+    restaurantId: ele,
+    restaurant: map[ele],
   }));
 
   return restaurants;
 };
 
-// NOTE: not done paiganation for favourites
 const getCustomerFavourites = async (req, res) => {
   const { user } = req.headers;
-  const favourites = await Favourite.findAll({ where: { customerId: user } });
-  const restaurants = await getRestaurants(favourites, req.headers.authorization);
-
-  res.status(200).json(restaurants);
-};
-
-const getCustomerFavouriteByID = async (req, res) => {
-  const { user } = req.headers;
-  const { favID } = req.params;
-  if (!favID || favID == 0) {
-    res.status(400).json(errors.badRequest);
+  const customer = await Customer.findOne({ where: { _id: user } });
+  if (!customer) {
+    res.status(404).json(errors.notFound);
     return;
   }
+  const restaurants = await getRestaurants(customer.favourites, req.headers.authorization);
 
-  const favourite = await Favourite.findOne({ where: { id: favID, customerId: user } });
-  const restaurants = await getRestaurants([favourite], req.headers.authorization);
-
-  res.status(200).json(...restaurants);
+  res.status(200).json(restaurants);
 };
 
 const createCustomerFavourite = async (req, res) => {
@@ -57,30 +46,28 @@ const createCustomerFavourite = async (req, res) => {
 
   const { user } = req.headers;
   const auth = req.headers.authorization;
-  const favBody = req.body;
+  const { restaurantId } = req.body;
 
-  if (favBody.restaurantId == 0) {
+  if (restaurantId == '') {
     res.status(400).json(errors.badRequest);
     return;
   }
 
   // check if restaurant exist
   try {
-    const resp = await axios.get(
-      `${global.gConfig.restaurant_url}/restaurants/${favBody.restaurantId}`,
-      {
-        headers: { Authorization: auth },
-      },
-    );
-
-    const favourite = await Favourite.create({
-      customerId: user,
-      restaurantId: favBody.restaurantId,
+    const resp = await axios.get(`${global.gConfig.restaurant_url}/restaurants/${restaurantId}`, {
+      headers: { Authorization: auth },
     });
 
+    await Customer.update(
+      {
+        customerId: Types.ObjectId(user),
+      },
+      { $push: { favourites: restaurantId } },
+    );
+
     res.status(201).json({
-      id: favourite.id,
-      restaurantId: favourite.restaurantId,
+      restaurantId,
       restaurant: resp.data,
       customerId: user,
     });
@@ -101,25 +88,19 @@ const deleteCustomerFavourite = async (req, res) => {
   const { user } = req.headers;
   const { favID } = req.params;
 
-  const favourite = await Favourite.findOne({ where: { restaurantId: favID, customerId: user } });
-
   try {
-    await favourite.destroy();
+    await Customer.update({ _id: user }, { $pull: { favourites: favID } });
+
     res.status(200).send(null);
     return;
   } catch (err) {
     console.error(err);
-    if (err.original) {
-      res.status(500).json({ status: 500, message: err.original.sqlMessage });
-    } else {
-      res.status(500).json(errors.serverError);
-    }
+    res.status(500).json(errors.serverError);
   }
 };
 
 module.exports = {
   getCustomerFavourites,
-  getCustomerFavouriteByID,
   createCustomerFavourite,
   deleteCustomerFavourite,
 };

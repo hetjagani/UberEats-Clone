@@ -14,7 +14,7 @@ const getFavouriteRestaurants = async (favs, auth) => {
 
   const map = {};
   res.data.forEach((ele) => {
-    map[ele.id] = ele;
+    map[ele._id] = ele;
   });
 
   const restaurants = favs.map((ele) => ({
@@ -108,7 +108,7 @@ const getCustomerByID = async (req, res) => {
 
   const customer = customers[0];
   if (customer.favourites.length > 0) {
-    customer.favourites = getFavouriteRestaurants(customer.favourites, authorization);
+    customer.favourites = await getFavouriteRestaurants(customer.favourites, authorization);
   }
 
   res.status(200).json(customer);
