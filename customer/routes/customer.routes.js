@@ -9,7 +9,7 @@ const router = express.Router();
 
 /**
  * @typedef Customer
- * @property {integer} id.required
+ * @property {string} id.required
  * @property {string} name.required
  * @property {string} nickname
  * @property {string} about
@@ -21,7 +21,7 @@ const router = express.Router();
  */
 
 const bodyValidators = () => [
-  body('id').exists().isInt().not().isIn([0]),
+  body('id').exists().isString(),
   body('name').exists().isString().not().isIn(['']),
   body('nickname').isString(),
   body('about').isString(),
@@ -29,7 +29,7 @@ const bodyValidators = () => [
   body('state').exists().isString().not().isIn(['']),
   body('country').exists().isString().not().isIn(['']),
   body('contact_no').exists().isString().not().isIn(['']),
-  body('mediumId').optional({ nullable: true }).isInt().not().isIn([0]),
+  body('medium').optional({ nullable: true }).isObject(),
 ];
 
 const [, ...updateValidators] = bodyValidators();
@@ -63,7 +63,7 @@ router.post('/', ...bodyValidators(), customerController.createCustomer);
  * @route GET /customers/{id}
  * @group Customers
  * @param {string} authorization.header.require
- * @param {integer} id.path.require
+ * @param {string} id.path.require
  * @returns {Customer.model} 200 - Customer for given ID
  */
 router.get('/:id', customerController.getCustomerByID);
@@ -73,7 +73,7 @@ router.get('/:id', customerController.getCustomerByID);
  * @route PUT /customers/{id}
  * @group Customers
  * @param {string} authorization.header.require
- * @param {integer} id.path.require
+ * @param {string} id.path.require
  * @param {Customer.model} Customer.body.require
  * @returns {Customer.model} 200 - Updated Customer
  */
@@ -84,7 +84,7 @@ router.put('/:id', ...updateValidators, customerController.updateCustomerByID);
  * @route DELETE /customers/{id}
  * @group Customers
  * @param {string} authorization.header.require
- * @param {integer} id.path.require
+ * @param {string} id.path.require
  * @returns {null} 200 - Delete Customer
  */
 router.delete('/:id', customerController.deleteCustomerByID);

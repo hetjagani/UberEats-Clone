@@ -193,7 +193,7 @@ const deleteRestaurant = async (req, res) => {
   try {
     const restaurant = await Restaurant.findOneAndRemove({ _id: id });
     if (!restaurant) {
-      res.status(401).send(errors.notFound);
+      res.status(404).send(errors.notFound);
       return;
     }
     res.status(200).send(null);

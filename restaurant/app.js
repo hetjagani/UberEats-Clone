@@ -9,7 +9,6 @@ const { getAuthMiddleware, getAccessMiddleware } = require('u-server-utils');
 const app = express();
 
 const expressSwagger = require('express-swagger-generator')(app);
-
 const cors = require('cors');
 const restaurantRouter = require('./routes/restaurant.routes');
 const validate = require('./util/authValidator');

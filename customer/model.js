@@ -1,121 +1,37 @@
-const { DataTypes } = require('sequelize');
+const { Schema, Types, model } = require('mongoose');
 
-const Customer = global.DB.define('customers', {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    unique: true,
-  },
-  name: {
-    type: DataTypes.STRING,
-  },
-  nickname: {
-    type: DataTypes.STRING,
-  },
-  about: {
-    type: DataTypes.STRING,
-  },
-  city: {
-    type: DataTypes.STRING,
-  },
-  state: {
-    type: DataTypes.STRING,
-  },
-  country: {
-    type: DataTypes.STRING,
-  },
-  contact_no: {
-    type: DataTypes.STRING,
-  },
+const MediaSchema = new Schema({
+  url: String,
+  alt_text: String,
 });
 
-const Media = global.DB.define('media', {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-    unique: true,
-  },
-  url: {
-    type: DataTypes.STRING,
-  },
-  alt_text: {
-    type: DataTypes.STRING,
-  },
+const CustomerSchema = new Schema({
+  name: String,
+  nickname: String,
+  about: String,
+  city: String,
+  state: String,
+  country: String,
+  contact_no: String,
+  medium: MediaSchema,
+  favourites: [Types.ObjectId],
+  addresses: [Types.ObjectId],
 });
 
-const Favourite = global.DB.define('favourites', {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-    unique: true,
-  },
-  restaurantId: {
-    type: DataTypes.INTEGER,
-  },
+const AddressSchema = new Schema({
+  firstLine: String,
+  secondLine: String,
+  zipcode: String,
+  city: String,
+  state: String,
+  country: String,
+  customerId: Types.ObjectId,
 });
 
-const Address = global.DB.define('addresses', {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-    unique: true,
-  },
-  firstLine: {
-    type: DataTypes.STRING,
-  },
-  secondLine: {
-    type: DataTypes.STRING,
-  },
-  zipcode: {
-    type: DataTypes.INTEGER,
-  },
-  city: {
-    type: DataTypes.STRING,
-  },
-  state: {
-    type: DataTypes.STRING,
-  },
-  country: {
-    type: DataTypes.STRING,
-  },
-});
-
-Customer.hasMany(Address, {
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE',
-});
-Address.belongsTo(Customer);
-
-Media.hasMany(Customer, {
-  onDelete: 'SET NULL',
-});
-Customer.belongsTo(Media);
-
-Customer.hasMany(Favourite, {
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE',
-});
-Favourite.belongsTo(Customer);
-
-const runMigration = async (force) => {
-  if (!global.DB) {
-    return Promise.reject(new Error('please initialize DB'));
-  }
-  if (force) {
-    await global.DB.sync({ force });
-  } else {
-    await global.DB.sync({ alter: true });
-  }
-  return Promise.resolve(global.DB);
-};
+const Customer = model('customers', CustomerSchema);
+const Address = model('addresses', AddressSchema);
 
 module.exports = {
   Customer,
-  Media,
-  Favourite,
   Address,
-  runMigration,
 };

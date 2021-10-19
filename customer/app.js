@@ -11,7 +11,6 @@ const expressSwagger = require('express-swagger-generator')(app);
 
 const cors = require('cors');
 const customerRouter = require('./routes/customer.routes');
-const mediaRouter = require('./routes/media.routes');
 const validate = require('./util/authValidator');
 const acl = require('./acl');
 
@@ -51,6 +50,5 @@ app.use(getAuthMiddleware(validate));
 app.use(getAccessMiddleware(acl));
 
 app.use('/customers', customerRouter);
-app.use('/media', mediaRouter);
 
 module.exports = app;
