@@ -3,15 +3,21 @@
 /* eslint-disable camelcase */
 /* eslint-disable eqeqeq */
 const { validationResult } = require('express-validator');
-const { Op } = require('sequelize');
-const { Restaurant, Media, Dish } = require('../model');
-const errors = require('../util/errors');
 const { getPaiganation } = require('u-server-utils');
 const { Types } = require('mongoose');
+const { Restaurant } = require('../model');
+const errors = require('../util/errors');
 
 const allRestaurants = async (req, res) => {
   const restaurants = await Restaurant.aggregate([
-    { $lookup: { from: 'dishes', localField: 'dishes', foreignField: '_id', as: 'dishes' } },
+    {
+      $lookup: {
+        from: 'dishes',
+        localField: 'dishes',
+        foreignField: '_id',
+        as: 'dishes',
+      },
+    },
   ]);
 
   res.status(200).json(restaurants);
@@ -19,7 +25,9 @@ const allRestaurants = async (req, res) => {
 
 const getAllRestaurants = async (req, res) => {
   const whereOpts = [];
-  const { address, city, restaurant_type, food_type, q } = req.query;
+  const {
+    address, city, restaurant_type, food_type, q,
+  } = req.query;
   if (address && address != '') {
     whereOpts.push({ address: { $regex: `(?i)(?<= |^)${address}(?= |$)` } });
   }
@@ -53,7 +61,14 @@ const getAllRestaurants = async (req, res) => {
 
   const resCount = await Restaurant.count(query).skip(offset).limit(limit);
   const restaurants = await Restaurant.aggregate([
-    { $lookup: { from: 'dishes', localField: 'dishes', foreignField: '_id', as: 'dishes' } },
+    {
+      $lookup: {
+        from: 'dishes',
+        localField: 'dishes',
+        foreignField: '_id',
+        as: 'dishes',
+      },
+    },
     { $match: query },
   ])
     .skip(offset)
@@ -64,21 +79,33 @@ const getAllRestaurants = async (req, res) => {
 
 const getRestaurantByID = async (req, res) => {
   const { id } = req.params;
-  if (!id || id == 0) {
+  if (!id) {
     res.status(400).json(errors.badRequest);
     return;
   }
 
-  const restaurants = await Restaurant.aggregate([
-    { $match: { _id: Types.ObjectId(id) } },
-    { $lookup: { from: 'dishes', localField: 'dishes', foreignField: '_id', as: 'dishes' } },
-  ]);
-  if (!restaurants || restaurants?.length < 1) {
-    res.status(404).send(errors.notFound);
-    return;
-  }
+  try {
+    const restaurants = await Restaurant.aggregate([
+      { $match: { _id: Types.ObjectId(id) } },
+      {
+        $lookup: {
+          from: 'dishes',
+          localField: 'dishes',
+          foreignField: '_id',
+          as: 'dishes',
+        },
+      },
+    ]);
+    if (!restaurants || restaurants?.length < 1) {
+      res.status(404).send(errors.notFound);
+      return;
+    }
 
-  res.status(200).json(restaurants[0]);
+    res.status(200).json(restaurants[0]);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json(errors.serverError);
+  }
 };
 
 const createRestaurant = async (req, res) => {
@@ -108,11 +135,7 @@ const createRestaurant = async (req, res) => {
     return;
   } catch (err) {
     console.error(err);
-    if (err.original) {
-      res.status(500).json({ status: 500, message: err.original.sqlMessage });
-    } else {
-      res.status(500).json(errors.serverError);
-    }
+    res.status(500).json(errors.serverError);
   }
 };
 
@@ -144,15 +167,20 @@ const updateRestaurantByID = async (req, res) => {
     restaurant.media = [];
   }
 
-  const dbRes = await Restaurant.findOneAndUpdate({ _id: id }, restaurant);
-  if (!dbRes) {
-    res.status(404).json(errors.notFound);
-    return;
+  try {
+    const dbRes = await Restaurant.findOneAndUpdate({ _id: id }, restaurant);
+    if (!dbRes) {
+      res.status(404).json(errors.notFound);
+      return;
+    }
+
+    const result = await Restaurant.findOne({ _id: dbRes._id });
+
+    res.status(200).json(result);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json(errors.serverError);
   }
-
-  const result = await Restaurant.findOne({ _id: dbRes._id });
-
-  res.status(200).json(result);
 };
 
 const deleteRestaurant = async (req, res) => {
@@ -162,13 +190,17 @@ const deleteRestaurant = async (req, res) => {
     return;
   }
 
-  const restaurant = await Restaurant.findOneAndRemove({ _id: id });
-  if (!restaurant) {
-    res.status(401).send(errors.notFound);
-    return;
+  try {
+    const restaurant = await Restaurant.findOneAndRemove({ _id: id });
+    if (!restaurant) {
+      res.status(401).send(errors.notFound);
+      return;
+    }
+    res.status(200).send(null);
+  } catch (e) {
+    console.log(e);
+    res.status(500).json(errors.serverError);
   }
-
-  res.status(200).send(null);
 };
 
 module.exports = {
