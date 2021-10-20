@@ -1,8 +1,9 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable eqeqeq */
 const { default: axios } = require('axios');
 const { validationResult } = require('express-validator');
-const { Sequelize } = require('sequelize');
-const { Order, OrderItem, CartItem } = require('../model');
+const { Types } = require('mongoose');
+const { Order, CartItem } = require('../model');
 const errors = require('../util/errors');
 
 const getRestaurants = async (auth) => {
@@ -12,7 +13,7 @@ const getRestaurants = async (auth) => {
 
   const map = {};
   res.data.forEach((ele) => {
-    map[ele.id] = ele;
+    map[ele._id] = ele;
   });
 
   return map;
@@ -25,7 +26,7 @@ const getAddresses = async () => {
 
   const map = {};
   res.data.forEach((ele) => {
-    map[ele.id] = ele;
+    map[ele._id] = ele;
   });
 
   return map;
@@ -36,20 +37,16 @@ const getAllOrders = async (req, res) => {
 
   const { status } = req.query;
 
-  let whereQ = { customerId: user };
+  let whereQ = { customerId: Types.ObjectId(user) };
   if (role == 'restaurant') {
-    whereQ = { restaurantId: user };
+    whereQ = { restaurantId: Types.ObjectId(user) };
   }
 
   if (status && status != '') {
     whereQ.status = status;
   }
 
-  const orders = await Order.findAll({
-    where: whereQ,
-    include: [OrderItem],
-    order: [['id', 'DESC']],
-  });
+  const orders = await Order.find(whereQ).sort({ date: -1 });
 
   try {
     // get all restaurants
@@ -60,16 +57,16 @@ const getAllOrders = async (req, res) => {
     const result = orders.map((order) => {
       const dishMap = {};
       restaurantMap[order.restaurantId].dishes.forEach((ele) => {
-        dishMap[ele.id] = ele;
+        dishMap[ele._id] = ele;
       });
 
       const dishes = order.orderitems.map((oi) => ({
-        ...oi.dataValues,
+        ...oi._doc,
         dish: dishMap[oi.dishId],
       }));
 
       return {
-        ...order.dataValues,
+        ...order._doc,
         restaurant: restaurantMap[order.restaurantId],
         orderitems: dishes,
         address: order.addressId ? addressMap[order.addressId] : null,
@@ -79,29 +76,15 @@ const getAllOrders = async (req, res) => {
     res.status(200).json(result);
   } catch (err) {
     console.error(err);
-    if (err.isAxiosError) {
-      if (err.response.status == 404) {
-        res.status(404).json({ ...errors.notFound, message: err.message });
-      } else {
-        res.status(500).json({ ...errors.serverError, message: err.message });
-      }
-    } else if (err.original) {
-      res.status(500).json({ status: 500, message: err.original.sqlMessage });
-    } else {
-      res.status(500).json(errors.serverError);
-    }
+    res.status(500).json(errors.serverError);
   }
 };
 
-// TODO: access order details based in role
 const getOrderById = async (req, res) => {
   const { id } = req.params;
   const { user } = req.headers;
 
-  const order = await Order.findOne({
-    where: { customerId: user, id },
-    include: [OrderItem],
-  });
+  const order = await Order.findOne({ customerId: user, _id: id });
   if (!order) {
     res.status(404).json(errors.notFound);
     return;
@@ -119,16 +102,16 @@ const getOrderById = async (req, res) => {
 
     const dishMap = {};
     resResp.data.dishes.forEach((dish) => {
-      dishMap[dish.id] = dish;
+      dishMap[dish._id] = dish;
     });
 
     const orderItems = order.orderitems.map((item) => ({
-      ...item.dataValues,
+      ...item._doc,
       dish: dishMap[item.dishId],
     }));
 
     const result = {
-      ...order.dataValues,
+      ...order._doc,
       restaurant: resResp.data,
       orderitems: orderItems,
     };
@@ -171,14 +154,14 @@ const createOrder = async (req, res) => {
     return;
   }
 
-  const cartItems = await CartItem.findAll({ where: { customerId: user } });
+  const cartItems = await CartItem.find({ customerId: Types.ObjectId(user) });
   if (!cartItems || cartItems.length === 0) {
     res.status(404).json({ ...errors.notFound, message: 'you have no items in cart' });
     return;
   }
+  console.log('Cart Item');
+  console.log(cartItems);
 
-  // get restaurant details(
-  const t = await global.DB.transaction();
   try {
     const response = await axios.get(
       `${global.gConfig.restaurant_url}/restaurants/${cartItems[0].restaurantId}`,
@@ -192,7 +175,7 @@ const createOrder = async (req, res) => {
 
     const dishMap = {};
     response.data.dishes.forEach((dish) => {
-      dishMap[parseInt(dish.id, 10)] = dish;
+      dishMap[dish._id] = dish;
     });
 
     let orderAmount = 0;
@@ -200,48 +183,42 @@ const createOrder = async (req, res) => {
       orderAmount += dishMap[item.dishId].price * item.quantity;
     });
 
-    const nOrder = await Order.create(
-      {
-        amount: orderAmount,
-        status: 'INIT',
-        date: Sequelize.fn('NOW'),
-        restaurantId: cartItems[0].restaurantId,
-        customerId: user,
-        type,
-      },
-      { transaction: t },
-    );
-
     const orderItems = cartItems.map((item) => ({
       dishId: item.dishId,
       restaurantId: item.restaurantId,
       quantity: item.quantity,
-      orderId: nOrder.id,
       notes: item.notes,
     }));
 
-    await OrderItem.bulkCreate(orderItems, { transaction: t });
+    const nOrder = await Order.create({
+      amount: orderAmount,
+      status: 'INIT',
+      date: Date.now(),
+      restaurantId: cartItems[0].restaurantId,
+      customerId: Types.ObjectId(user),
+      type,
+      orderitems: orderItems,
+    });
 
-    await CartItem.destroy({ where: { customerId: user } }, { transaction: t });
+    await CartItem.deleteMany({ customerId: Types.ObjectId(user) });
 
-    await t.commit();
+    const resultOrder = await Order.findOne({ _id: nOrder._id });
 
-    const resultOrder = await Order.findOne(
-      { where: { id: nOrder.id }, include: [OrderItem] },
-      { transaction: t },
-    );
+    console.log(dishMap);
 
     const orderDishes = resultOrder.orderitems.map((item) => ({
-      ...item.dataValues,
+      ...item._doc,
       dish: dishMap[item.dishId],
     }));
 
+    console.log(orderDishes);
+
+    // eslint-disable-next-line max-len
     res
       .status(201)
-      .json({ ...resultOrder.dataValues, orderitems: orderDishes, restaurant: response.data });
+      .json({ ...resultOrder._doc, orderitems: orderDishes, restaurant: response.data });
     return;
   } catch (err) {
-    await t.rollback();
     console.error(err);
     if (err.isAxiosError) {
       if (err.response.status == 404) {
@@ -267,9 +244,13 @@ const placeOrder = async (req, res) => {
     return;
   }
 
-  const { orderId, addressId } = req.body;
+  const { orderId, addressId, notes } = req.body;
 
-  const order = await Order.findOne({ where: { id: orderId, customerId: user, status: 'INIT' } });
+  const order = await Order.findOne({
+    _id: Types.ObjectId(orderId),
+    customerId: Types.ObjectId(user),
+    status: 'INIT',
+  });
   if (!order) {
     res.status(404).json(errors.notFound);
     return;
@@ -287,12 +268,13 @@ const placeOrder = async (req, res) => {
     }
 
     // if exists then update order with status PLACED and addressId
-    order.addressId = response.data.id;
+    order.addressId = response.data._id;
     order.status = 'PLACED';
+    order.notes = notes;
 
     await order.save();
 
-    const nOrder = await Order.findOne({ where: { id: order.id }, include: [OrderItem] });
+    const nOrder = await Order.findOne({ _id: order._id });
 
     const resResp = await axios.get(
       `${global.gConfig.restaurant_url}/restaurants/${nOrder.restaurantId}`,
@@ -306,16 +288,16 @@ const placeOrder = async (req, res) => {
 
     const dishMap = {};
     resResp.data.dishes.forEach((dish) => {
-      dishMap[parseInt(dish.id, 10)] = dish;
+      dishMap[dish._id] = dish;
     });
 
     const orderDishes = nOrder.orderitems.map((item) => ({
-      ...item.dataValues,
+      ...item._doc,
       dish: dishMap[item.dishId],
     }));
 
     res.status(200).json({
-      ...nOrder.dataValues,
+      ...nOrder._doc,
       address: response.data,
       orderitems: orderDishes,
       restaurant: resResp.data,
@@ -323,17 +305,7 @@ const placeOrder = async (req, res) => {
     return;
   } catch (err) {
     console.error(err);
-    if (err.isAxiosError) {
-      if (err.response.status == 404) {
-        res.status(404).json({ ...errors.notFound, message: err.message });
-      } else {
-        res.status(500).json({ ...errors.serverError, message: err.message });
-      }
-    } else if (err.original) {
-      res.status(500).json({ status: 500, message: err.original.sqlMessage });
-    } else {
-      res.status(500).json(errors.serverError);
-    }
+    res.status(500).json(errors.serverError);
   }
 };
 
@@ -350,7 +322,10 @@ const updateOrderStatus = async (req, res) => {
 
   const { status } = req.body;
 
-  const order = await Order.findOne({ where: { id, restaurantId: user } });
+  const order = await Order.findOne({
+    _id: Types.ObjectId(id),
+    restaurantId: Types.ObjectId(user),
+  });
   if (!order) {
     res.status(404).json(errors.notFound);
     return;
@@ -361,7 +336,7 @@ const updateOrderStatus = async (req, res) => {
   await order.save();
 
   try {
-    const nOrder = await Order.findOne({ where: { id: order.id }, include: [OrderItem] });
+    const nOrder = await Order.findOne({ _id: order._id });
 
     const resResp = await axios.get(
       `${global.gConfig.restaurant_url}/restaurants/${nOrder.restaurantId}`,
@@ -375,21 +350,21 @@ const updateOrderStatus = async (req, res) => {
 
     const dishMap = {};
     resResp.data.dishes.forEach((dish) => {
-      dishMap[parseInt(dish.id, 10)] = dish;
+      dishMap[dish._id] = dish;
     });
 
     const orderDishes = nOrder.orderitems.map((item) => ({
-      ...item.dataValues,
+      ...item._doc,
       dish: dishMap[item.dishId],
     }));
 
     const result = {
-      ...nOrder.dataValues,
+      ...nOrder._doc,
       orderitems: orderDishes,
       restaurant: resResp.data,
     };
 
-    const addressMap = getAddresses();
+    const addressMap = await getAddresses();
 
     if (order.addressId) {
       result.address = addressMap[order.addressId];
@@ -399,17 +374,7 @@ const updateOrderStatus = async (req, res) => {
     return;
   } catch (err) {
     console.error(err);
-    if (err.isAxiosError) {
-      if (err.status == 404) {
-        res.status(404).json({ ...errors.notFound, message: err.message });
-      } else {
-        res.status(500).json({ ...errors.serverError, message: err.message });
-      }
-    } else if (err.original) {
-      res.status(500).json({ status: 500, message: err.original.sqlMessage });
-    } else {
-      res.status(500).json(errors.serverError);
-    }
+    res.status(500).json(errors.serverError);
   }
 };
 

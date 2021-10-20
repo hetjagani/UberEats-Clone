@@ -15,10 +15,10 @@ const bodyValidators = () => [body('restaurantId').exists().isString()];
  * Get list of Favourites for Customer
  * @route GET /customers/favourites
  * @group Favourites
- * @param {string} authorization.header.require
+ * @security JWT
  * @param {integer} page.query.require
  * @param {integer} limit.query.require
- * @returns {Array.<Dish>} 200 - List of dishes info
+ * @returns {Array.<Favourite>} 200 - List of dishes info
  */
 router.get('/', favouriteController.getCustomerFavourites);
 
@@ -26,7 +26,7 @@ router.get('/', favouriteController.getCustomerFavourites);
  * Create Favourite for Customer
  * @route POST /customers/favourites
  * @group Favourites
- * @param {string} authorization.header.require
+ * @security JWT
  * @param {Favourite.model} Favourite.body.require
  * @returns {Favourite.model} 201 - Created Favourite
  */
@@ -36,7 +36,7 @@ router.post('/', ...bodyValidators(), favouriteController.createCustomerFavourit
  * Delete Favourite by ID
  * @route DELETE /customers/favourites/{favID}
  * @group Favourites
- * @param {string} authorization.header.require
+ * @security JWT
  * @param {string} favID.path.require
  * @returns {null} 200 - Delete Favourite
  */

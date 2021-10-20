@@ -41,7 +41,7 @@ router.use('/addresses', addressRouter);
  * Get list of Customers
  * @route GET /customers
  * @group Customers
- * @param {string} authorization.header.require
+ * @security JWT
  * @param {integer} page.query.require
  * @param {integer} limit.query.require
  * @returns {Array.<Customer>} 200 - List of customer info
@@ -52,7 +52,7 @@ router.get('/', customerController.getAllCustomers);
  * Create a Customer
  * @route POST /customers
  * @group Customers
- * @param {string} authorization.header.require
+ * @security JWT
  * @param {Customer.model} Customer.body.require
  * @returns {Customer.model} 201 - Created Customer
  */
@@ -62,7 +62,7 @@ router.post('/', ...bodyValidators(), customerController.createCustomer);
  * Get Customer by ID
  * @route GET /customers/{id}
  * @group Customers
- * @param {string} authorization.header.require
+ * @security JWT
  * @param {string} id.path.require
  * @returns {Customer.model} 200 - Customer for given ID
  */
@@ -72,7 +72,7 @@ router.get('/:id', customerController.getCustomerByID);
  * Update Customer by ID
  * @route PUT /customers/{id}
  * @group Customers
- * @param {string} authorization.header.require
+ * @security JWT
  * @param {string} id.path.require
  * @param {Customer.model} Customer.body.require
  * @returns {Customer.model} 200 - Updated Customer
@@ -83,7 +83,7 @@ router.put('/:id', ...updateValidators, customerController.updateCustomerByID);
  * Delete Customer by ID
  * @route DELETE /customers/{id}
  * @group Customers
- * @param {string} authorization.header.require
+ * @security JWT
  * @param {string} id.path.require
  * @returns {null} 200 - Delete Customer
  */

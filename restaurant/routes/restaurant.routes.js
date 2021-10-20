@@ -47,7 +47,7 @@ router.use('/:resID/dishes', dishRouter);
  * Get list of Restaurants
  * @route GET /restaurants/all
  * @group Restaurants
- * @param {string} authorization.header.require
+ * @security JWT
  * @returns {Array.<Restaurant>} 200 - List of restaurant info
  */
 router.get('/all', resController.allRestaurants);
@@ -56,7 +56,7 @@ router.get('/all', resController.allRestaurants);
  * Get list of Restaurants
  * @route GET /restaurants
  * @group Restaurants
- * @param {string} authorization.header.require
+ * @security JWT
  * @param {integer} page.query.require
  * @param {integer} limit.query.require
  * @param {string} address.query.require
@@ -72,7 +72,7 @@ router.get('/', resController.getAllRestaurants);
  * Create a Restaurant
  * @route POST /restaurants
  * @group Restaurants
- * @param {string} authorization.header.require
+ * @security JWT
  * @param {Restaurant.model} Restaurant.body.require
  * @returns {Restaurant.model} 201 - Created Restaurant
  */
@@ -82,7 +82,7 @@ router.post('/', ...bodyValidators(), resController.createRestaurant);
  * Get Restaurant by ID
  * @route GET /restaurants/{id}
  * @group Restaurants
- * @param {string} authorization.header.require
+ * @security JWT
  * @param {string} id.path.require
  * @returns {Restaurant.model} 200 - Restaurant for given ID
  */
@@ -92,7 +92,7 @@ router.get('/:id', resController.getRestaurantByID);
  * Update Restaurant by ID
  * @route PUT /restaurants/{id}
  * @group Restaurants
- * @param {string} authorization.header.require
+ * @security JWT
  * @param {string} id.path.require
  * @param {Restaurant.model} Restaurant.body.require
  * @returns {Restaurant.model} 200 - Updated Restaurant
@@ -103,7 +103,7 @@ router.put('/:id', ...updateValidators, resController.updateRestaurantByID);
  * Delete Restaurant by ID
  * @route DELETE /restaurants/{id}
  * @group Restaurants
- * @param {string} authorization.header.require
+ * @security JWT
  * @param {string} id.path.require
  * @returns {null} 200 - Delete Restaurant
  */

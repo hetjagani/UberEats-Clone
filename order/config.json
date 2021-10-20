@@ -1,9 +1,6 @@
 {
   "development": {
-    "database_host": "mysqldb",
-    "database_user": "uberadmin",
-    "database_password": "uberadminpass",
-    "database_name": "order",
+    "database_conn": "mongodb://uberadmin:uberadminpass@mongodb:27017/order",
     "auth_url": "http://auth:3000",
     "restaurant_url": "http://restaurant:3000",
     "customer_url": "http://customer:3000"

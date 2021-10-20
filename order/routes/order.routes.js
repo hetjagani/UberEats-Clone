@@ -18,8 +18,9 @@ const router = express.Router();
 
 /**
  * @typedef PlaceOrder
- * @property {integer} orderId.required
- * @property {integer} addressId.required
+ * @property {string} orderId.required
+ * @property {string} addressId.required
+ * @property {string} notes
  */
 
 /**
@@ -34,15 +35,17 @@ const bodyValidators = () => [
     .isIn(['PLACED', 'PREPARING', 'COMPLETE', 'PICKUP_READY', 'CANCEL']),
 ];
 const placeOrderValidators = () => [
-  body('orderId').exists().isInt().not().isIn([0]),
-  body('addressId').exists().isInt().not().isIn([0]),
+  body('orderId').exists().isString(),
+  body('addressId').exists().isString(),
+  body('notes').optional({ nullable: true }).isString(),
 ];
 
 /**
  * Get list of Orders
  * @route GET /orders
  * @group Orders
- * @param {string} authorization.header.require
+ * @param {string} status.query
+ * @security JWT
  * @returns {Array.<Order>} 200 - List of orders info
  */
 router.get('/', orderController.getAllOrders);
@@ -51,7 +54,7 @@ router.get('/', orderController.getAllOrders);
  * Place Order
  * @route POST /orders/place
  * @group Orders
- * @param {string} authorization.header.require
+ * @security JWT
  * @param {PlaceOrder.model} PlaceOrder.body.require
  * @returns {Order.model} 201 - Created Order
  */
@@ -61,7 +64,7 @@ router.post('/place', ...placeOrderValidators(), orderController.placeOrder);
  * Create Order
  * @route POST /orders/{type}
  * @group Orders
- * @param {string} authorization.header.require
+ * @security JWT
  * @param {string} type.path.require
  * @returns {Order.model} 201 - Created Order
  */
@@ -71,8 +74,8 @@ router.post('/:type', orderController.createOrder);
  * Get Order by ID
  * @route GET /orders/{id}
  * @group Orders
- * @param {string} authorization.header.require
- * @param {integer} id.path.require
+ * @security JWT
+ * @param {string} id.path.require
  * @returns {Order.model} 200 - Order for given ID
  */
 router.get('/:id', orderController.getOrderById);
@@ -81,8 +84,8 @@ router.get('/:id', orderController.getOrderById);
  * Update Order Status
  * @route PUT /orders/{id}
  * @group Orders
- * @param {string} authorization.header.require
- * @param {integer} id.path.require
+ * @security JWT
+ * @param {string} id.path.require
  * @param {UpdateOrder.model} UpdateOrder.body.require
  * @returns {Order.model} 200 - Updated Order
  */

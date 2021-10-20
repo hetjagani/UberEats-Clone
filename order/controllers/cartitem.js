@@ -1,6 +1,8 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable eqeqeq */
 const { default: axios } = require('axios');
 const { validationResult } = require('express-validator');
+const { Types } = require('mongoose');
 const { CartItem } = require('../model');
 const errors = require('../util/errors');
 
@@ -11,7 +13,7 @@ const getRestaurants = async (auth) => {
 
   const map = {};
   res.data.forEach((ele) => {
-    map[ele.id] = ele;
+    map[ele._id] = ele;
   });
 
   return map;
@@ -20,7 +22,7 @@ const getRestaurants = async (auth) => {
 const getAllCartItems = async (req, res) => {
   const { user } = req.headers;
 
-  const cartItems = await CartItem.findAll({ where: { customerId: user } });
+  const cartItems = await CartItem.find({ customerId: Types.ObjectId(user) });
 
   if (!cartItems || cartItems.length == 0) {
     res.status(200).json([]);
@@ -44,11 +46,11 @@ const getAllCartItems = async (req, res) => {
 
     const dishMap = {};
     restaurant.dishes.forEach((ele) => {
-      dishMap[ele.id] = ele;
+      dishMap[ele._id] = ele;
     });
 
     const result = cartItems.map((ele) => ({
-      id: ele.id,
+      _id: ele._id,
       restaurantId: ele.restaurantId,
       restaurant,
       dishId: ele.dishId,
@@ -79,7 +81,7 @@ const addCartItem = async (req, res) => {
   try {
     const restaurants = await getRestaurants(req.headers.authorization);
 
-    const cartItem = await CartItem.findOne({ where: { customerId: user } });
+    const cartItem = await CartItem.findOne({ customerId: Types.ObjectId(user) });
 
     if (cartItem && cartItem.restaurantId != req.body.restaurantId) {
       res.status(400).json({
@@ -87,27 +89,23 @@ const addCartItem = async (req, res) => {
         type: 'diff_restaurant',
         message: `Trying to add dish from <strong>${
           restaurants[req.body.restaurantId].name
-        }</strong> but cart has dishes for <strong>${restaurants[cartItem.restaurantId].name}</strong>`,
+        }</strong> but cart has dishes for <strong>${
+          restaurants[cartItem.restaurantId].name
+        }</strong>`,
         time: Date.now(),
       });
       return;
     }
 
-    const response = await axios.get(
-      `${global.gConfig.restaurant_url}/restaurants/${req.body.restaurantId}`,
-      { headers: { authorization: req.headers.authorization } },
-    );
-
-    if (!response) {
+    const restaurant = restaurants[req.body.restaurantId];
+    if (!restaurant) {
       res.status(404).json(errors.notFound);
       return;
     }
 
-    const restaurant = response.data;
-
     const dishMap = {};
     restaurant.dishes.forEach((ele) => {
-      dishMap[ele.id] = ele;
+      dishMap[ele._id] = ele;
     });
 
     if (!dishMap[req.body.dishId]) {
@@ -124,7 +122,7 @@ const addCartItem = async (req, res) => {
     });
 
     const result = {
-      id: nCartItem.id,
+      _id: nCartItem._id,
       restaurantId: nCartItem.restaurantId,
       restaurant,
       dishId: nCartItem.dishId,
@@ -147,30 +145,25 @@ const addCartItem = async (req, res) => {
 
 const deleteCartItem = async (req, res) => {
   const { id } = req.params;
-  if (!id || id == 0) {
+  if (!id) {
     res.status(400).json(errors.badRequest);
     return;
   }
 
   const { user } = req.headers;
 
-  const cartItem = await CartItem.findOne({ where: { id, customerId: user } });
-  if (!cartItem) {
-    res.status(404).json(errors.notFound);
-    return;
-  }
-
   try {
-    await cartItem.destroy();
+    const cartItem = await CartItem.findOneAndDelete({ _id: id, customerId: Types.ObjectId(user) });
+    if (!cartItem) {
+      res.status(404).json(errors.notFound);
+      return;
+    }
+
     res.status(200).json(null);
     return;
   } catch (err) {
     console.error(err);
-    if (err.original) {
-      res.status(500).json({ status: 500, message: err.original.sqlMessage });
-    } else {
-      res.status(500).json(errors.serverError);
-    }
+    res.status(500).json(errors.serverError);
   }
 };
 
@@ -178,16 +171,12 @@ const resetCartItems = async (req, res) => {
   const { user } = req.headers;
 
   try {
-    await CartItem.destroy({ where: { customerId: user } });
+    await CartItem.deleteMany({ customerId: Types.ObjectId(user) });
     res.status(200).json(null);
     return;
   } catch (err) {
     console.error(err);
-    if (err.original) {
-      res.status(500).json({ status: 500, message: err.original.sqlMessage });
-    } else {
-      res.status(500).json(errors.serverError);
-    }
+    res.status(500).json(errors.serverError);
   }
 };
 

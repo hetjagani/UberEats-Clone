@@ -37,6 +37,14 @@ const options = {
     host: 'localhost:7001',
     produces: ['application/json'],
     schemes: ['http'],
+    securityDefinitions: {
+      JWT: {
+        type: 'apiKey',
+        in: 'header',
+        name: 'Authorization',
+        description: 'JWT auth token',
+      },
+    },
   },
   // eslint-disable-next-line no-undef
   basedir: __dirname,
