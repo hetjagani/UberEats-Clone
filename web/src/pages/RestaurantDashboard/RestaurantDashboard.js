@@ -83,30 +83,36 @@ const RestaurantDashboard = () => {
               {loginRestaurant.name} (
               {loginRestaurant.restaurant_type && loginRestaurant.restaurant_type.toUpperCase()})
             </H5>
-            <Paragraph2><strong>Description: </strong>{loginRestaurant.description}</Paragraph2>
-            <Paragraph2><strong>Address:</strong> {loginRestaurant.address}</Paragraph2>
             <Paragraph2>
-              <strong>Location: </strong>{loginRestaurant.city} | {loginRestaurant.state} | {loginRestaurant.country}
+              <strong>Description: </strong>
+              {loginRestaurant.description}
+            </Paragraph2>
+            <Paragraph2>
+              <strong>Address:</strong> {loginRestaurant.address}
+            </Paragraph2>
+            <Paragraph2>
+              <strong>Location: </strong>
+              {loginRestaurant.city} | {loginRestaurant.state} | {loginRestaurant.country}
             </Paragraph2>
           </div>
-          <div className={css({width:'100px'})}>
-            <Button  onClick={() => setIsOpen(true)}>Add Dish</Button>
+          <div className={css({ width: '100px' })}>
+            <Button onClick={() => setIsOpen(true)}>Add Dish</Button>
           </div>
         </div>
       </div>
-      <div style={{ width: '90vw', margin:'40px' }}>
+      <div style={{ width: '90vw', margin: '40px' }}>
         <FlexGrid flexGridColumnCount={3} flexGridColumnGap="scale800" flexGridRowGap="scale800">
           {dishes.length > 0 &&
             dishes.map((dish) => {
               return (
                 <FlexGridItem {...itemProps} key={dish.id}>
-                  <DishCard dish={dish} editable={true} resID={loginRestaurant.id} />
+                  <DishCard dish={dish} editable={true} resID={loginRestaurant._id} />
                 </FlexGridItem>
               );
             })}
         </FlexGrid>
       </div>
-      <AddDishModal isOpen={isOpen} setIsOpen={setIsOpen} resID={loginRestaurant.id} />
+      <AddDishModal isOpen={isOpen} setIsOpen={setIsOpen} resID={loginRestaurant._id} />
     </div>
   );
 };

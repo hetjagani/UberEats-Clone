@@ -55,16 +55,8 @@ const AddDishModal = ({ isOpen, setIsOpen, resID }) => {
           notify({ type: 'info', description: `File ${res.key} uploaded...` });
 
           if (res.status == 204) {
-            axios
-              .post(`/restaurants/media`, { alt_text: res.key, url: res.location })
-              .then((res) => {
-                setMedia([...media, res.data]);
-                setIsOpen(false);
-                notify({ type: 'info', description: 'Added dish media' });
-              })
-              .catch((err) => {
-                notify({ type: 'error', description: err.response && err.response.data.message });
-              });
+            setMedia([...media, { alt_text: res.key, url: res.location }]);
+            notify({ type: 'info', description: 'Added dish media' });
           }
           setIsUploading(false);
         })
@@ -82,17 +74,13 @@ const AddDishModal = ({ isOpen, setIsOpen, resID }) => {
   const dispatch = useDispatch();
 
   const saveDish = () => {
-    let mediaArr = [];
-    media.forEach((m) => {
-      mediaArr.push(m.id);
-    });
     const data = {
       name,
       description,
       price,
       food_type: foodType[0] && foodType[0].id,
       category: category[0] && category[0].id,
-      media: mediaArr,
+      media,
     };
 
     dispatch(createRestaurantDish(data, resID)).then(() => {

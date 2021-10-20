@@ -145,18 +145,11 @@ export const deleteRestaurantDish = (resID, dishID) => {
 
 export const createDishMedia = (data, dishID) => {
   return (dispatch) => {
-    return axios
-      .post('/restaurants/media', data)
-      .then((res) => {
-        dispatch({
-          type: CREATE_DISH_MEDIA,
-          payload: { media: res.data, dishID },
-        });
-        notify({ type: 'info', description: 'Created Dish Media' });
-      })
-      .catch((err) => {
-        notify({ type: 'error', description: JSON.stringify(err.response.data.message) });
-      });
+    dispatch({
+      type: CREATE_DISH_MEDIA,
+      payload: { media: data, dishID },
+    });
+    notify({ type: 'info', description: 'Created Dish Media' });
   };
 };
 

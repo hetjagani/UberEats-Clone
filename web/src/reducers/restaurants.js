@@ -56,14 +56,14 @@ export default (state = initialState, action) => {
       };
 
     case UPDATE_RESTAURANT_DISH:
-      let filteredDishes = state.dishes.filter((d) => d.id != action.payload.dishID);
+      let filteredDishes = state.dishes.filter((d) => d._id != action.payload.dishID);
       return {
         ...state,
         dishes: [...filteredDishes, action.payload.dish],
       };
 
     case DELETE_RESTAURANT_DISH:
-      let afterDeleteDishes = state.dishes.filter((d) => d.id != action.payload);
+      let afterDeleteDishes = state.dishes.filter((d) => d._id != action.payload);
       return {
         ...state,
         dishes: afterDeleteDishes,
@@ -77,7 +77,7 @@ export default (state = initialState, action) => {
 
     case CREATE_DISH_MEDIA:
       let createddishes = state.dishes.map((d) => {
-        if (d.id == action.payload.dishID) {
+        if (d._id == action.payload.dishID) {
           d.media = [...d.media, action.payload.media];
         }
         return d;
@@ -89,7 +89,7 @@ export default (state = initialState, action) => {
 
     case CLEAR_DISH_MEDIA:
       let cleareddishes = state.dishes.map((d) => {
-        if (d.id == action.payload.dishID) {
+        if (d._id == action.payload.dishID) {
           d.media = [];
         }
         return d;

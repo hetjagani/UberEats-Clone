@@ -30,8 +30,10 @@ const DishCard = ({ dish, editable, resID }) => {
   });
 
   let featuredMediaURL = '';
-  if (dish.media && dish.media.length > 0) {
-    featuredMediaURL = dish.media[0].url;
+  if (dish.media?.length > 0) {
+    featuredMediaURL = dish.media[0]?.url;
+  } else {
+    featuredMediaURL = '/images/dish.jpg';
   }
 
   const [isOpen, setIsOpen] = React.useState(false);
@@ -67,7 +69,7 @@ const DishCard = ({ dish, editable, resID }) => {
           notify({ type: 'info', description: `File ${res.key} uploaded...` });
 
           if (res.status == 204) {
-            dispatch(createDishMedia({ alt_text: res.key, url: res.location }, dish.id));
+            dispatch(createDishMedia({ alt_text: res.key, url: res.location }, dish._id));
           }
           setIsUploading(false);
         })
@@ -79,30 +81,25 @@ const DishCard = ({ dish, editable, resID }) => {
   };
 
   const clearMedia = () => {
-    dispatch(clearDishMedia(dish.id));
+    dispatch(clearDishMedia(dish._id));
   };
 
-  // TODO: delete dish
   const saveDish = () => {
-    let mediaArr = [];
-    dish.media.forEach((m) => {
-      mediaArr.push(m.id);
-    });
     const data = {
       name,
       description,
       price,
       food_type: foodType[0] && foodType[0].id,
       category: category[0] && category[0].id,
-      media: mediaArr,
+      media: dish.media,
     };
-    dispatch(updateRestaurantDish(data, resID, dish.id)).then(() => {
+    dispatch(updateRestaurantDish(data, resID, dish._id)).then(() => {
       setIsOpen(false);
     });
   };
 
   const deleteDish = () => {
-    dispatch(deleteRestaurantDish(resID, dish.id));
+    dispatch(deleteRestaurantDish(resID, dish._id));
   };
 
   return (
