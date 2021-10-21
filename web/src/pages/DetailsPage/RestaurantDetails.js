@@ -116,13 +116,6 @@ const RestaurantDetails = ({ loginDetails, update }) => {
       notify({ type: 'error', description: 'Invalid Values' });
       return;
     }
-    let mediaArr = [];
-    if (media.length > 0) {
-      media.forEach((m) => {
-        mediaArr.push(m.id);
-      });
-    }
-
     const data = {
       id: loginDetails.id,
       name,
@@ -136,7 +129,7 @@ const RestaurantDetails = ({ loginDetails, update }) => {
       time_close: timeClose,
       food_type: foodType[0] && foodType[0].id,
       restaurant_type: resType[0] && resType[0].id,
-      media: mediaArr,
+      media: media,
     };
 
     if (update) {

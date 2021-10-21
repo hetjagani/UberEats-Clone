@@ -1,3 +1,5 @@
+/* eslint-disable array-callback-return */
+/* eslint-disable consistent-return */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable eqeqeq */
 const { default: axios } = require('axios');
@@ -60,10 +62,14 @@ const getAllOrders = async (req, res) => {
         dishMap[ele._id] = ele;
       });
 
-      const dishes = order.orderitems.map((oi) => ({
-        ...oi._doc,
-        dish: dishMap[oi.dishId],
-      }));
+      const dishes = order.orderitems.map((oi) => {
+        if (dishMap[oi.dishId]) {
+          return {
+            ...oi._doc,
+            dish: dishMap[oi.dishId],
+          };
+        }
+      });
 
       return {
         ...order._doc,

@@ -25,9 +25,7 @@ const allRestaurants = async (req, res) => {
 
 const getAllRestaurants = async (req, res) => {
   const whereOpts = [];
-  const {
-    address, city, restaurant_type, food_type, q,
-  } = req.query;
+  const { address, city, restaurant_type, food_type, q } = req.query;
   if (address && address != '') {
     whereOpts.push({ address: { $regex: `(?i)(?<= |^)${address}(?= |$)` } });
   }
@@ -131,7 +129,19 @@ const createRestaurant = async (req, res) => {
   try {
     const createdRes = await Restaurant.create(restaurant);
 
-    res.status(201).json(createdRes);
+    const result = await Restaurant.aggregate([
+      { $match: { _id: createdRes._id } },
+      {
+        $lookup: {
+          from: 'dishes',
+          localField: 'dishes',
+          foreignField: '_id',
+          as: 'dishes',
+        },
+      },
+    ]);
+
+    res.status(201).json(result[0]);
     return;
   } catch (err) {
     console.error(err);
@@ -174,9 +184,19 @@ const updateRestaurantByID = async (req, res) => {
       return;
     }
 
-    const result = await Restaurant.findOne({ _id: dbRes._id });
+    const result = await Restaurant.aggregate([
+      { $match: { _id: dbRes._id } },
+      {
+        $lookup: {
+          from: 'dishes',
+          localField: 'dishes',
+          foreignField: '_id',
+          as: 'dishes',
+        },
+      },
+    ]);
 
-    res.status(200).json(result);
+    res.status(200).json(result[0]);
   } catch (e) {
     console.error(e);
     res.status(500).json(errors.serverError);

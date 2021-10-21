@@ -9,6 +9,7 @@ import React, { useEffect, useState } from 'react';
 import notify from '../../utils/notify';
 import withAuth from '../AuthPage/withAuth';
 import Header from '../RestaurantDashboard/Header';
+import { StyledLink } from 'baseui/link';
 
 const RestaurantOrdersPage = () => {
   const [css] = useStyletron();
@@ -26,6 +27,8 @@ const RestaurantOrdersPage = () => {
   const [modalMap, setModalMap] = useState({});
   const [statusOrder, setStatusOrder] = useState(0);
   const [status, setStatus] = useState([]);
+  const [detailCustomer, setDetailCustomer] = useState({});
+  const [customerDetailModal, setCustomerDetailModal] = useState(false);
 
   const seeOrderDetails = (o) => {
     setDetailModal(true);
@@ -82,6 +85,12 @@ const RestaurantOrdersPage = () => {
     closeStatus();
   };
 
+  const openCustomerDetailModal = (customer) => {
+    setDetailCustomer(customer);
+    setCustomerDetailModal(true);
+    console.log(customer);
+  };
+
   useEffect(() => {
     axios
       .get('/customers')
@@ -89,7 +98,7 @@ const RestaurantOrdersPage = () => {
         const cusMap = {};
         res.data.nodes &&
           res.data.nodes.forEach((cus) => {
-            cusMap[cus.id] = cus;
+            cusMap[cus._id] = cus;
           });
 
         return axios
@@ -98,21 +107,29 @@ const RestaurantOrdersPage = () => {
             const sm = {};
             const mm = {};
             res.data.forEach((o) => {
-              sm[o.id] = [{ id: o.status, status: o.status }];
-              mm[o.id] = false;
+              sm[o._id] = [{ id: o.status, status: o.status }];
+              mm[o._id] = false;
             });
             setStatusMap(sm);
             setModalMap(mm);
 
+            // Keep link that shows customer profile
             const ords = res.data.map((o) => {
               return [
-                <Paragraph1>{cusMap[o.customerId].name}</Paragraph1>,
+                <Paragraph1>
+                  <StyledLink
+                    href="#"
+                    onClick={() => openCustomerDetailModal(cusMap[o.customerId])}
+                  >
+                    {cusMap[o.customerId].name}
+                  </StyledLink>
+                </Paragraph1>,
                 <Paragraph1>
                   {o.address && o.address.firstLine} {o.address && o.address.secondLine}
                 </Paragraph1>,
                 <Paragraph1>{o.type && o.type.toUpperCase()}</Paragraph1>,
                 <Paragraph1>${o.amount}</Paragraph1>,
-                <Button onClick={() => openStatus(o.id)}>Status</Button>,
+                <Button onClick={() => openStatus(o._id)}>Status</Button>,
                 <Button onClick={() => seeOrderDetails(o)}>Details</Button>,
               ];
             });
@@ -121,11 +138,10 @@ const RestaurantOrdersPage = () => {
           });
       })
       .catch((err) => {
+        console.log(err);
         notify({ type: 'info', description: 'Error fetching orders.' });
       });
   }, [status]);
-
-  useEffect(() => {}, [statusMap]);
 
   return (
     <div>
@@ -222,6 +238,38 @@ const RestaurantOrdersPage = () => {
           </ModalFooter>
         </Modal>
       </div>
+
+      <Modal onClose={() => setCustomerDetailModal(false)} isOpen={customerDetailModal}>
+        <ModalHeader>{detailCustomer?.nickname}</ModalHeader>
+        <ModalBody>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <img style={{width: '300px', height: '200px'}} src={detailCustomer.medium ? detailCustomer.medium?.url : '/images/user.png'}></img>
+          </div>
+          <Paragraph1>
+            <strong>Name: </strong> {detailCustomer.name}
+          </Paragraph1>
+          <Paragraph1>
+            <strong>About: </strong> {detailCustomer.about}
+          </Paragraph1>
+          <Paragraph1>
+            <strong>City: </strong> {detailCustomer.city}
+          </Paragraph1>
+          <Paragraph1>
+            <strong>State: </strong> {detailCustomer.state}
+          </Paragraph1>
+          <Paragraph1>
+            <strong>Country: </strong> {detailCustomer.country}
+          </Paragraph1>
+          <Paragraph1>
+            <strong>Contact No: </strong> {detailCustomer.contact_no}
+          </Paragraph1>
+        </ModalBody>
+        <ModalFooter>
+          <ModalButton kind="tertiary" onClick={() => setCustomerDetailModal(false)}>
+            Cancel
+          </ModalButton>
+        </ModalFooter>
+      </Modal>
     </div>
   );
 };

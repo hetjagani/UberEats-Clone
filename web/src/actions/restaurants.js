@@ -67,19 +67,10 @@ export const updateRestaurant = (data, id) => {
 
 export const createRestaurantMedia = (data) => {
   return (dispatch) => {
-    const token = getCookie('auth');
-    return axios
-      .post('/restaurants/media', data, { headers: { Authorization: token } })
-      .then((res) => {
-        dispatch({
-          type: CREATE_RESTAURANT_MEDIA,
-          payload: res.data,
-        });
-        notify({ type: 'info', description: 'Created Restaurant Media' });
-      })
-      .catch((err) => {
-        notify({ type: 'error', description: JSON.stringify(err.response.data.message) });
-      });
+    dispatch({
+      type: CREATE_RESTAURANT_MEDIA,
+      payload: data,
+    });
   };
 };
 

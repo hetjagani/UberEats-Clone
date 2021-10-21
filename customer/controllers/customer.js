@@ -47,6 +47,10 @@ const getAllCustomers = async (req, res) => {
     const { limit, offset } = getPaiganation(req.query.page, req.query.limit);
 
     const cusCount = await Customer.count({ _id: { $in: customerIds } });
+    let nameQ = {};
+    if (q != '') {
+      nameQ = { name: { regex: `(?i)(?<= |^)${q}(?= |$)` } };
+    }
     const customers = await Customer.aggregate([
       {
         $lookup: {
@@ -58,7 +62,7 @@ const getAllCustomers = async (req, res) => {
       },
       {
         $match: {
-          $and: [{ _id: { $in: customerIds } }, { name: { regex: `(?i)(?<= |^)${q}(?= |$)` } }],
+          $and: [{ _id: { $in: customerIds } }, nameQ],
         },
       },
     ])
