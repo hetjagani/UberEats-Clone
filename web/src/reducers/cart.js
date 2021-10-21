@@ -22,7 +22,7 @@ export default (state = initialState, action) => {
         dishes: [
           ...state.dishes,
           {
-            itemId: action.payload.id,
+            itemId: action.payload._id,
             dish: action.payload.dish,
             quantity: action.payload.quantity,
             notes: action.payload.notes,

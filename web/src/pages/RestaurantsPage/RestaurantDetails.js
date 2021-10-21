@@ -135,8 +135,8 @@ const RestaurantDetails = () => {
           {dishes.length > 0 &&
             dishes.map((dish) => {
               return (
-                <FlexGridItem {...itemProps} key={dish.id}>
-                  <DishDetails dish={dish} resId={restaurant.id} />
+                <FlexGridItem {...itemProps} key={dish._id}>
+                  <DishDetails dish={dish} resId={restaurant._id} />
                 </FlexGridItem>
               );
             })}

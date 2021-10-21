@@ -38,7 +38,6 @@ const MyCartPage = () => {
   const dispatch = useDispatch();
 
   const deleteFromCart = (id) => {
-    console.log('Remove cart item ', id);
     dispatch(removeDishFromCart(id));
   };
 
@@ -73,7 +72,7 @@ const MyCartPage = () => {
       .then((res) => {
         console.log(res.data);
         dispatch(placedOrder())
-        history.push(`/orders/${res.data.id}`);
+        history.push(`/orders/${res.data._id}`);
       })
       .catch((err) => {
         notify({ type: 'error', description: 'Error creating order' });

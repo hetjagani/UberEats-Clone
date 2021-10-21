@@ -77,7 +77,7 @@ const CheckoutPage = () => {
     addresses &
       addresses.forEach((add) => {
         opts.push({
-          id: add.id,
+          id: add._id,
           address: `${add.firstLine}, ${add.secondLine}, ${add.zipcode}, ${add.city}, ${add.country}`,
         });
       });
@@ -116,7 +116,7 @@ const CheckoutPage = () => {
   const dispatch = useDispatch();
 
   const placeOrder = () => {
-    const data = { orderId: order.id, addressId: address[0] && address[0].id };
+    const data = { orderId: order._id, addressId: address[0] && address[0].id };
 
     axios
       .post(`/orders/place`, data)
@@ -143,7 +143,7 @@ const CheckoutPage = () => {
       city: city[0] && city[0].id,
       state: state[0] && state[0].id,
       country: country[0] && country[0].id,
-      customerId: loginCustomer.id,
+      customerId: loginCustomer._id,
     };
 
     dispatch(createCustomerAddress(data)).then(() => {

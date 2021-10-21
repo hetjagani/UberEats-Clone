@@ -23,7 +23,7 @@ const DishDetails = ({ dish, resId }) => {
 
   const addDish = () => {
     const data = {
-      dishId: dish.id,
+      dishId: dish._id,
       restaurantId: resId,
       quantity: parseInt(quantity, 10),
       notes,
@@ -69,7 +69,7 @@ const DishDetails = ({ dish, resId }) => {
               dish.media.length > 0 &&
               dish.media.map((m) => {
                 return (
-                  <div key={m.id}>
+                  <div key={m._id}>
                     <img src={m.url} alt={m.alt_text} style={{ width: '50%', height: '50%' }} />
                   </div>
                 );

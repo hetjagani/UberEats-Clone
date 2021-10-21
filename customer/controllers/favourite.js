@@ -26,7 +26,7 @@ const getRestaurants = async (favs, auth) => {
 
 const getCustomerFavourites = async (req, res) => {
   const { user } = req.headers;
-  const customer = await Customer.findOne({ where: { _id: user } });
+  const customer = await Customer.findOne({ _id: user });
   if (!customer) {
     res.status(404).json(errors.notFound);
     return;

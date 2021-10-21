@@ -62,7 +62,7 @@ export default (state = initialState, action) => {
       };
 
     case DELETE_CUSTOMER_ADDRESS:
-      const afterDelete = state.addresses.filter((add) => add.id != action.payload);
+      const afterDelete = state.addresses.filter((add) => add._id != action.payload);
       return {
         ...state,
         addresses: afterDelete,
@@ -70,7 +70,7 @@ export default (state = initialState, action) => {
 
     case UPDATE_CUSTOMER_ADDRESS:
       const newAddresses = state.addresses.map((add) => {
-        if (add.id == action.payload.id) {
+        if (add._id == action.payload._id) {
           return action.payload;
         } else {
           return add;
@@ -87,7 +87,6 @@ export default (state = initialState, action) => {
         favourites: [
           ...state.favourites,
           {
-            id: action.payload.id,
             restaurantId: action.payload.restaurantId,
             customerId: action.payload.customerId,
           },

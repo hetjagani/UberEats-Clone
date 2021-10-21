@@ -76,7 +76,7 @@ const RestaurantsGrid = ({ favs, address, city, restaurant_type, food_type, sear
   useEffect(() => {
     const fm = {};
     restaurants.forEach((res) => {
-      fm[res.id] = false;
+      fm[res._id] = false;
     });
     favourites.forEach((fav) => {
       fm[fav.restaurantId] = true;
@@ -116,8 +116,8 @@ const RestaurantsGrid = ({ favs, address, city, restaurant_type, food_type, sear
         {restaurants &&
           restaurants.map((res) => {
             return favs ? (
-              favMap[res.id] && (
-                <FlexGridItem key={res.id} {...itemProps}>
+              favMap[res._id] && (
+                <FlexGridItem key={res._id} {...itemProps}>
                   <Card
                     overrides={{
                       Root: { style: { width: '450px', height: 'fit-content' } },
@@ -156,8 +156,8 @@ const RestaurantsGrid = ({ favs, address, city, restaurant_type, food_type, sear
                           alignItems: 'center',
                         }}
                       >
-                        <Button kind="minimal" onClick={() => toggleFavourite(res.id)}>
-                          {favMap[res.id] ? favouriteIcon : notFavouriteIcon}
+                        <Button kind="minimal" onClick={() => toggleFavourite(res._id)}>
+                          {favMap[res._id] ? favouriteIcon : notFavouriteIcon}
                         </Button>
                         <Button onClick={() => gotoDetails(res.id)}>Details</Button>
                       </div>
@@ -166,7 +166,7 @@ const RestaurantsGrid = ({ favs, address, city, restaurant_type, food_type, sear
                 </FlexGridItem>
               )
             ) : (
-              <FlexGridItem key={res.id} {...itemProps}>
+              <FlexGridItem key={res._id} {...itemProps}>
                 <Card
                   overrides={{
                     Root: { style: { width: '450px', height: 'fit-content' } },
@@ -204,10 +204,10 @@ const RestaurantsGrid = ({ favs, address, city, restaurant_type, food_type, sear
                         alignItems: 'center',
                       }}
                     >
-                      <Button kind="minimal" onClick={() => toggleFavourite(res.id)}>
-                        {favMap[res.id] ? favouriteIcon : notFavouriteIcon}
+                      <Button kind="minimal" onClick={() => toggleFavourite(res._id)}>
+                        {favMap[res._id] ? favouriteIcon : notFavouriteIcon}
                       </Button>
-                      <Button onClick={() => gotoDetails(res.id)}>Details</Button>
+                      <Button onClick={() => gotoDetails(res._id)}>Details</Button>
                     </div>
                   </StyledAction>
                 </Card>

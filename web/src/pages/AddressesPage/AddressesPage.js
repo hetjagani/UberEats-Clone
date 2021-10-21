@@ -60,7 +60,7 @@ const AddressesPage = () => {
   const [tableData, setTableData] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [update, setUpdate] = useState(false);
-  const [updateId, setUpdateId] = useState(0);
+  const [updateId, setUpdateId] = useState('');
 
   const [firstLine, setFirstLine] = useState('');
   const [secondLine, setSecondLine] = useState('');
@@ -82,14 +82,14 @@ const AddressesPage = () => {
           <Paragraph2>{add.country}</Paragraph2>,
           <Button
             onClick={() => {
-              deleteAddress(add.id);
+              deleteAddress(add._id);
             }}
           >
             Delete
           </Button>,
           <Button
             onClick={() => {
-              openUpdateModal(add.id);
+              openUpdateModal(add._id);
             }}
           >
             Update
@@ -101,7 +101,7 @@ const AddressesPage = () => {
   }, [addresses]);
 
   useEffect(() => {
-    const filtered = addresses.filter((item) => item.id == updateId);
+    const filtered = addresses.filter((item) => item._id == updateId);
     if (filtered.length > 0) {
       setFirstLine(filtered[0].firstLine);
       setSecondLine(filtered[0].secondLine);
@@ -120,7 +120,7 @@ const AddressesPage = () => {
 
   const openAddModal = () => {
     setUpdate(false);
-    setUpdateId(0);
+    setUpdateId('');
 
     setFirstLine('');
     setSecondLine('');
@@ -142,7 +142,7 @@ const AddressesPage = () => {
       city: city[0] && city[0].id,
       state: state[0] && state[0].id,
       country: country[0] && country[0].id,
-      customerId: loginCustomer.id,
+      customerId: loginCustomer._id,
     };
     if (update) {
       dispatch(updateCustomerAddress(data, updateId)).then(() => {
