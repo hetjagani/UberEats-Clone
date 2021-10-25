@@ -174,6 +174,10 @@ const CustomerOrdersPage = () => {
               {detailOrder.address &&
                 `${detailOrder.address.firstLine} ${detailOrder.address.secondLine}`}
             </Paragraph1>
+            <Paragraph1>
+              <strong>Order Notes: </strong>
+              {detailOrder.notes && detailOrder.notes}
+            </Paragraph1>
             <Paragraph1>Order Items</Paragraph1>
             <Table
               className={css({ width: '100%' })}

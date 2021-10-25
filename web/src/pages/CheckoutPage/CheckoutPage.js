@@ -66,6 +66,7 @@ const CheckoutPage = () => {
   const [city, setCity] = useState([]);
   const [state, setState] = useState([]);
   const [country, setCountry] = useState([]);
+  const [notes, setNotes] = useState('');
   const [openModal, setOpenModal] = useState(false);
 
   const { loginCustomer, addresses } = useSelector((state) => {
@@ -116,7 +117,7 @@ const CheckoutPage = () => {
   const dispatch = useDispatch();
 
   const placeOrder = () => {
-    const data = { orderId: order._id, addressId: address[0] && address[0].id };
+    const data = { orderId: order._id, addressId: address[0] && address[0].id, notes };
 
     axios
       .post(`/orders/place`, data)
@@ -176,7 +177,7 @@ const CheckoutPage = () => {
           />
 
           <div>
-            <H2>Select Address</H2>
+            <H2>Add Notes</H2>
           </div>
           <div
             style={{
@@ -184,6 +185,27 @@ const CheckoutPage = () => {
               justifyContent: 'space-between',
               alignItems: 'center',
               height: 'fit-content',
+            }}
+          >
+            <div style={{ width: '80%' }}>
+              <Input
+                placeholder={'Additional Notes'}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div>
+            <H2>Select Address</H2>
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-start',
+              alignItems: 'flex-start',
+              height: 'fit-content',
+              flexDirection: 'column',
             }}
           >
             <div style={{ width: '80%' }}>
@@ -204,7 +226,9 @@ const CheckoutPage = () => {
                 Add Address
               </Button>
             </div>
-            <Button onClick={placeOrder}>Place Order</Button>
+            <div style={{ marginTop: '20px' }}>
+              <Button onClick={placeOrder}>Place Order</Button>
+            </div>
           </div>
         </div>
         <div className={restaurantContainer}>
