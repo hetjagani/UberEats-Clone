@@ -34,7 +34,7 @@ const getAllCustomers = async (req, res) => {
   }
   try {
     // fetch all restaurant's orders from orders service
-    const orderRes = await axios.get(`${global.gConfig.order_url}/orders`, {
+    const orderRes = await axios.get(`${global.gConfig.order_url}/orders/all`, {
       headers: { Authorization: authorization },
     });
 

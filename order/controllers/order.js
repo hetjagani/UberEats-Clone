@@ -5,6 +5,7 @@
 const { default: axios } = require('axios');
 const { validationResult } = require('express-validator');
 const { Types } = require('mongoose');
+const { getPaiganation } = require('u-server-utils');
 const { Order, CartItem } = require('../model');
 const errors = require('../util/errors');
 
@@ -48,7 +49,51 @@ const getAllOrders = async (req, res) => {
     whereQ.status = status;
   }
 
-  const orders = await Order.find(whereQ).sort({ date: -1 });
+  const { limit, offset } = getPaiganation(req.query.page, req.query.limit);
+
+  const ordersCnt = await Order.count(whereQ);
+  const orders = await Order.find(whereQ).sort({ date: -1 }).skip(offset).limit(limit);
+
+  try {
+    // get all restaurants
+    const restaurantMap = await getRestaurants(req.headers.authorization);
+    const addressMap = await getAddresses();
+
+    // map each order with restaurant and dishes
+    const result = orders.map((order) => {
+      const dishMap = {};
+      restaurantMap[order.restaurantId].dishes.forEach((ele) => {
+        dishMap[ele._id] = ele;
+      });
+
+      const dishes = order.orderitems.map((oi) => {
+        if (dishMap[oi.dishId]) {
+          return {
+            ...oi._doc,
+            dish: dishMap[oi.dishId],
+          };
+        }
+      });
+
+      return {
+        ...order._doc,
+        restaurant: restaurantMap[order.restaurantId],
+        orderitems: dishes,
+        address: order.addressId ? addressMap[order.addressId] : null,
+      };
+    });
+
+    res.status(200).json({ nodes: result, total: ordersCnt });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json(errors.serverError);
+  }
+};
+
+const getAllRestaurantsOrder = async (req, res) => {
+  const { user } = req.headers;
+
+  const orders = await Order.find({ restaurantId: Types.ObjectId(user) });
 
   try {
     // get all restaurants
@@ -390,4 +435,5 @@ module.exports = {
   createOrder,
   placeOrder,
   updateOrderStatus,
+  getAllRestaurantsOrder,
 };

@@ -2,9 +2,10 @@ import axios from 'axios';
 import { useStyletron } from 'baseui';
 import { Button } from 'baseui/button';
 import { Modal, ModalBody, ModalButton, ModalFooter, ModalHeader } from 'baseui/modal';
+import { Pagination } from 'baseui/pagination';
 import { Select } from 'baseui/select';
 import { Table, SIZE } from 'baseui/table-semantic';
-import { H2, H4, Paragraph1 } from 'baseui/typography';
+import { H2, H4, Paragraph1, ParagraphMedium } from 'baseui/typography';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 import notify from '../../utils/notify';
@@ -26,6 +27,9 @@ const CustomerOrdersPage = () => {
   const [detailOrder, setDetailOrder] = useState({});
   const [detailOrderTable, setDetailOrderTable] = useState([]);
   const [status, setStatus] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState([{ id: 5, size: '5' }]);
 
   const statusOpts = [
     { id: '', status: 'ALL' },
@@ -56,10 +60,12 @@ const CustomerOrdersPage = () => {
 
   useEffect(() => {
     axios
-      .get(`/orders`, { params: { status: status[0] && status[0].id } })
+      .get(`/orders`, {
+        params: { status: status[0] && status[0].id, page: page, limit: limit[0] && limit[0].id },
+      })
       .then((res) => {
-        setOrders(res.data);
-        const ords = res.data.map((o) => {
+        setOrders(res.data.nodes);
+        const ords = res.data.nodes?.map((o) => {
           return [
             <Paragraph1>{o.restaurant && o.restaurant.name}</Paragraph1>,
             <Paragraph1>
@@ -72,11 +78,12 @@ const CustomerOrdersPage = () => {
           ];
         });
         setTableData(ords);
+        setTotal(Math.floor(res.data.total / (limit[0] && limit[0].id)) + 1);
       })
       .catch((err) => {
         notify({ type: 'info', description: 'Error fetching orders.' });
       });
-  }, [status]);
+  }, [status, limit, page]);
 
   return (
     <div>
@@ -84,24 +91,59 @@ const CustomerOrdersPage = () => {
       <div className={mainContainer}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <H2>Your Orders</H2>
-          <div style={{ width: '20%' }}>
-            <Select
-              placeholder="Select Order Status"
-              options={statusOpts}
-              valueKey="id"
-              labelKey="status"
-              onChange={({ value }) => setStatus(value)}
-              value={status}
-            />
+          <div style={{ width: '40%', display: 'flex', justifyContent: 'flex-end' }}>
+            <div style={{ margin: '10px' }}>
+              <Select
+                placeholder="Select Page Size"
+                options={[
+                  { id: 2, size: '2' },
+                  { id: 5, size: '5' },
+                  { id: 10, size: '10' },
+                ]}
+                valueKey="id"
+                labelKey="size"
+                onChange={({ value }) => setLimit(value)}
+                value={limit}
+                clearable={false}
+              />
+            </div>
+            <div style={{ margin: '10px' }}>
+              <Select
+                placeholder="Select Order Status"
+                options={[{ id: '', status: 'ALL' }, ...statusOpts]}
+                valueKey="id"
+                labelKey="status"
+                onChange={({ value }) => setStatus(value)}
+                value={status}
+              />
+            </div>
           </div>
         </div>
 
-        <Table
-          className={css({ width: '100%' })}
-          size={SIZE.spacious}
-          columns={['Restaurant', 'Address', 'Type', 'Price', 'Status', 'Details']}
-          data={tableData}
-        />
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <Table
+            className={css({ width: '100%' })}
+            size={SIZE.spacious}
+            columns={['Restaurant', 'Address', 'Type', 'Price', 'Status', 'Details']}
+            data={tableData}
+          />
+          <div style={{ margin: '20px' }}>
+            <Pagination
+              numPages={total}
+              currentPage={page}
+              onPageChange={({ nextPage }) => {
+                setPage(Math.min(Math.max(nextPage, 1), 20));
+              }}
+            />
+          </div>
+        </div>
         <Modal
           onClose={() => {
             setDetailModal(false);

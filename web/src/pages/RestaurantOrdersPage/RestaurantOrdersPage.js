@@ -10,6 +10,7 @@ import notify from '../../utils/notify';
 import withAuth from '../AuthPage/withAuth';
 import Header from '../RestaurantDashboard/Header';
 import { StyledLink } from 'baseui/link';
+import { Pagination } from 'baseui/pagination';
 
 const RestaurantOrdersPage = () => {
   const [css] = useStyletron();
@@ -29,6 +30,9 @@ const RestaurantOrdersPage = () => {
   const [status, setStatus] = useState([]);
   const [detailCustomer, setDetailCustomer] = useState({});
   const [customerDetailModal, setCustomerDetailModal] = useState(false);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState([{ id: 5, size: '5' }]);
 
   const seeOrderDetails = (o) => {
     setDetailModal(true);
@@ -102,19 +106,26 @@ const RestaurantOrdersPage = () => {
           });
 
         return axios
-          .get(`/orders`, { params: { status: status[0] && status[0].id } })
+          .get(`/orders`, {
+            params: {
+              status: status[0] && status[0].id,
+              page: page,
+              limit: limit[0] && limit[0].id,
+            },
+          })
           .then((res) => {
             const sm = {};
             const mm = {};
-            res.data.forEach((o) => {
-              sm[o._id] = [{ id: o.status, status: o.status }];
-              mm[o._id] = false;
-            });
+            res.data.total > 0 &&
+              res.data.nodes.forEach((o) => {
+                sm[o._id] = [{ id: o.status, status: o.status }];
+                mm[o._id] = false;
+              });
             setStatusMap(sm);
             setModalMap(mm);
 
             // Keep link that shows customer profile
-            const ords = res.data.map((o) => {
+            const ords = res.data.nodes?.map((o) => {
               return [
                 <Paragraph1>
                   <StyledLink
@@ -135,13 +146,14 @@ const RestaurantOrdersPage = () => {
             });
             setTableData(ords);
             setOrders(res.data);
+            setTotal(Math.floor(res.data.total / (limit[0] && limit[0].id)) + 1);
           });
       })
       .catch((err) => {
         console.log(err);
         notify({ type: 'info', description: 'Error fetching orders.' });
       });
-  }, [status]);
+  }, [status, page, limit]);
 
   return (
     <div>
@@ -151,24 +163,59 @@ const RestaurantOrdersPage = () => {
       <div className={mainContainer}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <H2>Your Orders</H2>
-          <div style={{ width: '20%' }}>
-            <Select
-              placeholder="Select Order Status"
-              options={[{ id: '', status: 'ALL' }, ...statusOpts]}
-              valueKey="id"
-              labelKey="status"
-              onChange={({ value }) => setStatus(value)}
-              value={status}
-            />
+          <div style={{ width: '40%', display: 'flex', justifyContent: 'flex-end' }}>
+            <div style={{ margin: '10px' }}>
+              <Select
+                placeholder="Select Page Size"
+                options={[
+                  { id: 2, size: '2' },
+                  { id: 5, size: '5' },
+                  { id: 10, size: '10' },
+                ]}
+                valueKey="id"
+                labelKey="size"
+                onChange={({ value }) => setLimit(value)}
+                value={limit}
+                clearable={false}
+              />
+            </div>
+            <div style={{ margin: '10px' }}>
+              <Select
+                placeholder="Select Order Status"
+                options={[{ id: '', status: 'ALL' }, ...statusOpts]}
+                valueKey="id"
+                labelKey="status"
+                onChange={({ value }) => setStatus(value)}
+                value={status}
+              />
+            </div>
           </div>
         </div>
 
-        <Table
-          className={css({ width: '100%' })}
-          size={SIZE.spacious}
-          columns={['Customer', 'Address', 'Type', 'Price', 'Status', 'Details']}
-          data={tableData}
-        />
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <Table
+            className={css({ width: '100%' })}
+            size={SIZE.spacious}
+            columns={['Customer', 'Address', 'Type', 'Price', 'Status', 'Details']}
+            data={tableData}
+          />
+          <div style={{ margin: '20px' }}>
+            <Pagination
+              numPages={total}
+              currentPage={page}
+              onPageChange={({ nextPage }) => {
+                setPage(Math.min(Math.max(nextPage, 1), 20));
+              }}
+            />
+          </div>
+        </div>
         <Modal
           onClose={() => {
             setDetailModal(false);
@@ -243,7 +290,10 @@ const RestaurantOrdersPage = () => {
         <ModalHeader>{detailCustomer?.nickname}</ModalHeader>
         <ModalBody>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <img style={{width: '300px', height: '200px'}} src={detailCustomer.medium ? detailCustomer.medium?.url : '/images/user.png'}></img>
+            <img
+              style={{ width: '300px', height: '200px' }}
+              src={detailCustomer.medium ? detailCustomer.medium?.url : '/images/user.png'}
+            ></img>
           </div>
           <Paragraph1>
             <strong>Name: </strong> {detailCustomer.name}

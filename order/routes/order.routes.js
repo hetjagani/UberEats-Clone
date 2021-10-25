@@ -45,10 +45,21 @@ const placeOrderValidators = () => [
  * @route GET /orders
  * @group Orders
  * @param {string} status.query
+ * @param {string} page.query
+ * @param {string} limit.query
  * @security JWT
  * @returns {Array.<Order>} 200 - List of orders info
  */
 router.get('/', orderController.getAllOrders);
+
+/**
+ * Get all restaurant's of Orders
+ * @route GET /orders/all
+ * @group Orders
+ * @security JWT
+ * @returns {Array.<Order>} 200 - List of orders info
+ */
+router.get('/all', orderController.getAllRestaurantsOrder);
 
 /**
  * Place Order
