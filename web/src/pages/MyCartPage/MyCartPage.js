@@ -5,12 +5,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import NavBar from '../RestaurantsPage/NavBar';
 import { Table, SIZE } from 'baseui/table-semantic';
 import { Button } from 'baseui/button';
-import { placedOrder, removeDishFromCart } from '../../actions/cart';
+import { placedOrder, removeDishFromCart, updateItemInCart } from '../../actions/cart';
 import { Carousel } from 'react-responsive-carousel';
 import axios from 'axios';
 import { useHistory } from 'react-router';
 import notify from '../../utils/notify';
 import withAuth from '../AuthPage/withAuth';
+import { Modal, ModalHeader, ModalBody, ModalFooter, ModalButton } from 'baseui/modal';
+import { Input } from 'baseui/input';
 
 const MyCartPage = () => {
   const [css] = useStyletron();
@@ -41,6 +43,31 @@ const MyCartPage = () => {
     dispatch(removeDishFromCart(id));
   };
 
+  const [updateItem, setUpdateItem] = useState('');
+  const [updateRestaurant, setUpdateRestaurant] = useState('');
+  const [updateModal, setUpdateModal] = useState(false);
+  const [updateQty, setUpdateQty] = useState(1);
+  const [updateNotes, setUpdateNotes] = useState('');
+
+  const updateDishDetails = (data) => {
+    setUpdateItem(data.itemId);
+    setUpdateRestaurant(data.restaurantId);
+    setUpdateModal(true);
+  };
+
+  const updateCartItem = () => {
+    const data = {
+      restaurantId: updateRestaurant,
+      quantity: updateQty,
+      notes: updateNotes,
+    };
+    console.log(updateItem);
+    console.log(data);
+    dispatch(updateItemInCart(data, updateItem)).then(() => {
+      setUpdateModal(false);
+    });
+  };
+
   useEffect(() => {
     const td = [];
     dishes.forEach((dish) => {
@@ -58,11 +85,18 @@ const MyCartPage = () => {
           >
             Remove
           </Button>,
+          <Button
+            onClick={() => {
+              updateDishDetails({ itemId: dish.itemId, restaurantId: dish.dish.restaurantId });
+            }}
+          >
+            Update
+          </Button>,
         ]);
       }
     });
     setTableData(td);
-  }, [dishes.length]);
+  }, [dishes]);
 
   const history = useHistory();
 
@@ -71,7 +105,7 @@ const MyCartPage = () => {
       .post(`/orders/${restaurant.restaurant_type}`)
       .then((res) => {
         console.log(res.data);
-        dispatch(placedOrder())
+        dispatch(placedOrder());
         history.push(`/orders/${res.data._id}`);
       })
       .catch((err) => {
@@ -81,6 +115,42 @@ const MyCartPage = () => {
 
   return (
     <div>
+      <Modal
+        onClose={() => {
+          setUpdateModal(false);
+        }}
+        isOpen={updateModal}
+      >
+        <ModalHeader>Update Cart Item</ModalHeader>
+        <ModalBody>
+          Quantity:
+          <Input
+            type="number"
+            value={updateQty}
+            onChange={(e) => setUpdateQty(e.target.value)}
+            placeholder="Quantity"
+            clearOnEscape
+          />
+          Notes:
+          <Input
+            value={updateNotes}
+            onChange={(e) => setUpdateNotes(e.target.value)}
+            placeholder="Additional Notes for item"
+            clearOnEscape
+          />
+        </ModalBody>
+        <ModalFooter>
+          <ModalButton
+            kind="tertiary"
+            onClick={() => {
+              setUpdateModal(false);
+            }}
+          >
+            Cancel
+          </ModalButton>
+          <ModalButton onClick={updateCartItem}>Save</ModalButton>
+        </ModalFooter>
+      </Modal>
       <NavBar />
       <div className={mainContainer}>
         <div className={dishTableContainer}>
@@ -100,7 +170,7 @@ const MyCartPage = () => {
             </div>
           </div>
           <Table
-            columns={['Name', 'Description', 'Price', 'Qty', 'Notes', 'Remove']}
+            columns={['Name', 'Description', 'Price', 'Qty', 'Notes', 'Remove', 'Update']}
             data={tableData}
             horizontalScrollWidth={undefined}
             size={SIZE.spacious}
@@ -142,7 +212,8 @@ const MyCartPage = () => {
             <strong>Timing:</strong> {restaurant.time_open} - {restaurant.time_close}
           </Paragraph2>
           <Paragraph2>
-            <strong>Type:</strong> {restaurant.restaurant_type && restaurant.restaurant_type.toUpperCase()}
+            <strong>Type:</strong>{' '}
+            {restaurant.restaurant_type && restaurant.restaurant_type.toUpperCase()}
           </Paragraph2>
         </div>
       </div>

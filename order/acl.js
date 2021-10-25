@@ -5,5 +5,6 @@ module.exports = {
   'PUT /orders?(.+)': ['restaurant'],
   'GET /cartitems': ['customer'],
   'POST /cartitems': ['customer'],
+  'PUT /cartitems/?(.+)': ['customer'],
   'DELETE /cartitems/?(.+)': ['customer'],
 };

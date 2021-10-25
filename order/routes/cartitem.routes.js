@@ -20,6 +20,11 @@ const bodyValidators = () => [
   body('notes').isString(),
 ];
 
+const updateValidators = () => [
+  body('quantity').exists().isInt().not().isIn([0]),
+  body('notes').isString(),
+];
+
 /**
  * Get list of CartItems
  * @route GET /cartitems
@@ -38,6 +43,17 @@ router.get('/', cartItemController.getAllCartItems);
  * @returns {CartItem.model} 201 - Created Cart Item
  */
 router.post('/', ...bodyValidators(), cartItemController.addCartItem);
+
+/**
+ * Update Item in Cart
+ * @route PUT /cartitems/{id}
+ * @group CartItems
+ * @security JWT
+ * @param {string} id.path.require
+ * @param {CartItem.model} CartItem.body.require
+ * @returns {CartItem.model} 200 - Updated Cart Item
+ */
+router.put('/:id', ...updateValidators(), cartItemController.updateCartItem);
 
 /**
  * Reset Cart

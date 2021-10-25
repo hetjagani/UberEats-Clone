@@ -143,6 +143,57 @@ const addCartItem = async (req, res) => {
   }
 };
 
+const updateCartItem = async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    res.status(400).json(errors.badRequest);
+    return;
+  }
+
+  const { user } = req.headers;
+  const { notes, quantity, restaurantId } = req.body;
+
+  try {
+    const cartItem = await CartItem.findOne({
+      _id: id,
+      customerId: Types.ObjectId(user),
+      restaurantId: Types.ObjectId(restaurantId),
+    });
+    if (!cartItem) {
+      res.status(404).json(errors.notFound);
+      return;
+    }
+
+    cartItem.notes = notes;
+    cartItem.quantity = quantity;
+
+    await cartItem.save();
+
+    const response = await axios.get(
+      `${global.gConfig.restaurant_url}/restaurants/${restaurantId}`,
+      { headers: { authorization: req.headers.authorization } },
+    );
+
+    if (!response) {
+      res.status(404).json(errors.notFound);
+      return;
+    }
+
+    const restaurant = response.data;
+
+    const dishMap = {};
+    restaurant.dishes.forEach((ele) => {
+      dishMap[ele._id] = ele;
+    });
+
+    res.status(200).json({ ...cartItem._doc, dish: dishMap[cartItem.dishId] });
+    return;
+  } catch (err) {
+    console.error(err);
+    res.status(500).json(errors.serverError);
+  }
+};
+
 const deleteCartItem = async (req, res) => {
   const { id } = req.params;
   if (!id) {
@@ -185,4 +236,5 @@ module.exports = {
   addCartItem,
   deleteCartItem,
   resetCartItems,
+  updateCartItem,
 };

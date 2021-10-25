@@ -5,6 +5,7 @@ import {
   FETCH_CART_ITEMS,
   PLACE_ORDER,
   REMOVE_DISH_FROM_CART,
+  UPDATE_CART_ITEM,
 } from '../actions/types';
 
 const initialState = {
@@ -29,6 +30,25 @@ export default (state = initialState, action) => {
           },
         ],
       };
+
+    case UPDATE_CART_ITEM:
+      const updatedItems = state.dishes.map((item) => {
+        if (item.itemId == action.payload._id) {
+          return {
+            itemId: action.payload._id,
+            dish: action.payload.dish,
+            quantity: action.payload.quantity,
+            notes: action.payload.notes,
+          };
+        } else {
+          return item;
+        }
+      });
+      return {
+        ...state,
+        dishes: updatedItems,
+      };
+
     case FETCH_CART_ITEMS:
       const nextState = { ...state };
       if (action.payload && action.payload.length > 0) {
@@ -37,7 +57,7 @@ export default (state = initialState, action) => {
       const newDishes = [];
       action.payload.forEach((item) => {
         newDishes.push({
-          itemId: item.id,
+          itemId: item._id,
           dish: item.dish,
           quantity: item.quantity,
           notes: item.notes,

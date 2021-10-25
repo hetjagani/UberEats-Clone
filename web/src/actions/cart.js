@@ -7,6 +7,7 @@ import {
   FETCH_CART_ITEMS,
   PLACE_ORDER,
   REMOVE_DISH_FROM_CART,
+  UPDATE_CART_ITEM,
 } from './types';
 
 export const fetchAllCartItems = (data) => {
@@ -46,6 +47,24 @@ export const addDishToCart = (data) => {
             payload: err.response.data,
           });
         }
+      });
+  };
+};
+
+export const updateItemInCart = (data, itemId) => {
+  return (dispatch) => {
+    return axios
+      .put(`/cartitems/${itemId}`, data)
+      .then((res) => {
+        dispatch({
+          type: UPDATE_CART_ITEM,
+          payload: res.data,
+        });
+        notify({ type: 'info', description: `Updated dish ${res.data.dish.name} in cart.` });
+      })
+      .catch((err) => {
+        console.log(err);
+        notify({ type: 'error', description: JSON.stringify(err.response?.data?.message) });
       });
   };
 };
