@@ -50,19 +50,10 @@ export const createCustomer = (data) => {
 
 export const createCustomerMedium = (data) => {
   return (dispatch) => {
-    const token = getCookie('auth');
-    return axios
-      .post('/customers/media', data, { headers: { Authorization: token } })
-      .then((res) => {
-        dispatch({
-          type: CREATE_CUSTOMER_MEDIUM,
-          payload: res.data,
-        });
-        notify({ type: 'info', description: 'Created Customer Media' });
-      })
-      .catch((err) => {
-        notify({ type: 'error', description: JSON.stringify(err.response.data.message) });
-      });
+    dispatch({
+      type: CREATE_CUSTOMER_MEDIUM,
+      payload: data,
+    });
   };
 };
 

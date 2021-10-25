@@ -105,7 +105,7 @@ function CustomerDetails({ loginDetails, update }) {
       state: state[0] && state[0].state,
       country: country[0] && country[0].country,
       contact_no: contactNo,
-      mediumId: medium && medium.id,
+      medium: medium,
     };
     if (update) {
       dispatch(updateCustomer(data, data.id)).then(() => {
@@ -219,7 +219,7 @@ function CustomerDetails({ loginDetails, update }) {
         </Button>
       </div>
       <div className={imgContainer}>
-        {medium && medium.id && medium.id !== 0 ? (
+        {medium ? (
           <div
             style={{
               display: 'flex',
