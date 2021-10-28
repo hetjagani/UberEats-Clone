@@ -1,20 +1,6 @@
 version: "3.7"
 
 services:
-  #########################################################################
-  #                               DB                                      #
-  #########################################################################
-  mysqldb:
-    image: mysql
-    restart: unless-stopped
-    ports:
-      - 3306:3306
-    volumes: 
-      - ./sql-data:/var/lib/mysql
-      - ./db-init-scripts:/docker-entrypoint-initdb.d
-    networks: 
-      - uber-eats
-
   mongodb:
     image: mongo:4.4.0-rc7
     restart: always
