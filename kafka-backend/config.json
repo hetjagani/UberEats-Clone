@@ -1,0 +1,9 @@
+{
+  "development": {
+    "auth_conn": "mongodb://uberadmin:uberadminpass@mongodb:27017/auth",
+    "customer_conn": "mongodb://uberadmin:uberadminpass@mongodb:27017/customer",
+    "restaurant_conn": "mongodb://uberadmin:uberadminpass@mongodb:27017/restaurant",
+    "order_conn": "mongodb://uberadmin:uberadminpass@mongodb:27017/order",
+    "kafka_host": "kafka:9092"
+  }
+}

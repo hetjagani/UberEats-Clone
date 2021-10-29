@@ -3,7 +3,7 @@ version: "3.7"
 services:
   mongodb:
     image: mongo:4.4.0-rc7
-    restart: always
+    restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: uberadmin
       MONGO_INITDB_ROOT_PASSWORD: uberadminpass
@@ -44,13 +44,32 @@ services:
     networks: 
       - uber-eats
 
+  kafka-backend:
+    depends_on: 
+      - kafka
+      - zookeeper
+    build:
+      context: ./kafka-backend
+      dockerfile: Dockerfile
+    volumes: 
+      - type: bind
+        source: ./kafka-backend
+        target: /app
+      - type: bind
+        source: ./kafka-backend/node_modules
+        target: /app/node_modules
+    restart: unless-stopped
+    networks: 
+      - uber-eats
+
   #########################################################################
   #                               SERVICES                                #
   #########################################################################
 
   auth:
     depends_on: 
-      - mysqldb
+      - mongodb
+      - kafka-backend
     build:
       context: ./auth
       dockerfile: Dockerfile
@@ -69,7 +88,8 @@ services:
 
   restaurant:
     depends_on: 
-      - mysqldb
+      - mongodb
+      - kafka-backend
     build:
       context: ./restaurant
       dockerfile: Dockerfile
@@ -88,7 +108,8 @@ services:
 
   customer:
     depends_on: 
-      - mysqldb
+      - mongodb
+      - kafka-backend
     build:
       context: ./customer
       dockerfile: Dockerfile
@@ -107,7 +128,8 @@ services:
 
   order:
     depends_on: 
-      - mysqldb
+      - mongodb
+      - kafka-backend
     build:
       context: ./order
       dockerfile: Dockerfile
@@ -123,6 +145,7 @@ services:
     restart: unless-stopped
     networks: 
       - uber-eats
+
 
   web:
     depends_on: 
@@ -148,7 +171,7 @@ services:
 
   nginx:
     depends_on: 
-      - mysqldb
+      - mongodb
     image: nginx:alpine
     ports:
       - 8000:8000

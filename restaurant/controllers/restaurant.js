@@ -7,6 +7,7 @@ const { getPaiganation } = require('u-server-utils');
 const { Types } = require('mongoose');
 const { Restaurant } = require('../model');
 const errors = require('../util/errors');
+const { sendData } = require('../util/kafka');
 
 const allRestaurants = async (req, res) => {
   const restaurants = await Restaurant.aggregate([
@@ -126,11 +127,13 @@ const createRestaurant = async (req, res) => {
   const restaurant = req.body;
   restaurant._id = restaurant.id;
 
-  try {
-    const createdRes = await Restaurant.create(restaurant);
-
+  sendData('restaurant.create', restaurant, async (err, resp) => {
+    if (err) {
+      res.status(500).json(errors.serverError);
+      return;
+    }
     const result = await Restaurant.aggregate([
-      { $match: { _id: createdRes._id } },
+      { $match: { _id: Types.ObjectId(resp._id) } },
       {
         $lookup: {
           from: 'dishes',
@@ -142,11 +145,7 @@ const createRestaurant = async (req, res) => {
     ]);
 
     res.status(201).json(result[0]);
-    return;
-  } catch (err) {
-    console.error(err);
-    res.status(500).json(errors.serverError);
-  }
+  });
 };
 
 const updateRestaurantByID = async (req, res) => {
@@ -178,25 +177,31 @@ const updateRestaurantByID = async (req, res) => {
   }
 
   try {
-    const dbRes = await Restaurant.findOneAndUpdate({ _id: id }, restaurant);
+    const dbRes = await Restaurant.findOne({ _id: id });
     if (!dbRes) {
       res.status(404).json(errors.notFound);
       return;
     }
 
-    const result = await Restaurant.aggregate([
-      { $match: { _id: dbRes._id } },
-      {
-        $lookup: {
-          from: 'dishes',
-          localField: 'dishes',
-          foreignField: '_id',
-          as: 'dishes',
+    sendData('restaurant.update', { id: dbRes._id, restaurant }, async (err, resp) => {
+      if (err) {
+        res.status(500).json(errors.serverError);
+        return;
+      }
+      const result = await Restaurant.aggregate([
+        { $match: { _id: Types.ObjectId(resp._id) } },
+        {
+          $lookup: {
+            from: 'dishes',
+            localField: 'dishes',
+            foreignField: '_id',
+            as: 'dishes',
+          },
         },
-      },
-    ]);
+      ]);
 
-    res.status(200).json(result[0]);
+      res.status(200).json(result[0]);
+    });
   } catch (e) {
     console.error(e);
     res.status(500).json(errors.serverError);

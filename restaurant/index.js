@@ -3,8 +3,10 @@ const http = require('http');
 require('./config');
 const { initDB } = require('./db');
 const app = require('./app');
+const { initKafkaProducer, createKafkaTopics } = require('./util/kafka');
 
 initDB();
+initKafkaProducer(createKafkaTopics);
 const port = process.env.PORT || '3000';
 app.set('port', port);
 const server = http.createServer(app);
