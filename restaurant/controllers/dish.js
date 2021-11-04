@@ -5,7 +5,7 @@ const { Types } = require('mongoose');
 const { getPaiganation } = require('u-server-utils');
 const { Dish, Restaurant } = require('../model');
 const errors = require('../util/errors');
-const { sendData } = require('../util/kafka/topics');
+const { makeRequest } = require('../util/kafka/client');
 
 const getDishesForRestaurant = async (req, res) => {
   const { resID } = req.params;
@@ -67,34 +67,24 @@ const createDishForRestaurant = async (req, res) => {
     return;
   }
 
-  try {
-    const restaurant = await Restaurant.findOne({ _id: resID });
-    if (!restaurant) {
-      res.status(404).json({ ...errors.notFound, message: 'restaurant not found' });
+  const restaurant = await Restaurant.findOne({ _id: Types.ObjectId(resID) });
+  if (!restaurant) {
+    res.status(404).json({ ...errors.notFound, message: 'restaurant not found' });
+    return;
+  }
+
+  const dish = req.body;
+  dish.restaurantId = resID;
+  makeRequest('dish.create', dish, async (err, resp) => {
+    if (err || !resp) {
+      res.status(500).json(errors.serverError);
       return;
     }
 
-    const dish = req.body;
-    dish.restaurantId = resID;
-    sendData('dish.create', dish, async (err, resp) => {
-      try {
-        if (err) {
-          res.status(500).json(errors.serverError);
-          return;
-        }
+    const result = await Dish.findOne({ _id: Types.ObjectId(resp._id) });
 
-        const result = await Dish.findOne({ _id: Types.ObjectId(resp._id) });
-
-        res.status(201).json(result);
-        Promise.resolve(result);
-      } catch (e) {
-        console.error(e);
-      }
-    });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json(errors.serverError);
-  }
+    res.status(201).json(result);
+  });
 };
 
 const updateDishInRestaurant = async (req, res) => {
@@ -124,20 +114,21 @@ const updateDishInRestaurant = async (req, res) => {
 
   dish.restaurantId = resID;
 
-  try {
-    const dbRes = await Dish.findOneAndUpdate({ _id: dishID, restaurantId: resID }, dish);
-    if (!dbRes) {
-      res.status(404).json({ ...errors.notFound, message: 'dish not found for restaurant' });
+  const dbRes = await Dish.findOne({ _id: dishID, restaurantId: resID }, dish);
+  if (!dbRes) {
+    res.status(404).json({ ...errors.notFound, message: 'dish not found for restaurant' });
+    return;
+  }
+
+  makeRequest('dish.update', { id: dbRes._id, data: dish }, async (err, resp) => {
+    if (err || !resp) {
+      res.status(500).json(errors.serverError);
       return;
     }
-
-    const result = await Dish.findOne({ _id: dbRes._id });
+    const result = await Dish.findOne({ _id: resp._id });
 
     res.status(200).json(result);
-  } catch (e) {
-    console.error(e);
-    res.status(500).json(errors.serverError);
-  }
+  });
 };
 
 const deleteDishInRestaurant = async (req, res) => {
@@ -153,20 +144,21 @@ const deleteDishInRestaurant = async (req, res) => {
     return;
   }
 
-  try {
-    const dish = await Dish.findOneAndDelete({ _id: dishID, restaurantId: resID });
-    if (!dish) {
-      res.status(404).json({ ...errors.notFound, message: 'dish not found for restaurant' });
+  const dish = await Dish.findOne({ _id: dishID, restaurantId: resID });
+  if (!dish) {
+    res.status(404).json({ ...errors.notFound, message: 'dish not found for restaurant' });
+    return;
+  }
+
+  makeRequest('dish.delete', { id: dish._id, restaurantId: dish.restaurantId }, (err, resp) => {
+    if (err || !resp) {
+      res.status(500).json(errors.serverError);
       return;
     }
-
-    await Restaurant.update({ _id: resID }, { $pull: { dishes: dish._id } });
-
-    res.status(200).send(null);
-  } catch (e) {
-    console.error(e);
-    res.status(500).json(errors.serverError);
-  }
+    if (resp.success) {
+      res.status(200).json(null);
+    }
+  });
 };
 
 module.exports = {

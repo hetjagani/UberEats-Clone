@@ -56,10 +56,16 @@ export default (state = initialState, action) => {
       };
 
     case UPDATE_RESTAURANT_DISH:
-      let filteredDishes = state.dishes.filter((d) => d._id != action.payload.dishID);
+      let updatedDishes = state.dishes.map((d) => {
+        if (d._id == action.payload.dishID) {
+          return action.payload.dish;
+        } else {
+          return d;
+        }
+      });
       return {
         ...state,
-        dishes: [...filteredDishes, action.payload.dish],
+        dishes: updatedDishes,
       };
 
     case DELETE_RESTAURANT_DISH:

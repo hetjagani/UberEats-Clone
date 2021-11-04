@@ -3,19 +3,21 @@ var connection = new require('./kafka/connection');
 var createRestaurant = require('./services/restaurant/create');
 var updateRestaurant = require('./services/restaurant/update');
 var deleteRestaurant = require('./services/restaurant/delete');
+var createDish = require('./services/dish/create');
+var updateDish = require('./services/dish/update');
+var deleteDish = require('./services/dish/delete');
 
 function handleTopicRequest(topic_name, fname) {
   var consumer = connection.getConsumer(topic_name);
   var producer = connection.getProducer();
   console.log('server is running ');
   consumer.on('message', (message) => {
-    console.log('message received for ' + topic_name + ' ', fname);
+    console.log('MESSAGE RECEIVED FOR ' + topic_name);
     console.log(message.value);
     try {
       var data = JSON.parse(message.value);
 
       fname(data.data, (err, res) => {
-        console.log('SENDING DATA FROM KAFKA BACKEND: ', JSON.stringify(res));
         var payloads = [
           {
             topic: 'response_topic',
@@ -43,3 +45,6 @@ function handleTopicRequest(topic_name, fname) {
 handleTopicRequest('restaurant.create', createRestaurant);
 handleTopicRequest('restaurant.update', updateRestaurant);
 handleTopicRequest('restaurant.delete', deleteRestaurant);
+handleTopicRequest('dish.create', createDish);
+handleTopicRequest('dish.update', updateDish);
+handleTopicRequest('dish.delete', deleteDish);

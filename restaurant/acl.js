@@ -6,7 +6,7 @@ module.exports = {
   'GET /restaurants?(.+)': ['restaurant', 'customer', 'admin'],
   'POST /restaurants': ['restaurant'],
   'PUT /restaurants/(.+)': ['restaurant'],
-  'DELETE /restaurants/(.+)': ['admin', 'restaurant'],
+  'DELETE /restaurants/(.+)': ['admin'],
   'GET /media?(.+)': ['restaurant', 'customer'],
   'POST /media': ['restaurant'],
   'PUT /media?(.+)': ['restaurant'],
