@@ -1,9 +1,11 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable eqeqeq */
 const { validationResult } = require('express-validator');
+const { Types } = require('mongoose');
 const { getPaiganation } = require('u-server-utils');
 const { Dish, Restaurant } = require('../model');
 const errors = require('../util/errors');
+const { sendData } = require('../util/kafka/topics');
 
 const getDishesForRestaurant = async (req, res) => {
   const { resID } = req.params;
@@ -74,11 +76,21 @@ const createDishForRestaurant = async (req, res) => {
 
     const dish = req.body;
     dish.restaurantId = resID;
-    const createdRes = await Dish.create(dish);
+    sendData('dish.create', dish, async (err, resp) => {
+      try {
+        if (err) {
+          res.status(500).json(errors.serverError);
+          return;
+        }
 
-    restaurant.dishes.push(createdRes._id);
-    await restaurant.save();
-    res.status(201).json(createdRes);
+        const result = await Dish.findOne({ _id: Types.ObjectId(resp._id) });
+
+        res.status(201).json(result);
+        Promise.resolve(result);
+      } catch (e) {
+        console.error(e);
+      }
+    });
   } catch (e) {
     console.error(e);
     res.status(500).json(errors.serverError);

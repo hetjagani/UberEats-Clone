@@ -219,7 +219,7 @@ function CustomerDetails({ loginDetails, update }) {
         </Button>
       </div>
       <div className={imgContainer}>
-        {medium ? (
+        {medium?.url ? (
           <div
             style={{
               display: 'flex',

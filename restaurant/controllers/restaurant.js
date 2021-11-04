@@ -7,7 +7,7 @@ const { getPaiganation } = require('u-server-utils');
 const { Types } = require('mongoose');
 const { Restaurant } = require('../model');
 const errors = require('../util/errors');
-const { sendData } = require('../util/kafka');
+const { makeRequest } = require('../util/kafka/client');
 
 const allRestaurants = async (req, res) => {
   const restaurants = await Restaurant.aggregate([
@@ -127,8 +127,8 @@ const createRestaurant = async (req, res) => {
   const restaurant = req.body;
   restaurant._id = restaurant.id;
 
-  sendData('restaurant.create', restaurant, async (err, resp) => {
-    if (err) {
+  makeRequest('restaurant.create', restaurant, async (err, resp) => {
+    if (err || !resp) {
       res.status(500).json(errors.serverError);
       return;
     }
@@ -176,36 +176,31 @@ const updateRestaurantByID = async (req, res) => {
     restaurant.media = [];
   }
 
-  try {
-    const dbRes = await Restaurant.findOne({ _id: id });
-    if (!dbRes) {
-      res.status(404).json(errors.notFound);
+  const dbRes = await Restaurant.findOne({ _id: id });
+  if (!dbRes) {
+    res.status(404).json(errors.notFound);
+    return;
+  }
+
+  makeRequest('restaurant.update', { id: dbRes._id, data: restaurant }, async (err, resp) => {
+    if (err || !resp) {
+      res.status(500).json(errors.serverError);
       return;
     }
-
-    sendData('restaurant.update', { id: dbRes._id, restaurant }, async (err, resp) => {
-      if (err) {
-        res.status(500).json(errors.serverError);
-        return;
-      }
-      const result = await Restaurant.aggregate([
-        { $match: { _id: Types.ObjectId(resp._id) } },
-        {
-          $lookup: {
-            from: 'dishes',
-            localField: 'dishes',
-            foreignField: '_id',
-            as: 'dishes',
-          },
+    const result = await Restaurant.aggregate([
+      { $match: { _id: Types.ObjectId(resp._id) } },
+      {
+        $lookup: {
+          from: 'dishes',
+          localField: 'dishes',
+          foreignField: '_id',
+          as: 'dishes',
         },
-      ]);
+      },
+    ]);
 
-      res.status(200).json(result[0]);
-    });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json(errors.serverError);
-  }
+    res.status(200).json(result[0]);
+  });
 };
 
 const deleteRestaurant = async (req, res) => {
@@ -215,17 +210,21 @@ const deleteRestaurant = async (req, res) => {
     return;
   }
 
-  try {
-    const restaurant = await Restaurant.findOneAndRemove({ _id: id });
-    if (!restaurant) {
-      res.status(404).send(errors.notFound);
+  const restaurant = await Restaurant.findOne({ _id: Types.ObjectId(id) });
+  if (!restaurant) {
+    res.status(404).send(errors.notFound);
+    return;
+  }
+
+  makeRequest('restaurant.delete', { id: restaurant._id }, async (err, resp) => {
+    if (err || !resp) {
+      res.status(500).json(errors.serverError);
       return;
     }
-    res.status(200).send(null);
-  } catch (e) {
-    console.log(e);
-    res.status(500).json(errors.serverError);
-  }
+    if (resp.success) {
+      res.status(200).json(null);
+    }
+  });
 };
 
 module.exports = {

@@ -1,3 +1,4 @@
+const { Types } = require('mongoose');
 const mongoose = require('mongoose');
 
 const getAuthConnection = () => {
@@ -39,7 +40,7 @@ const getRestaurantConnection = () => {
       type: String,
       enum: ['appetizer', 'salad', 'main_course', 'dessert', 'beverage'],
     },
-    restaurantId: mongoose.Types.ObjectId,
+    restaurantId: Types.ObjectId,
     media: [MediaSchema],
   });
 
