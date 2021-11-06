@@ -225,6 +225,8 @@ const deleteRestaurant = async (req, res) => {
     }
     if (resp.success) {
       res.status(200).json(null);
+    } else {
+      res.status(500).json(errors.serverError);
     }
   });
 };

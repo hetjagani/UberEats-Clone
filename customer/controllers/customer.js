@@ -6,6 +6,7 @@ const { Types } = require('mongoose');
 const { Customer } = require('../model');
 const errors = require('../util/errors');
 const getPaiganation = require('../util/paiganation');
+const { makeRequest } = require('../util/kafka/client');
 
 const getFavouriteRestaurants = async (favs, auth) => {
   const res = await axios.get(`${global.gConfig.restaurant_url}/restaurants/all`, {
@@ -138,14 +139,15 @@ const createCustomer = async (req, res) => {
   const customer = req.body;
   customer._id = customer.id;
 
-  try {
-    const createdCustomer = await Customer.create(customer);
-    res.status(201).json(createdCustomer);
-    return;
-  } catch (err) {
-    console.error(err);
-    res.status(500).json(errors.serverError);
-  }
+  makeRequest('customer.create', customer, async (err, resp) => {
+    if (err || !resp) {
+      res.status(500).json(errors.serverError);
+      return;
+    }
+    const result = await Customer.findOne({ _id: Types.ObjectId(resp._id) });
+
+    res.status(201).json(result);
+  });
 };
 
 const updateCustomerByID = async (req, res) => {
@@ -172,10 +174,15 @@ const updateCustomerByID = async (req, res) => {
 
   const customer = req.body;
 
-  try {
-    const dbRes = await Customer.findOneAndUpdate({ _id: id }, customer);
-    if (!dbRes) {
-      res.status(404).json(errors.notFound);
+  const dbRes = await Customer.findOne({ _id: id }, customer);
+  if (!dbRes) {
+    res.status(404).json(errors.notFound);
+    return;
+  }
+
+  makeRequest('customer.update', { id: dbRes._id, data: customer }, async (err, resp) => {
+    if (err || !resp) {
+      res.status(500).json(errors.serverError);
       return;
     }
 
@@ -196,10 +203,7 @@ const updateCustomerByID = async (req, res) => {
     ]);
 
     res.status(200).json(customers[0]);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json(errors.serverError);
-  }
+  });
 };
 
 const deleteCustomerByID = async (req, res) => {
@@ -209,18 +213,24 @@ const deleteCustomerByID = async (req, res) => {
     return;
   }
 
-  try {
-    const customer = await Customer.findOneAndDelete({ _id: id });
-    if (!customer) {
-      res.status(404).send(errors.notFound);
+  const customer = await Customer.findOne({ _id: id });
+  if (!customer) {
+    res.status(404).send(errors.notFound);
+    return;
+  }
+
+  makeRequest('customer.delete', { id: customer._id }, (err, resp) => {
+    if (err || !resp) {
+      res.status(500).json(errors.serverError);
       return;
     }
 
-    res.status(200).send(null);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json(errors.serverError);
-  }
+    if (resp.success) {
+      res.status(200).json(null);
+    } else {
+      res.status(500).json(errors.serverError);
+    }
+  });
 };
 
 module.exports = {

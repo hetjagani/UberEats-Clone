@@ -72,7 +72,46 @@ const getRestaurantConnection = () => {
   return { restaurantConn, Restaurant, Dish };
 };
 
+const getCustomerConnection = () => {
+  const customerConn = mongoose.createConnection(global.gConfig.customer_conn);
+  mongoose.set('debug', true);
+
+  const MediaSchema = new mongoose.Schema({
+    url: String,
+    alt_text: String,
+  });
+
+  const CustomerSchema = new mongoose.Schema({
+    name: String,
+    nickname: String,
+    about: String,
+    city: String,
+    state: String,
+    country: String,
+    contact_no: String,
+    medium: MediaSchema,
+    favourites: [Types.ObjectId],
+    addresses: [Types.ObjectId],
+  });
+
+  const AddressSchema = new mongoose.Schema({
+    firstLine: String,
+    secondLine: String,
+    zipcode: String,
+    city: String,
+    state: String,
+    country: String,
+    customerId: Types.ObjectId,
+  });
+
+  const Customer = customerConn.model('customers', CustomerSchema);
+  const Address = customerConn.model('addresses', AddressSchema);
+
+  return { customerConn, Customer, Address };
+};
+
 module.exports = {
   getAuthConnection,
   getRestaurantConnection,
+  getCustomerConnection,
 };
