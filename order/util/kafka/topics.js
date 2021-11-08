@@ -38,12 +38,12 @@ const createKafkaTopics = () => {
         replicationFactor: 1,
       },
       {
-        topic: 'order.update',
+        topic: 'order.place',
         partitions: 1,
         replicationFactor: 1,
       },
       {
-        topic: 'order.delete',
+        topic: 'order.updatestatus',
         partitions: 1,
         replicationFactor: 1,
       },

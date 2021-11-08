@@ -8,6 +8,7 @@ const { Types } = require('mongoose');
 const { getPaiganation } = require('u-server-utils');
 const { Order, CartItem } = require('../model');
 const errors = require('../util/errors');
+const { makeRequest } = require('../util/kafka/client');
 
 const getRestaurants = async (auth) => {
   const res = await axios.get(`${global.gConfig.restaurant_url}/restaurants/all`, {
@@ -210,8 +211,6 @@ const createOrder = async (req, res) => {
     res.status(404).json({ ...errors.notFound, message: 'you have no items in cart' });
     return;
   }
-  console.log('Cart Item');
-  console.log(cartItems);
 
   try {
     const response = await axios.get(
@@ -241,34 +240,37 @@ const createOrder = async (req, res) => {
       notes: item.notes,
     }));
 
-    const nOrder = await Order.create({
-      amount: orderAmount,
-      status: 'INIT',
-      date: Date.now(),
-      restaurantId: cartItems[0].restaurantId,
-      customerId: Types.ObjectId(user),
-      type,
-      orderitems: orderItems,
-    });
+    makeRequest(
+      'order.create',
+      {
+        amount: orderAmount,
+        status: 'INIT',
+        date: Date.now(),
+        restaurantId: cartItems[0].restaurantId,
+        customerId: Types.ObjectId(user),
+        type,
+        orderitems: orderItems,
+      },
+      async (err, resp) => {
+        if (err || !resp) {
+          res.status(500).json(errors.serverError);
+          return;
+        }
 
-    await CartItem.deleteMany({ customerId: Types.ObjectId(user) });
+        await CartItem.deleteMany({ customerId: Types.ObjectId(user) });
 
-    const resultOrder = await Order.findOne({ _id: nOrder._id });
+        const resultOrder = await Order.findOne({ _id: Types.ObjectId(resp._id) });
 
-    console.log(dishMap);
+        const orderDishes = resultOrder.orderitems.map((item) => ({
+          ...item._doc,
+          dish: dishMap[item.dishId],
+        }));
 
-    const orderDishes = resultOrder.orderitems.map((item) => ({
-      ...item._doc,
-      dish: dishMap[item.dishId],
-    }));
-
-    console.log(orderDishes);
-
-    // eslint-disable-next-line max-len
-    res
-      .status(201)
-      .json({ ...resultOrder._doc, orderitems: orderDishes, restaurant: response.data });
-    return;
+        res
+          .status(201)
+          .json({ ...resultOrder._doc, orderitems: orderDishes, restaurant: response.data });
+      },
+    );
   } catch (err) {
     console.error(err);
     if (err.isAxiosError) {
@@ -318,42 +320,45 @@ const placeOrder = async (req, res) => {
       return;
     }
 
-    // if exists then update order with status PLACED and addressId
     order.addressId = response.data._id;
     order.status = 'PLACED';
     order.notes = notes;
 
-    await order.save();
+    makeRequest('order.place', { id: order._id, order }, async (err, resp) => {
+      if (err || !resp) {
+        res.status(500).json(errors.serverError);
+        return;
+      }
 
-    const nOrder = await Order.findOne({ _id: order._id });
+      const nOrder = await Order.findOne({ _id: Types.ObjectId(resp._id) });
 
-    const resResp = await axios.get(
-      `${global.gConfig.restaurant_url}/restaurants/${nOrder.restaurantId}`,
-      { headers: { Authorization: req.headers.authorization } },
-    );
+      const resResp = await axios.get(
+        `${global.gConfig.restaurant_url}/restaurants/${nOrder.restaurantId}`,
+        { headers: { Authorization: req.headers.authorization } },
+      );
 
-    if (resResp.status != 200) {
-      res.status(500).json(errors.serverError);
-      return;
-    }
+      if (resResp.status != 200) {
+        res.status(500).json(errors.serverError);
+        return;
+      }
 
-    const dishMap = {};
-    resResp.data.dishes.forEach((dish) => {
-      dishMap[dish._id] = dish;
+      const dishMap = {};
+      resResp.data.dishes.forEach((dish) => {
+        dishMap[dish._id] = dish;
+      });
+
+      const orderDishes = nOrder.orderitems.map((item) => ({
+        ...item._doc,
+        dish: dishMap[item.dishId],
+      }));
+
+      res.status(200).json({
+        ...nOrder._doc,
+        address: response.data,
+        orderitems: orderDishes,
+        restaurant: resResp.data,
+      });
     });
-
-    const orderDishes = nOrder.orderitems.map((item) => ({
-      ...item._doc,
-      dish: dishMap[item.dishId],
-    }));
-
-    res.status(200).json({
-      ...nOrder._doc,
-      address: response.data,
-      orderitems: orderDishes,
-      restaurant: resResp.data,
-    });
-    return;
   } catch (err) {
     console.error(err);
     res.status(500).json(errors.serverError);
@@ -382,47 +387,43 @@ const updateOrderStatus = async (req, res) => {
     return;
   }
 
-  order.status = status;
-
-  await order.save();
-
   try {
-    const nOrder = await Order.findOne({ _id: order._id });
+    makeRequest('order.updatestatus', { id: order._id, status }, async (err, resp) => {
+      const nOrder = await Order.findOne({ _id: Types.ObjectId(resp._id) });
+      const resResp = await axios.get(
+        `${global.gConfig.restaurant_url}/restaurants/${nOrder.restaurantId}`,
+        { headers: { Authorization: req.headers.authorization } },
+      );
 
-    const resResp = await axios.get(
-      `${global.gConfig.restaurant_url}/restaurants/${nOrder.restaurantId}`,
-      { headers: { Authorization: req.headers.authorization } },
-    );
+      if (resResp.status != 200) {
+        res.status(500).json(errors.serverError);
+        return;
+      }
 
-    if (resResp.status != 200) {
-      res.status(500).json(errors.serverError);
-      return;
-    }
+      const dishMap = {};
+      resResp.data.dishes.forEach((dish) => {
+        dishMap[dish._id] = dish;
+      });
 
-    const dishMap = {};
-    resResp.data.dishes.forEach((dish) => {
-      dishMap[dish._id] = dish;
+      const orderDishes = nOrder.orderitems.map((item) => ({
+        ...item._doc,
+        dish: dishMap[item.dishId],
+      }));
+
+      const result = {
+        ...nOrder._doc,
+        orderitems: orderDishes,
+        restaurant: resResp.data,
+      };
+
+      const addressMap = await getAddresses();
+
+      if (order.addressId) {
+        result.address = addressMap[order.addressId];
+      }
+
+      res.status(200).json(result);
     });
-
-    const orderDishes = nOrder.orderitems.map((item) => ({
-      ...item._doc,
-      dish: dishMap[item.dishId],
-    }));
-
-    const result = {
-      ...nOrder._doc,
-      orderitems: orderDishes,
-      restaurant: resResp.data,
-    };
-
-    const addressMap = await getAddresses();
-
-    if (order.addressId) {
-      result.address = addressMap[order.addressId];
-    }
-
-    res.status(200).json(result);
-    return;
   } catch (err) {
     console.error(err);
     res.status(500).json(errors.serverError);
