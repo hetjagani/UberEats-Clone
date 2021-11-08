@@ -18,6 +18,9 @@ var createCartitem = require('./services/cartitem/create');
 var updateCartitem = require('./services/cartitem/update');
 var deleteCartitem = require('./services/cartitem/delete');
 var resetCartitem = require('./services/cartitem/reset');
+var createOrder = require('./services/order/create');
+var placeOrder = require('./services/order/place');
+var updateOrderStatus = require('./services/order/updatestatus');
 
 function handleTopicRequest(topic_name, fname) {
   var consumer = connection.getConsumer(topic_name);
@@ -72,3 +75,6 @@ handleTopicRequest('cartitem.create', createCartitem);
 handleTopicRequest('cartitem.update', updateCartitem);
 handleTopicRequest('cartitem.delete', deleteCartitem);
 handleTopicRequest('cartitem.reset', resetCartitem);
+handleTopicRequest('order.create', createOrder);
+handleTopicRequest('order.place', placeOrder);
+handleTopicRequest('order.updatestatus', updateOrderStatus);
