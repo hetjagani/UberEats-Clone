@@ -48,11 +48,6 @@ const createKafkaTopics = () => {
         replicationFactor: 1,
       },
       {
-        topic: 'favourite.update',
-        partitions: 1,
-        replicationFactor: 1,
-      },
-      {
         topic: 'favourite.delete',
         partitions: 1,
         replicationFactor: 1,

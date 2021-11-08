@@ -2,9 +2,9 @@
 /* eslint-disable eqeqeq */
 const { default: axios } = require('axios');
 const { validationResult } = require('express-validator');
-const { Types } = require('mongoose');
 const { Customer } = require('../model');
 const errors = require('../util/errors');
+const { makeRequest } = require('../util/kafka/client');
 
 const getRestaurants = async (favs, auth) => {
   const res = await axios.get(`${global.gConfig.restaurant_url}/restaurants/all`, {
@@ -59,19 +59,21 @@ const createCustomerFavourite = async (req, res) => {
       headers: { Authorization: auth },
     });
 
-    await Customer.update(
-      {
-        customerId: Types.ObjectId(user),
-      },
-      { $push: { favourites: restaurantId } },
-    );
-
-    res.status(201).json({
-      restaurantId,
-      restaurant: resp.data,
-      customerId: user,
+    makeRequest('favourite.create', { customerId: user, restaurantId }, (err, ret) => {
+      if (err || !ret) {
+        res.status(500).json(errors.serverError);
+        return;
+      }
+      if (ret.success) {
+        res.status(201).json({
+          restaurantId,
+          restaurant: resp.data,
+          customerId: user,
+        });
+      } else {
+        res.status(500).json(errors.serverError);
+      }
     });
-    return;
   } catch (err) {
     console.error(err.toJSON());
     if (err.original) {
@@ -88,15 +90,18 @@ const deleteCustomerFavourite = async (req, res) => {
   const { user } = req.headers;
   const { favID } = req.params;
 
-  try {
-    await Customer.update({ _id: user }, { $pull: { favourites: favID } });
+  makeRequest('favourite.delete', { customerId: user, restaurantId: favID }, (err, resp) => {
+    if (err || !resp) {
+      res.status(500).json(errors.serverError);
+      return;
+    }
 
-    res.status(200).send(null);
-    return;
-  } catch (err) {
-    console.error(err);
-    res.status(500).json(errors.serverError);
-  }
+    if (resp.success) {
+      res.status(200).send(null);
+    } else {
+      res.status(500).json(errors.serverError);
+    }
+  });
 };
 
 module.exports = {

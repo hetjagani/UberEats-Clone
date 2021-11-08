@@ -12,6 +12,8 @@ var deleteCustomer = require('./services/customer/delete');
 var createAddress = require('./services/address/create');
 var updateAddress = require('./services/address/update');
 var deleteAddress = require('./services/address/delete');
+var createFavourite = require('./services/favourite/create');
+var deleteFavourite = require('./services/favourite/delete');
 
 function handleTopicRequest(topic_name, fname) {
   var consumer = connection.getConsumer(topic_name);
@@ -60,3 +62,5 @@ handleTopicRequest('customer.delete', deleteCustomer);
 handleTopicRequest('address.create', createAddress);
 handleTopicRequest('address.update', updateAddress);
 handleTopicRequest('address.delete', deleteAddress);
+handleTopicRequest('favourite.create', createFavourite);
+handleTopicRequest('favourite.delete', deleteFavourite);
