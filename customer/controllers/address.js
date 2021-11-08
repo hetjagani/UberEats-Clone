@@ -2,8 +2,9 @@
 /* eslint-disable eqeqeq */
 const { validationResult } = require('express-validator');
 const { Types } = require('mongoose');
-const { Address, Customer } = require('../model');
+const { Address } = require('../model');
 const errors = require('../util/errors');
+const { makeRequest } = require('../util/kafka/client');
 
 // NOTE: not done paiganation for addresses
 const getAllAddresses = async (req, res) => {
@@ -54,17 +55,15 @@ const createAddress = async (req, res) => {
   const { user } = req.headers;
   const address = req.body;
 
-  try {
-    const createdRes = await Address.create({ ...address, customerId: user });
+  makeRequest('address.create', { customerId: user, address }, async (err, resp) => {
+    if (err || !resp) {
+      res.status(500).json(errors.serverError);
+      return;
+    }
+    const result = await Address.findOne({ _id: resp._id });
 
-    await Customer.update({ _id: Types.ObjectId(user) }, { $push: { addresses: createdRes._id } });
-
-    res.status(201).json(createdRes);
-    return;
-  } catch (err) {
-    console.error(err);
-    res.status(500).json(errors.serverError);
-  }
+    res.status(201).json(result);
+  });
 };
 
 const updateAddress = async (req, res) => {
@@ -84,23 +83,25 @@ const updateAddress = async (req, res) => {
   const { user } = req.headers;
   const address = req.body;
 
-  try {
-    const dbRes = await Address.findOneAndUpdate(
-      { _id: id, customerId: user },
-      { ...address, customerId: Types.ObjectId(user) },
-      { returnOriginal: false },
-    );
-    if (!dbRes) {
-      res.status(404).json(errors.notFound);
-      return;
-    }
-
-    res.status(200).json(dbRes);
+  const dbRes = await Address.findOne({ _id: id, customerId: user });
+  if (!dbRes) {
+    res.status(404).json(errors.notFound);
     return;
-  } catch (err) {
-    console.error(err);
-    res.status(500).json(errors.serverError);
   }
+
+  makeRequest(
+    'address.update',
+    { id: dbRes._id, address: { ...address, customerId: Types.ObjectId(user) } },
+    async (err, resp) => {
+      if (err || !resp) {
+        res.status(500).json(errors.serverError);
+        return;
+      }
+      const result = await Address.findOne({ _id: resp._id });
+
+      res.status(200).json(result);
+    },
+  );
 };
 
 const deleteAddress = async (req, res) => {
@@ -110,22 +111,25 @@ const deleteAddress = async (req, res) => {
     return;
   }
 
-  try {
-    const { user } = req.headers;
-    const address = await Address.findOneAndDelete({ _id: id, customerId: Types.ObjectId(user) });
-    if (!address) {
-      res.status(404).json(errors.notFound);
+  const { user } = req.headers;
+  const address = await Address.findOne({ _id: id, customerId: Types.ObjectId(user) });
+  if (!address) {
+    res.status(404).json(errors.notFound);
+    return;
+  }
+
+  makeRequest('address.delete', { id, customerId: user }, (err, resp) => {
+    if (err || !resp) {
+      res.status(500).json(errors.serverError);
       return;
     }
 
-    await Customer.update({ _id: Types.ObjectId(user) }, { $pull: { addresses: address._id } });
-
-    res.status(200).send(null);
-    return;
-  } catch (err) {
-    console.error(err);
-    res.status(500).json(errors.serverError);
-  }
+    if (resp.success) {
+      res.status(200).json(null);
+    } else {
+      res.status(500).json(errors.serverError);
+    }
+  });
 };
 
 module.exports = {

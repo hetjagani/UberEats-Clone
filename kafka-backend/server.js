@@ -9,6 +9,9 @@ var deleteDish = require('./services/dish/delete');
 var createCustomer = require('./services/customer/create');
 var updateCustomer = require('./services/customer/update');
 var deleteCustomer = require('./services/customer/delete');
+var createAddress = require('./services/address/create');
+var updateAddress = require('./services/address/update');
+var deleteAddress = require('./services/address/delete');
 
 function handleTopicRequest(topic_name, fname) {
   var consumer = connection.getConsumer(topic_name);
@@ -53,4 +56,7 @@ handleTopicRequest('dish.update', updateDish);
 handleTopicRequest('dish.delete', deleteDish);
 handleTopicRequest('customer.create', createCustomer);
 handleTopicRequest('customer.update', updateCustomer);
-handleTopicRequest('customer.delete', updateCustomer);
+handleTopicRequest('customer.delete', deleteCustomer);
+handleTopicRequest('address.create', createAddress);
+handleTopicRequest('address.update', updateAddress);
+handleTopicRequest('address.delete', deleteAddress);
