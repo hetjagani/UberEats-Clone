@@ -110,8 +110,53 @@ const getCustomerConnection = () => {
   return { customerConn, Customer, Address };
 };
 
+const getOrderConnection = () => {
+  const orderConn = mongoose.createConnection(global.gConfig.order_conn);
+  mongoose.set('debug', true);
+
+  const CartItemSchema = new mongoose.Schema({
+    customerId: Types.ObjectId,
+    dishId: Types.ObjectId,
+    restaurantId: Types.ObjectId,
+    quantity: Number,
+    notes: String,
+  });
+
+  const OrderItemSchema = new mongoose.Schema({
+    customerId: Types.ObjectId,
+    dishId: Types.ObjectId,
+    restaurantId: Types.ObjectId,
+    quantity: Number,
+    notes: String,
+  });
+
+  const OrderSchema = new mongoose.Schema({
+    amount: Number,
+    status: {
+      type: String,
+      enum: ['INIT', 'PLACED', 'PREPARING', 'PICKUP_READY', 'COMPLETE', 'CANCEL'],
+    },
+    date: Date,
+    restaurantId: Types.ObjectId,
+    customerId: Types.ObjectId,
+    addressId: Types.ObjectId,
+    type: {
+      type: String,
+      enum: ['delivery', 'pickup'],
+    },
+    orderitems: [OrderItemSchema],
+    notes: String,
+  });
+
+  const Order = orderConn.model('orders', OrderSchema);
+  const CartItem = orderConn.model('cartitems', CartItemSchema);
+
+  return { orderConn, Order, CartItem };
+};
+
 module.exports = {
   getAuthConnection,
   getRestaurantConnection,
   getCustomerConnection,
+  getOrderConnection,
 };

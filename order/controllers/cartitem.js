@@ -5,6 +5,7 @@ const { validationResult } = require('express-validator');
 const { Types } = require('mongoose');
 const { CartItem } = require('../model');
 const errors = require('../util/errors');
+const { makeRequest } = require('../util/kafka/client');
 
 const getRestaurants = async (auth) => {
   const res = await axios.get(`${global.gConfig.restaurant_url}/restaurants/all`, {
@@ -113,26 +114,33 @@ const addCartItem = async (req, res) => {
       return;
     }
 
-    const nCartItem = await CartItem.create({
-      customerId: user,
-      dishId: req.body.dishId,
-      restaurantId: req.body.restaurantId,
-      quantity: req.body.quantity,
-      notes: req.body.notes,
-    });
+    makeRequest(
+      'cartitem.create',
+      {
+        customerId: user,
+        dishId: req.body.dishId,
+        restaurantId: req.body.restaurantId,
+        quantity: req.body.quantity,
+        notes: req.body.notes,
+      },
+      (err, resp) => {
+        if (err || !resp) {
+          res.status(500).json(errors.serverError);
+          return;
+        }
+        const result = {
+          _id: resp._id,
+          restaurantId: resp.restaurantId,
+          restaurant,
+          dishId: resp.dishId,
+          dish: dishMap[resp.dishId],
+          quantity: resp.quantity,
+          notes: resp.notes,
+        };
 
-    const result = {
-      _id: nCartItem._id,
-      restaurantId: nCartItem.restaurantId,
-      restaurant,
-      dishId: nCartItem.dishId,
-      dish: dishMap[nCartItem.dishId],
-      quantity: nCartItem.quantity,
-      notes: nCartItem.notes,
-    };
-
-    res.status(201).json(result);
-    return;
+        res.status(201).json(result);
+      },
+    );
   } catch (err) {
     console.log(err);
     if (err.isAxiosError) {
@@ -167,8 +175,6 @@ const updateCartItem = async (req, res) => {
     cartItem.notes = notes;
     cartItem.quantity = quantity;
 
-    await cartItem.save();
-
     const response = await axios.get(
       `${global.gConfig.restaurant_url}/restaurants/${restaurantId}`,
       { headers: { authorization: req.headers.authorization } },
@@ -186,7 +192,16 @@ const updateCartItem = async (req, res) => {
       dishMap[ele._id] = ele;
     });
 
-    res.status(200).json({ ...cartItem._doc, dish: dishMap[cartItem.dishId] });
+    makeRequest('cartitem.update', { id: cartItem._id, data: cartItem }, async (err, resp) => {
+      if (err || !resp) {
+        res.status(500).json(errors.serverError);
+        return;
+      }
+
+      const result = await CartItem.findOne({ _id: Types.ObjectId(resp._id) });
+      res.status(200).json({ ...result._doc, dish: dishMap[cartItem.dishId] });
+    });
+
     return;
   } catch (err) {
     console.error(err);
@@ -203,32 +218,41 @@ const deleteCartItem = async (req, res) => {
 
   const { user } = req.headers;
 
-  try {
-    const cartItem = await CartItem.findOneAndDelete({ _id: id, customerId: Types.ObjectId(user) });
-    if (!cartItem) {
-      res.status(404).json(errors.notFound);
+  const cartItem = await CartItem.findOne({ _id: id, customerId: Types.ObjectId(user) });
+  if (!cartItem) {
+    res.status(404).json(errors.notFound);
+    return;
+  }
+
+  makeRequest('cartitem.delete', { id: cartItem._id }, (err, resp) => {
+    if (err || !resp) {
+      res.status(500).json(errors.serverError);
       return;
     }
 
-    res.status(200).json(null);
-    return;
-  } catch (err) {
-    console.error(err);
-    res.status(500).json(errors.serverError);
-  }
+    if (resp.success) {
+      res.status(200).json(null);
+    } else {
+      res.status(500).json(errors.serverError);
+    }
+  });
 };
 
 const resetCartItems = async (req, res) => {
   const { user } = req.headers;
 
-  try {
-    await CartItem.deleteMany({ customerId: Types.ObjectId(user) });
-    res.status(200).json(null);
-    return;
-  } catch (err) {
-    console.error(err);
-    res.status(500).json(errors.serverError);
-  }
+  makeRequest('cartitem.reset', { customerId: user }, (err, resp) => {
+    if (err || !resp) {
+      res.status(500).json(errors.serverError);
+      return;
+    }
+
+    if (resp.success) {
+      res.status(200).json(null);
+    } else {
+      res.status(500).json(errors.serverError);
+    }
+  });
 };
 
 module.exports = {
