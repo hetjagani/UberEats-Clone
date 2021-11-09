@@ -238,6 +238,7 @@ const createOrder = async (req, res) => {
       restaurantId: item.restaurantId,
       quantity: item.quantity,
       notes: item.notes,
+      price: dishMap[item.dishId].price,
     }));
 
     makeRequest(

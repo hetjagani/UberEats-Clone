@@ -14,6 +14,7 @@ const OrderItemSchema = new Schema({
   restaurantId: Types.ObjectId,
   quantity: Number,
   notes: String,
+  price: Number,
 });
 
 const OrderSchema = new Schema({

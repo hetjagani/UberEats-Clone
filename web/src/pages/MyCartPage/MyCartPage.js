@@ -75,7 +75,6 @@ const MyCartPage = () => {
         td.push([
           dish.dish.name,
           dish.dish.description,
-          dish.dish.price,
           dish.quantity,
           dish.notes,
           <Button

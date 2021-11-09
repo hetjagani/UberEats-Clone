@@ -51,7 +51,7 @@ const CustomerOrdersPage = () => {
           oi.dish && oi.dish.name,
           oi.notes,
           oi.quantity,
-          `$${oi.dish && oi.dish.price} x ${oi.quantity}`,
+          `$${oi.price} x ${oi.quantity}`,
         ];
       });
     td.push(['', '', 'Total', `$${o.amount}`]);
