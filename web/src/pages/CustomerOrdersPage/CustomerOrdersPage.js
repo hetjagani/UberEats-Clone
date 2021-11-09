@@ -30,6 +30,7 @@ const CustomerOrdersPage = () => {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState([{ id: 5, size: '5' }]);
+  const [updatePage, setUpdatePage] = useState(false);
 
   const statusOpts = [
     { id: '', status: 'ALL' },
@@ -83,7 +84,23 @@ const CustomerOrdersPage = () => {
       .catch((err) => {
         notify({ type: 'info', description: 'Error fetching orders.' });
       });
-  }, [status, limit, page]);
+  }, [status, limit, page, updatePage]);
+
+  const cancelOrder = (id) => {
+    axios
+      .put(`/orders/${id}`, { status: 'CANCEL' })
+      .then((res) => {
+        setUpdatePage(!updatePage);
+        setDetailModal(false);
+        notify({type: 'info', description: 'Order Cancelled'})
+      })
+      .catch((err) => {
+        notify({
+          type: 'error',
+          description: err?.response?.data?.message || 'Error Canceling Order',
+        });
+      });
+  };
 
   return (
     <div>
@@ -191,6 +208,9 @@ const CustomerOrdersPage = () => {
               <ModalButton onClick={() => history.push(`/orders/${detailOrder.id}`)}>
                 Complete Order
               </ModalButton>
+            )}
+            {detailOrder.status === 'PLACED' && (
+              <ModalButton onClick={() => cancelOrder(detailOrder._id)}>Cancel Order</ModalButton>
             )}
             <ModalButton
               kind="tertiary"

@@ -132,7 +132,7 @@ const RestaurantOrdersPage = () => {
                     href="#"
                     onClick={() => openCustomerDetailModal(cusMap[o.customerId])}
                   >
-                    {cusMap[o.customerId].name}
+                    {cusMap[o.customerId]?.name || 'Unknown Customer'}
                   </StyledLink>
                 </Paragraph1>,
                 <Paragraph1>
@@ -151,7 +151,7 @@ const RestaurantOrdersPage = () => {
       })
       .catch((err) => {
         console.log(err);
-        notify({ type: 'info', description: 'Error fetching orders.' });
+        notify({ type: 'error', description: 'Error fetching orders.' });
       });
   }, [status, page, limit]);
 
@@ -295,7 +295,7 @@ const RestaurantOrdersPage = () => {
         <ModalBody>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <img
-              style={{ width: '300px', height: '200px' }}
+              style={{ maxWidth: '200px', maxHeight: '200px' }}
               src={detailCustomer.medium ? detailCustomer.medium?.url : '/images/user.png'}
             ></img>
           </div>

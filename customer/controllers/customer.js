@@ -40,9 +40,9 @@ const getAllCustomers = async (req, res) => {
     });
 
     // get all customer ids from all orders and return those customers
-    const customerIds = orderRes.data.map((order) => {
-      if (order.status != 'INIT') return Types.ObjectId(order.customerId);
-      return 0;
+    const customerIds = [];
+    orderRes.data.forEach((order) => {
+      if (order.status != 'INIT') customerIds.push(Types.ObjectId(order.customerId));
     });
 
     const { limit, offset } = getPaiganation(req.query.page, req.query.limit);

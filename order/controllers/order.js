@@ -366,7 +366,7 @@ const placeOrder = async (req, res) => {
 };
 
 const updateOrderStatus = async (req, res) => {
-  const { user } = req.headers;
+  const { user, role } = req.headers;
   const { id } = req.params;
 
   const valErr = validationResult(req);
@@ -378,12 +378,30 @@ const updateOrderStatus = async (req, res) => {
 
   const { status } = req.body;
 
-  const order = await Order.findOne({
+  const whereQ = {
     _id: Types.ObjectId(id),
-    restaurantId: Types.ObjectId(user),
-  });
+  };
+  if (role === 'customer') {
+    whereQ.customerId = Types.ObjectId(user);
+  } else if (role === 'restaurant') {
+    whereQ.restaurantId = Types.ObjectId(user);
+  }
+
+  const order = await Order.findOne(whereQ);
   if (!order) {
     res.status(404).json(errors.notFound);
+    return;
+  }
+
+  if (role === 'customer' && status !== 'CANCEL') {
+    res.status(400).json(errors.badRequest);
+    return;
+  }
+
+  if (role === 'customer' && order.status != 'PLACED') {
+    res
+      .status(400)
+      .json({ ...errors.badRequest, message: 'Cannot cancel order once the order is processed' });
     return;
   }
 
