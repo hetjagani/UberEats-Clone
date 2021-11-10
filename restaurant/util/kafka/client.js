@@ -14,4 +14,4 @@ function makeRequest(queue_name, msg_payload, callback) {
   });
 }
 
-exports.makeRequest = makeRequest;
+module.exports = { makeRequest };

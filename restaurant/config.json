@@ -6,6 +6,7 @@
   },
   "test": {
     "database_conn": "mongodb://uberadmin:uberadminpass@localhost:27017/restaurant_test",
-    "auth_url": "http://auth:7000"
+    "auth_url": "http://localhost:7000",
+    "kafka_host": "localhost:9092"
   }
 }

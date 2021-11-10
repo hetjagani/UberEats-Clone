@@ -4,24 +4,24 @@ process.env.NODE_ENV = 'test';
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
+require('../config');
+const { initDB } = require('../db');
+const app = require('../app');
+const { User } = require('../model');
 
 chai.should();
 chai.use(chaiHttp);
 
-let app;
 describe('POST /auth/signup', () => {
   before((done) => {
-    require('../config');
-    const { initDB } = require('../db');
-    initDB()
-      .then(() => {
-        const { runMigration } = require('../model');
-        return runMigration(true);
-      })
-      .then(() => {
-        app = require('../app');
-        done();
-      });
+    initDB();
+    done();
+  });
+
+  after((done) => {
+    User.deleteMany({}).then(() => {
+      done();
+    });
   });
 
   it('it should create a new user', (done) => {

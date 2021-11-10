@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable global-require */
 /* eslint-disable no-undef */
 process.env.NODE_ENV = 'test';
@@ -5,6 +6,12 @@ process.env.NODE_ENV = 'test';
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const nock = require('nock');
+require('../config');
+const { Types } = require('mongoose');
+const sinon = require('sinon');
+const { initDB } = require('../db');
+const kafkaClient = require('../util/kafka/client');
+const { Customer } = require('../model');
 
 chai.should();
 chai.use(chaiHttp);
@@ -12,29 +19,48 @@ chai.use(chaiHttp);
 let app;
 describe('Customer Testcases', () => {
   before((done) => {
-    require('../config');
-    const { initDB } = require('../db');
-    initDB()
-      .then(() => {
-        const { runMigration } = require('../model');
-        return runMigration(true);
-      })
-      .then(() => {
-        app = require('../app');
-        done();
-      });
+    initDB();
+    Customer.deleteMany({}).then(() => {
+      done();
+    });
   });
 
   beforeEach(() => {
     nock(`${global.gConfig.auth_url}`)
       .get('/auth/validate')
       .query({ token: 'secrettoken' })
-      .reply(200, { valid: true, role: 'customer', user: 1 });
+      .reply(200, { valid: true, role: 'customer', user: '616eee906f354a1864dc650d' });
+
+    stb = sinon.stub(kafkaClient, 'makeRequest').callsFake((queue_name, msg_payload, callback) => {
+      if (queue_name === 'customer.create') {
+        Customer.create(msg_payload)
+          .then((d) => {
+            callback(null, d);
+          })
+          .catch((err) => {
+            callback(err, null);
+          });
+      }
+      if (queue_name === 'customer.update') {
+        Customer.updateOne({ _id: Types.ObjectId(msg_payload.id) }, msg_payload.data)
+          .then(() => {
+            callback(null, { _id: msg_payload.id });
+          })
+          .catch((err) => {
+            callback(err, null);
+          });
+      }
+    });
+    app = require('../app');
+  });
+
+  afterEach(() => {
+    stb.restore();
   });
 
   it('it should create a customer', (done) => {
     const data = {
-      id: 1,
+      id: '616eee906f354a1864dc650d',
       name: 'Test Customer',
       nickname: 'TestNickname',
       about: 'Test About',
@@ -65,10 +91,10 @@ describe('Customer Testcases', () => {
       });
   });
 
-  it('it should fetch the created restaurant', (done) => {
+  it('it should fetch the created customer', (done) => {
     chai
       .request(app)
-      .get('/customers/1')
+      .get('/customers/616eee906f354a1864dc650d')
       .set('Authorization', 'secrettoken')
       .end((err, res) => {
         if (err) {
@@ -87,9 +113,9 @@ describe('Customer Testcases', () => {
       });
   });
 
-  it('it should update the restaurant', (done) => {
+  it('it should update the customer', (done) => {
     const data = {
-      id: 1,
+      id: '616eee906f354a1864dc650d',
       name: 'Test Updated Customer',
       nickname: 'TestUpdatedNickname',
       about: 'Test Updated About',
@@ -100,7 +126,7 @@ describe('Customer Testcases', () => {
     };
     chai
       .request(app)
-      .put('/customers/1')
+      .put('/customers/616eee906f354a1864dc650d')
       .send(data)
       .set('Authorization', 'secrettoken')
       .end((err, res) => {

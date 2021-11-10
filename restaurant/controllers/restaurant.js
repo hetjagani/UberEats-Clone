@@ -26,9 +26,7 @@ const allRestaurants = async (req, res) => {
 
 const getAllRestaurants = async (req, res) => {
   const whereOpts = [];
-  const {
-    address, city, restaurant_type, food_type, q,
-  } = req.query;
+  const { address, city, restaurant_type, food_type, q } = req.query;
   if (address && address != '') {
     whereOpts.push({ address: { $regex: `(?i)(?<= |^)${address}(?= |$)` } });
   }

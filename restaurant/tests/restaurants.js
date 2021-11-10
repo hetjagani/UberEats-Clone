@@ -1,14 +1,17 @@
+/* eslint-disable camelcase */
 /* eslint-disable global-require */
 /* eslint-disable no-undef */
 process.env.NODE_ENV = 'test';
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
+const { Types } = require('mongoose');
 const nock = require('nock');
 require('../config');
+const sinon = require('sinon');
 const { initDB } = require('../db');
-const app = require('../app');
 const { Restaurant } = require('../model');
+const kafkaClient = require('../util/kafka/client');
 
 chai.should();
 chai.use(chaiHttp);
@@ -16,7 +19,7 @@ chai.use(chaiHttp);
 describe('Restaurant Testcases', () => {
   before((done) => {
     initDB();
-    Restaurant.remove({}, () => {
+    Restaurant.deleteMany({}).then(() => {
       done();
     });
   });
@@ -26,6 +29,32 @@ describe('Restaurant Testcases', () => {
       .get('/auth/validate')
       .query({ token: 'secrettoken' })
       .reply(200, { valid: true, role: 'restaurant', user: '616eee906f354a1864dc650d' });
+
+    stb = sinon.stub(kafkaClient, 'makeRequest').callsFake((queue_name, msg_payload, callback) => {
+      if (queue_name === 'restaurant.create') {
+        Restaurant.create(msg_payload)
+          .then((d) => {
+            callback(null, d);
+          })
+          .catch((err) => {
+            callback(err, null);
+          });
+      }
+      if (queue_name === 'restaurant.update') {
+        Restaurant.updateOne({ _id: Types.ObjectId(msg_payload.id) }, msg_payload.data)
+          .then(() => {
+            callback(null, { _id: msg_payload.id });
+          })
+          .catch((err) => {
+            callback(err, null);
+          });
+      }
+    });
+    app = require('../app');
+  });
+
+  afterEach(() => {
+    stb.restore();
   });
 
   it('it should create a restaurant', (done) => {
@@ -43,6 +72,7 @@ describe('Restaurant Testcases', () => {
       food_type: 'veg',
       restaurant_type: 'delivery',
     };
+
     chai
       .request(app)
       .post('/restaurants')
@@ -97,7 +127,6 @@ describe('Restaurant Testcases', () => {
 
   it('it should update the restaurant', (done) => {
     const data = {
-      id: '616eee906f354a1864dc650d',
       name: 'Test Updated Restaurant',
       description: 'Test Updated Description',
       address: 'Test Updated Address',
@@ -110,6 +139,7 @@ describe('Restaurant Testcases', () => {
       food_type: 'non-veg',
       restaurant_type: 'pickup',
     };
+
     chai
       .request(app)
       .put('/restaurants/616eee906f354a1864dc650d')
