@@ -5,7 +5,7 @@ if (!global.gConfig.database_conn) {
 }
 
 const initDB = () => {
-  mongoose.connect(global.gConfig.database_conn, { maxPoolSize: 50, minPoolSize: 5 });
+  mongoose.connect(global.gConfig.database_conn);
   mongoose.set('debug', true);
 };
 
