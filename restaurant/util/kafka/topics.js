@@ -23,6 +23,11 @@ const createKafkaTopics = () => {
         replicationFactor: 1,
       },
       {
+        topic: 'restaurant.delete',
+        partitions: 1,
+        replicationFactor: 1,
+      },
+      {
         topic: 'dish.create',
         partitions: 1,
         replicationFactor: 1,

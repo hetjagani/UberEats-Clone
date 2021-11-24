@@ -33,12 +33,12 @@ services:
     ports:
       - '9092:9092'
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENERS: PLAINTEXT://:9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://:9092
-      KAFKA_ADVERTISED_HOSTNAME: kafka
-      ALLOW_PLAINTEXT_LISTNER: yes
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_ADVERTISED_HOSTNAME=kafka
+      - ALLOW_PLAINTEXT_LISTNERS=yes
     depends_on:
       - zookeeper
     networks: 
@@ -146,6 +146,27 @@ services:
     networks: 
       - uber-eats
 
+  graphql:
+    depends_on: 
+      - auth
+      - customer
+      - restaurant
+      - order
+    build:
+      context: ./graphql
+      dockerfile: Dockerfile
+    ports:
+      - 3001:3001
+    volumes: 
+      - type: bind
+        source: ./graphql
+        target: /app
+      - type: bind
+        source: ./graphql/node_modules
+        target: /app/node_modules
+    restart: unless-stopped
+    networks: 
+      - uber-eats
 
   web:
     depends_on: 
