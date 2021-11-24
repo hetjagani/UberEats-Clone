@@ -1,6 +1,9 @@
 # Uber Eats Clone
 
-In this project a food delivery system is being developed in which restaurants and customers register themselves. This system is similar to Uber Eats application. The tech stack used to develop the system consist of Node.js (Express) for backend, React for frontend and MySQL for database. User can register themself as customer or restaurant. Restaurant users can add/update/delete the dishes which they serve and can see/update the orders that are done by the customers. Customer orders can see the restaurants in their city and can filter through the restaurants and can order dishes from the restaurants. 
+In this project a food delivery system is being developed in which restaurants and customers register themselves. This system is similar to Uber Eats application. The tech
+stack used to develop the system consist of Node.js (Express) for backend, React for frontend and MongoDB for database and Kafka as message broker service. User can
+register themself as customer or restaurant. Restaurant users can add/update/delete the dishes which they serve and can see/update the orders that are done by the customers.
+Customer orders can see the restaurants in their city and can filter through the restaurants and can order dishes from the restaurants. 
 
 ## System Design 
 ![System Design](SystemDesign.png)
