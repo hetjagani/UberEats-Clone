@@ -8,6 +8,13 @@ const fs = require('fs');
 const { getAuthMiddleware } = require('u-server-utils');
 const validate = require('./authValidator');
 const { restaurant, restaurants } = require('./resolvers/restaurant');
+const { dish, dishes } = require('./resolvers/dish');
+const { customer } = require('./resolvers/customer');
+const { favourites } = require('./resolvers/favourite');
+const { addresses, address } = require('./resolvers/address');
+const { orders, order } = require('./resolvers/order');
+const { cartitems } = require('./resolvers/cartitems');
+
 const gqlSchema = fs.readFileSync('./schema/schema.graphql');
 
 app.use(cors());
@@ -25,9 +32,16 @@ let schema = buildSchema(gqlSchema.toString());
 const root = {
   restaurant,
   restaurants,
+  dish,
+  dishes,
+  customer,
+  favourites,
+  addresses,
+  address,
+  orders,
+  order,
+  cartitems,
 };
-
-app.use(getAuthMiddleware(validate));
 
 app.use(
   '/query',
@@ -37,6 +51,8 @@ app.use(
     graphiql: true,
   }),
 );
+
+app.use(getAuthMiddleware(validate));
 
 app.listen(3001, () => {
   console.log('GraphQL server started on port 3001');

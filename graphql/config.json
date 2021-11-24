@@ -1,7 +1,9 @@
 {
   "development": {
     "auth_url": "http://auth:3000",
-    "restaurant_url": "http://restaurant:3000"
+    "restaurant_url": "http://restaurant:3000",
+    "customer_url": "http://customer:3000",
+    "order_url": "http://order:3000"
   },
   "test": {
     "database_conn": "mongodb://uberadmin:uberadminpass@localhost:27017/restaurant_test",

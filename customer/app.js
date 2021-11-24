@@ -55,7 +55,7 @@ const options = {
 expressSwagger(options);
 
 app.use(getAuthMiddleware(validate));
-app.use(getAccessMiddleware(acl));
+// app.use(getAccessMiddleware(acl));
 
 app.use('/customers', customerRouter);
 

@@ -9,6 +9,16 @@ type RestaurantPage {
   nodes: [Restaurant]!
 }
 
+type DishPage {
+  total: Int!
+  nodes: [Dish]!
+}
+
+type OrderPage {
+  total: Int!
+  nodes: [Order]!
+}
+
 type Restaurant {
   _id: String!
   name: String
@@ -23,6 +33,82 @@ type Restaurant {
   time_open: String
   time_close: String
   media: [Media]
+  dishes: [Dish]
+}
+
+type Dish {
+  _id: String!
+  name: String
+  description: String
+  price: Int
+  food_type: String
+  category: String
+  restaurantId: String
+  media: [Media]
+}
+
+type Customer {
+  _id: String!
+  name: String
+  nickname: String
+  about: String
+  city: String
+  state: String
+  country: String
+  contact_no: String
+  medium: [Media]
+  favourites: [Favourite]
+}
+
+type Favourite {
+  restaurantId: String
+  restaurant: Restaurant
+}
+
+type Address {
+  _id: String
+  firstLine: String
+  secondLine: String
+  zipcode: String
+  city: String
+  state: String
+  country: String
+  customerId: String
+}
+
+type OrderItem {
+  _id: String
+  dishId: String
+  restaurantId: String
+  quantity: Int
+  notes: String
+  price: Float
+  dish: Dish
+}
+
+type Order {
+  _id: String
+  amount: Float
+  status: String
+  date: String
+  restaurantId: String
+  customerId: String
+  type: String
+  addressId: String
+  notes: String
+  restaurant: Restaurant
+  address: Address
+  orderitems: [OrderItem]
+}
+
+type CartItem {
+  _id: String
+  restaurantId: String
+  restaurant: Restaurant
+  dishId: String
+  dish: Dish
+  quantity: Int
+  notes: String
 }
 
 type Query {
@@ -36,6 +122,15 @@ type Query {
     food_type: String
     q: String
   ): RestaurantPage
+  dish(_id: String!, restaurantId: String!): Dish
+  dishes(restaurantId: String!, page: Int, limit: Int): DishPage
+  customer(_id: String!): Customer
+  favourites: [Favourite]
+  addresses: [Address]
+  address(_id: String!): Address
+  orders(status: String): OrderPage
+  order(_id: String!): Order
+  cartitems: [CartItem]
 }
 
 schema {
