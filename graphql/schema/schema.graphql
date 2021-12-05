@@ -40,7 +40,7 @@ type Dish {
   _id: String!
   name: String
   description: String
-  price: Int
+  price: Float
   food_type: String
   category: String
   restaurantId: String
@@ -111,6 +111,12 @@ type CartItem {
   notes: String
 }
 
+input OrderReq {
+  orderId: String!
+  addressId: String!
+  notes: String
+}
+
 type Query {
   restaurant(_id: String!): Restaurant
   restaurants(
@@ -128,11 +134,17 @@ type Query {
   favourites: [Favourite]
   addresses: [Address]
   address(_id: String!): Address
-  orders(status: String): OrderPage
+  orders(status: String, page: Int, limit: Int): OrderPage
   order(_id: String!): Order
   cartitems: [CartItem]
 }
 
+type Mutation {
+  initOrder(type: String!): Order
+  placeOrder(order: OrderReq!): Order
+}
+
 schema {
   query: Query
+  mutation: Mutation
 }

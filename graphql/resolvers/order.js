@@ -12,7 +12,7 @@ const orders = async (args, req) => {
     });
 
     return response.data;
-  } catch {
+  } catch (err) {
     console.log(err);
     if (err.isAxiosError) {
       return new GraphQLError(err.response?.message);
@@ -31,7 +31,45 @@ const order = async (args, req) => {
     });
 
     return response.data;
-  } catch {
+  } catch (err) {
+    console.log(err);
+    if (err.isAxiosError) {
+      return new GraphQLError(err.response?.message);
+    }
+    return new GraphQLError(err);
+  }
+};
+
+const initOrder = async (args, req) => {
+  try {
+    const response = await axios.post(
+      `${global.gConfig.order_url}/orders/${args.type}`,
+      {},
+      {
+        headers: { Authorization: req.headers.authorization },
+      },
+    );
+
+    return response.data;
+  } catch (err) {
+    console.log(err);
+    if (err.isAxiosError) {
+      return new GraphQLError(err.response?.message);
+    }
+    return new GraphQLError(err);
+  }
+};
+
+const placeOrder = async (args, req) => {
+  try {
+    const sendBody = args.order;
+
+    const response = await axios.post(`${global.gConfig.order_url}/orders/place`, sendBody, {
+      headers: { Authorization: req.headers.authorization },
+    });
+
+    return response.data;
+  } catch (err) {
     console.log(err);
     if (err.isAxiosError) {
       return new GraphQLError(err.response?.message);
@@ -43,4 +81,6 @@ const order = async (args, req) => {
 module.exports = {
   orders,
   order,
+  initOrder,
+  placeOrder,
 };

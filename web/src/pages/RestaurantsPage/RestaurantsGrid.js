@@ -12,6 +12,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { MdFavouriteBorder, MdFavorite, MdFavoriteBorder } from 'react-icons/md';
 import { addCustomerFavourite, deleteCustomerFavourite } from '../../actions/customers';
 import { Pagination, SIZE } from 'baseui/pagination';
+import query from '../../utils/graphql/query';
+import { restaurantsQuery } from '../../queries/restaurants';
 
 const RestaurantsGrid = ({ favs, address, city, restaurant_type, food_type, searchQ }) => {
   const [css] = useStyletron();
@@ -50,22 +52,20 @@ const RestaurantsGrid = ({ favs, address, city, restaurant_type, food_type, sear
   });
 
   useEffect(() => {
-    axios
-      .get(`/restaurants`, {
-        params: {
-          city,
-          restaurant_type,
-          food_type,
-          q: searchQ,
-          page,
-          limit: 8,
-          address: address,
-        },
-      })
+    const variables = {
+      city,
+      restaurant_type,
+      food_type,
+      q: searchQ,
+      page,
+      limit: 8,
+      address: address,
+    };
+    query(restaurantsQuery, variables)
       .then((res) => {
-        if (res.data.total >= 0) {
-          setRestaurants(res.data.nodes);
-          setTotal(Math.floor(res.data.total / 8) + 1);
+        if (res.restaurants.total >= 0) {
+          setRestaurants(res.restaurants.nodes);
+          setTotal(Math.floor(res.restaurants.total / 8) + 1);
         }
       })
       .catch((err) => {

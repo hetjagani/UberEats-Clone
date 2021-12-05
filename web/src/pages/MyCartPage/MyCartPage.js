@@ -13,6 +13,8 @@ import notify from '../../utils/notify';
 import withAuth from '../AuthPage/withAuth';
 import { Modal, ModalHeader, ModalBody, ModalFooter, ModalButton } from 'baseui/modal';
 import { Input } from 'baseui/input';
+import query from '../../utils/graphql/query';
+import { initOrderMutation } from '../../mutations/orders';
 
 const MyCartPage = () => {
   const [css] = useStyletron();
@@ -61,8 +63,6 @@ const MyCartPage = () => {
       quantity: updateQty,
       notes: updateNotes,
     };
-    console.log(updateItem);
-    console.log(data);
     dispatch(updateItemInCart(data, updateItem)).then(() => {
       setUpdateModal(false);
     });
@@ -75,6 +75,7 @@ const MyCartPage = () => {
         td.push([
           dish.dish.name,
           dish.dish.description,
+          dish.dish.price,
           dish.quantity,
           dish.notes,
           <Button
@@ -100,12 +101,12 @@ const MyCartPage = () => {
   const history = useHistory();
 
   const createOrder = () => {
-    axios
-      .post(`/orders/${restaurant.restaurant_type}`)
+    const variables = { type: restaurant.restaurant_type };
+    query(initOrderMutation, variables)
       .then((res) => {
-        console.log(res.data);
+        console.log(res.initOrder);
         dispatch(placedOrder());
-        history.push(`/orders/${res.data._id}`);
+        history.push(`/orders/${res.initOrder._id}`);
       })
       .catch((err) => {
         notify({ type: 'error', description: 'Error creating order' });

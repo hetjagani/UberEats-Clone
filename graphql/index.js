@@ -12,7 +12,7 @@ const { dish, dishes } = require('./resolvers/dish');
 const { customer } = require('./resolvers/customer');
 const { favourites } = require('./resolvers/favourite');
 const { addresses, address } = require('./resolvers/address');
-const { orders, order } = require('./resolvers/order');
+const { orders, order, initOrder, placeOrder } = require('./resolvers/order');
 const { cartitems } = require('./resolvers/cartitems');
 
 const gqlSchema = fs.readFileSync('./schema/schema.graphql');
@@ -41,6 +41,8 @@ const root = {
   orders,
   order,
   cartitems,
+  initOrder,
+  placeOrder,
 };
 
 app.use(

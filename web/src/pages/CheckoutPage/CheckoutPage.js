@@ -16,6 +16,9 @@ import { Modal, ModalHeader, ModalBody, ModalFooter, ModalButton, ROLE } from 'b
 import { FormControl } from 'baseui/form-control';
 import { Input } from 'baseui/input';
 import { createCustomerAddress } from '../../actions/customers';
+import query from '../../utils/graphql/query';
+import { orderQuery } from '../../queries/orders';
+import { placeOrderQuery } from '../../mutations/orders';
 
 const CheckoutPage = () => {
   const [css] = useStyletron();
@@ -86,10 +89,10 @@ const CheckoutPage = () => {
   }, [addresses]);
 
   useEffect(() => {
-    axios
-      .get(`/orders/${id}`)
+    const variables = { id };
+    query(orderQuery, variables)
       .then((res) => {
-        setOrder(res.data);
+        setOrder(res.order);
       })
       .catch((err) => {
         notify({ type: 'error', description: 'Error fetching order' });
@@ -119,8 +122,7 @@ const CheckoutPage = () => {
   const placeOrder = () => {
     const data = { orderId: order._id, addressId: address[0] && address[0].id, notes };
 
-    axios
-      .post(`/orders/place`, data)
+    query(placeOrderQuery, { order: data })
       .then((res) => {
         dispatch(placedOrder());
         notify({ type: 'info', description: `Order placed successfully` });

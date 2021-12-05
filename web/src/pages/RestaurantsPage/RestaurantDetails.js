@@ -14,6 +14,8 @@ import withAuth from '../AuthPage/withAuth';
 import { Modal, ModalHeader, ModalBody, ModalFooter, ModalButton } from 'baseui/modal';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearCart } from '../../actions/cart';
+import query from '../../utils/graphql/query';
+import { restaurantQuery } from '../../queries/restaurants';
 
 const RestaurantDetails = () => {
   const { id } = useParams();
@@ -64,12 +66,12 @@ const RestaurantDetails = () => {
 
   useEffect(() => {
     setErrDiffRes(false);
-    axios
-      .get(`/restaurants/${id}`)
+    const variables = { id };
+    query(restaurantQuery, variables)
       .then((res) => {
-        setRestaurant(res.data);
-        setMedia(res.data.media);
-        setDishes(res.data.dishes);
+        setRestaurant(res.restaurant);
+        setMedia(res.restaurant.media);
+        setDishes(res.restaurant.dishes);
       })
       .catch((err) => {
         console.error(err);

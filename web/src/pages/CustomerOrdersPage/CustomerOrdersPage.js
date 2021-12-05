@@ -8,6 +8,8 @@ import { Table, SIZE } from 'baseui/table-semantic';
 import { H2, H4, Paragraph1, ParagraphMedium } from 'baseui/typography';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
+import { orderQuery, ordersQuery } from '../../queries/orders';
+import query from '../../utils/graphql/query';
 import notify from '../../utils/notify';
 import withAuth from '../AuthPage/withAuth';
 import NavBar from '../RestaurantsPage/NavBar';
@@ -47,12 +49,7 @@ const CustomerOrdersPage = () => {
     const td =
       o.orderitems &&
       o.orderitems.map((oi) => {
-        return [
-          oi.dish && oi.dish.name,
-          oi.notes,
-          oi.quantity,
-          `$${oi.price} x ${oi.quantity}`,
-        ];
+        return [oi.dish && oi.dish.name, oi.notes, oi.quantity, `$${oi.price} x ${oi.quantity}`];
       });
     td.push(['', '', 'Total', `$${o.amount}`]);
 
@@ -60,13 +57,15 @@ const CustomerOrdersPage = () => {
   };
 
   useEffect(() => {
-    axios
-      .get(`/orders`, {
-        params: { status: status[0] && status[0].id, page: page, limit: limit[0] && limit[0].id },
-      })
+    const variables = {
+      status: status[0] && status[0].id,
+      page: page,
+      limit: limit[0] && limit[0].id,
+    };
+    query(ordersQuery, variables)
       .then((res) => {
-        setOrders(res.data.nodes);
-        const ords = res.data.nodes?.map((o) => {
+        setOrders(res.orders.nodes);
+        const ords = res.orders.nodes?.map((o) => {
           return [
             <Paragraph1>{o.restaurant && o.restaurant.name}</Paragraph1>,
             <Paragraph1>
@@ -79,9 +78,10 @@ const CustomerOrdersPage = () => {
           ];
         });
         setTableData(ords);
-        setTotal(Math.floor(res.data.total / (limit[0] && limit[0].id)) + 1);
+        setTotal(Math.floor(res.orders.total / (limit[0] && limit[0].id)) + 1);
       })
       .catch((err) => {
+        console.log(err);
         notify({ type: 'info', description: 'Error fetching orders.' });
       });
   }, [status, limit, page, updatePage]);
@@ -92,7 +92,7 @@ const CustomerOrdersPage = () => {
       .then((res) => {
         setUpdatePage(!updatePage);
         setDetailModal(false);
-        notify({type: 'info', description: 'Order Cancelled'})
+        notify({ type: 'info', description: 'Order Cancelled' });
       })
       .catch((err) => {
         notify({
@@ -205,7 +205,7 @@ const CustomerOrdersPage = () => {
           </ModalBody>
           <ModalFooter>
             {detailOrder.status === 'INIT' && (
-              <ModalButton onClick={() => history.push(`/orders/${detailOrder.id}`)}>
+              <ModalButton onClick={() => history.push(`/orders/${detailOrder._id}`)}>
                 Complete Order
               </ModalButton>
             )}

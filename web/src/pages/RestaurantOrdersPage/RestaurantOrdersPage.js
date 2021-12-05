@@ -11,6 +11,8 @@ import withAuth from '../AuthPage/withAuth';
 import Header from '../RestaurantDashboard/Header';
 import { StyledLink } from 'baseui/link';
 import { Pagination } from 'baseui/pagination';
+import query from '../../utils/graphql/query';
+import { ordersQuery } from '../../queries/orders';
 
 const RestaurantOrdersPage = () => {
   const [css] = useStyletron();
@@ -40,12 +42,7 @@ const RestaurantOrdersPage = () => {
     const td =
       o.orderitems &&
       o.orderitems.map((oi) => {
-        return [
-          oi.dish && oi.dish.name,
-          oi.notes,
-          oi.quantity,
-          `$${oi.price} x ${oi.quantity}`,
-        ];
+        return [oi.dish && oi.dish.name, oi.notes, oi.quantity, `$${oi.price} x ${oi.quantity}`];
       });
     td.push(['', '', 'Total', `$${o.amount}`]);
 
@@ -105,49 +102,44 @@ const RestaurantOrdersPage = () => {
             cusMap[cus._id] = cus;
           });
 
-        return axios
-          .get(`/orders`, {
-            params: {
-              status: status[0] && status[0].id,
-              page: page,
-              limit: limit[0] && limit[0].id,
-            },
-          })
-          .then((res) => {
-            const sm = {};
-            const mm = {};
-            res.data.total > 0 &&
-              res.data.nodes.forEach((o) => {
-                sm[o._id] = [{ id: o.status, status: o.status }];
-                mm[o._id] = false;
-              });
-            setStatusMap(sm);
-            setModalMap(mm);
+        const variables = {
+          status: status[0] && status[0].id,
+          page: page,
+          limit: limit[0] && limit[0].id,
+        };
 
-            // Keep link that shows customer profile
-            const ords = res.data.nodes?.map((o) => {
-              return [
-                <Paragraph1>
-                  <StyledLink
-                    href="#"
-                    onClick={() => openCustomerDetailModal(cusMap[o.customerId])}
-                  >
-                    {cusMap[o.customerId]?.name || 'Unknown Customer'}
-                  </StyledLink>
-                </Paragraph1>,
-                <Paragraph1>
-                  {o.address && o.address.firstLine} {o.address && o.address.secondLine}
-                </Paragraph1>,
-                <Paragraph1>{o.type && o.type.toUpperCase()}</Paragraph1>,
-                <Paragraph1>${o.amount}</Paragraph1>,
-                <Button onClick={() => openStatus(o._id)}>Status</Button>,
-                <Button onClick={() => seeOrderDetails(o)}>Details</Button>,
-              ];
+        query(ordersQuery, variables).then((res) => {
+          const sm = {};
+          const mm = {};
+          res.orders.total > 0 &&
+            res.orders.nodes.forEach((o) => {
+              sm[o._id] = [{ id: o.status, status: o.status }];
+              mm[o._id] = false;
             });
-            setTableData(ords);
-            setOrders(res.data);
-            setTotal(Math.floor(res.data.total / (limit[0] && limit[0].id)) + 1);
+          setStatusMap(sm);
+          setModalMap(mm);
+
+          // Keep link that shows customer profile
+          const ords = res.orders.nodes?.map((o) => {
+            return [
+              <Paragraph1>
+                <StyledLink href="#" onClick={() => openCustomerDetailModal(cusMap[o.customerId])}>
+                  {cusMap[o.customerId]?.name || 'Unknown Customer'}
+                </StyledLink>
+              </Paragraph1>,
+              <Paragraph1>
+                {o.address && o.address.firstLine} {o.address && o.address.secondLine}
+              </Paragraph1>,
+              <Paragraph1>{o.type && o.type.toUpperCase()}</Paragraph1>,
+              <Paragraph1>${o.amount}</Paragraph1>,
+              <Button onClick={() => openStatus(o._id)}>Status</Button>,
+              <Button onClick={() => seeOrderDetails(o)}>Details</Button>,
+            ];
           });
+          setTableData(ords);
+          setOrders(res.orders);
+          setTotal(Math.floor(res.orders.total / (limit[0] && limit[0].id)) + 1);
+        });
       })
       .catch((err) => {
         console.log(err);
