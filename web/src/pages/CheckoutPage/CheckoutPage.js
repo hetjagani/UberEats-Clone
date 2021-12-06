@@ -18,7 +18,7 @@ import { Input } from 'baseui/input';
 import { createCustomerAddress } from '../../actions/customers';
 import query from '../../utils/graphql/query';
 import { orderQuery } from '../../queries/orders';
-import { placeOrderQuery } from '../../mutations/orders';
+import { placeOrderQuery } from '../../mutations/mutations';
 
 const CheckoutPage = () => {
   const [css] = useStyletron();

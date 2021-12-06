@@ -125,3 +125,23 @@ mutation placeOrder($order: OrderReq!) {
   }
 }
 `
+export const createCustomer = `
+mutation createCustomer($customer: CustomerReq!) {
+  createCustomer(customer: $customer) {
+    _id
+    name
+    nickname
+    about
+    city
+    state
+    country
+    contact_no
+    medium{
+      url
+      alt_text
+    }
+    favourites {
+      restaurantId
+    }
+  }
+}`

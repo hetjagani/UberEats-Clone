@@ -14,7 +14,7 @@ import withAuth from '../AuthPage/withAuth';
 import { Modal, ModalHeader, ModalBody, ModalFooter, ModalButton } from 'baseui/modal';
 import { Input } from 'baseui/input';
 import query from '../../utils/graphql/query';
-import { initOrderMutation } from '../../mutations/orders';
+import { initOrderMutation } from '../../mutations/mutations';
 
 const MyCartPage = () => {
   const [css] = useStyletron();

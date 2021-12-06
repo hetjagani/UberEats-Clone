@@ -1,6 +1,9 @@
 import axios from 'axios';
 import { getCookie } from 'react-use-cookie';
 import notify from '../utils/notify';
+import query from '../utils/graphql/query';
+import { createCustomer as createCustomerQ } from '../mutations/mutations';
+
 import {
   ADD_CUSTOMER_FAVOURITE,
   CLEAR_CUSTOMER_MEDIUM,
@@ -32,13 +35,11 @@ export const fetchAuthCustomer = (id, token) => {
 
 export const createCustomer = (data) => {
   return (dispatch) => {
-    const token = getCookie('auth');
-    return axios
-      .post('/customers', data, { headers: { Authorization: token } })
+    return query(createCustomerQ, { customer: data })
       .then((res) => {
         dispatch({
           type: CREATE_CUSTOMER,
-          payload: res.data,
+          payload: res.createCustomer,
         });
         notify({ type: 'info', description: 'Created Customer' });
       })

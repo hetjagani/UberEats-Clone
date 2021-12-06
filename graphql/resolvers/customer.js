@@ -24,11 +24,15 @@ const customer = async (args, req) => {
 const createCustomer = async (args, req) => {
   try {
     const customerData = args.customer;
+    const { authorization } = req.headers;
+    console.log(authorization);
+    console.log(customerData);
     const created = await axios.post(`${global.gConfig.customer_url}/customers`, customerData, {
-      headers: { Authorization: req.headers.authorization },
+      headers: { Authorization: authorization },
     });
-    return created.data
-  } catch {
+    console.log(created);
+    return created.data;
+  } catch (err) {
     console.log(err);
     if (err.isAxiosError) {
       return new GraphQLError(err.response?.message);

@@ -1,6 +1,6 @@
 type Media {
-  _id: String!
-  url: String!
+  _id: String
+  url: String
   alt_text: String
 }
 
@@ -130,7 +130,7 @@ input CustomerReq {
 }
 
 input InpMedia {
-  url: String!
+  url: String
   alt_text: String
 }
 
