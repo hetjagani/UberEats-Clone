@@ -21,6 +21,23 @@ const customer = async (args, req) => {
   }
 };
 
+const createCustomer = async (args, req) => {
+  try {
+    const customerData = args.customer;
+    const created = await axios.post(`${global.gConfig.customer_url}/customers`, customerData, {
+      headers: { Authorization: req.headers.authorization },
+    });
+    return created.data
+  } catch {
+    console.log(err);
+    if (err.isAxiosError) {
+      return new GraphQLError(err.response?.message);
+    }
+    return new GraphQLError(err);
+  }
+};
+
 module.exports = {
   customer,
+  createCustomer,
 };

@@ -9,7 +9,7 @@ const { getAuthMiddleware } = require('u-server-utils');
 const validate = require('./authValidator');
 const { restaurant, restaurants } = require('./resolvers/restaurant');
 const { dish, dishes } = require('./resolvers/dish');
-const { customer } = require('./resolvers/customer');
+const { customer, createCustomer } = require('./resolvers/customer');
 const { favourites } = require('./resolvers/favourite');
 const { addresses, address } = require('./resolvers/address');
 const { orders, order, initOrder, placeOrder } = require('./resolvers/order');
@@ -43,6 +43,7 @@ const root = {
   cartitems,
   initOrder,
   placeOrder,
+  createCustomer,
 };
 
 app.use(
