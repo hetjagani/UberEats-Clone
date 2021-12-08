@@ -145,3 +145,111 @@ mutation createCustomer($customer: CustomerReq!) {
     }
   }
 }`
+
+export const createRestaurant = `
+mutation createRestaurant($restaurant: RestaurantReq!) {
+  createRestaurant(restaurant: $restaurant) {
+    _id
+    name
+    description
+    address
+    city
+    state
+    country
+    contact_no
+    food_type
+    restaurant_type
+    time_open
+    time_close
+    media{
+      url
+      alt_text
+    }
+  }
+}`
+
+export const createDish = `
+mutation createDish($dish: DishReq!) {
+  createDish(dish: $dish) {
+    _id
+    name
+    description
+    price
+    food_type
+    category
+    restaurantId
+    media{
+      url
+      alt_text
+    }
+  }
+}`
+
+export const createFavourite =`
+mutation createFavourite($restaurantId: String!) {
+  createFavourite(restaurantId: $restaurantId) {
+    _id
+    name
+    description
+    address
+    city
+    state
+    country
+    contact_no
+    food_type
+    restaurant_type
+    time_open
+    time_close
+    dishes{
+      _id
+      name
+      description
+      price
+    }
+    media{
+      url
+      alt_text
+    }
+  }
+}`
+
+export const addCartItem = `
+mutation addCartItem($cartItem: CartItemReq!) {
+  addCartItem(cartItem: $cartItem) {
+    _id
+    dishId
+    quantity
+    notes
+    restaurant {
+      _id
+      name
+      description
+      address
+      city
+      state
+      country
+      contact_no
+      food_type
+      restaurant_type
+      time_open
+      time_close
+      media {
+        url
+        alt_text
+      }
+    }
+    dish {
+      _id
+      name
+      description
+      price
+      food_type
+      category
+      restaurantId
+      media {
+        url
+        alt_text
+      }
+    }
+  }
+}`

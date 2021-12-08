@@ -129,6 +129,48 @@ input CustomerReq {
   medium: InpMedia
 }
 
+input RestaurantReq {
+  id: String!
+  name: String!
+  description: String
+  address: String
+  city: String
+  state: String
+  country: String
+  contact_no: String
+  time_open: String
+  time_close: String
+  food_type: String
+  restaurant_type: String
+  medium: InpMedia
+}
+
+input DishReq {
+  name: String
+  description: String
+  price: Float
+  food_type: String
+  category: String
+  media: [InpMedia]
+}
+
+input AddressReq {
+  firstLine: String
+  secondLine: String
+  zipcode: Int
+  city: String
+  state: String
+  country: String
+  customerId: String
+}
+
+input CartItemReq {
+  dishId: String
+  restaurantId: String
+  quantity: Int
+  notes: String
+}
+
 input InpMedia {
   url: String
   alt_text: String
@@ -157,9 +199,14 @@ type Query {
 }
 
 type Mutation {
+  createRestaurant(restaurant: RestaurantReq): Restaurant
+  createCustomer(customer: CustomerReq!): Customer
+  createDish(dish: DishReq): Dish
+  createAddress(address: AddressReq): Address
+  createFavourite(restaurantId: String): Restaurant
   initOrder(type: String!): Order
   placeOrder(order: OrderReq!): Order
-  createCustomer(customer: CustomerReq!): Customer
+  addCartItem(cartItem: CartItemReq): CartItem
 }
 
 schema {

@@ -17,7 +17,7 @@ import { FormControl } from 'baseui/form-control';
 import { Input } from 'baseui/input';
 import { createCustomerAddress } from '../../actions/customers';
 import query from '../../utils/graphql/query';
-import { orderQuery } from '../../queries/orders';
+import { orderQuery } from '../../queries/queries';
 import { placeOrderQuery } from '../../mutations/mutations';
 
 const CheckoutPage = () => {

@@ -13,7 +13,7 @@ import { MdFavouriteBorder, MdFavorite, MdFavoriteBorder } from 'react-icons/md'
 import { addCustomerFavourite, deleteCustomerFavourite } from '../../actions/customers';
 import { Pagination, SIZE } from 'baseui/pagination';
 import query from '../../utils/graphql/query';
-import { restaurantsQuery } from '../../queries/restaurants';
+import { restaurantsQuery } from '../../queries/queries';
 
 const RestaurantsGrid = ({ favs, address, city, restaurant_type, food_type, searchQ }) => {
   const [css] = useStyletron();

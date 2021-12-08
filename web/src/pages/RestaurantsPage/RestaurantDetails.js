@@ -15,7 +15,7 @@ import { Modal, ModalHeader, ModalBody, ModalFooter, ModalButton } from 'baseui/
 import { useDispatch, useSelector } from 'react-redux';
 import { clearCart } from '../../actions/cart';
 import query from '../../utils/graphql/query';
-import { restaurantQuery } from '../../queries/restaurants';
+import { restaurantQuery } from '../../queries/queries';
 
 const RestaurantDetails = () => {
   const { id } = useParams();

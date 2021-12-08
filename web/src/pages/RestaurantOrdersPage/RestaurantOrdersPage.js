@@ -12,7 +12,7 @@ import Header from '../RestaurantDashboard/Header';
 import { StyledLink } from 'baseui/link';
 import { Pagination } from 'baseui/pagination';
 import query from '../../utils/graphql/query';
-import { ordersQuery } from '../../queries/orders';
+import { ordersQuery } from '../../queries/queries';
 
 const RestaurantOrdersPage = () => {
   const [css] = useStyletron();

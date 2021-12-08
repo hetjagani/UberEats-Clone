@@ -8,7 +8,7 @@ import { Table, SIZE } from 'baseui/table-semantic';
 import { H2, H4, Paragraph1, ParagraphMedium } from 'baseui/typography';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
-import { orderQuery, ordersQuery } from '../../queries/orders';
+import { orderQuery, ordersQuery } from '../../queries/queries';
 import query from '../../utils/graphql/query';
 import notify from '../../utils/notify';
 import withAuth from '../AuthPage/withAuth';
