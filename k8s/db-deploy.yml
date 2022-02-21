@@ -1,0 +1,66 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ubereats-db
+  labels:
+    app: ubereats
+    tier: db
+spec:
+  selector:
+    matchLabels:
+      app: ubereats
+      tier: db
+  template:
+    metadata:
+      labels:
+        app: ubereats
+        tier: db
+    spec:
+      containers:
+      - name: mongo-db
+        image: mongo:4.4.0-rc7
+        resources:
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        ports:
+        - containerPort: 27017
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          value: uberadmin
+        - name: MONGO_INITDB_ROOT_PASSWORD 
+          value: uberadminpass
+        volumeMounts:
+        - name: mongo-persistent-storage
+          mountPath: /data/db
+        - name: db-init-script
+          mountPath: /docker-entrypoint-initdb.d
+          readOnly: true
+      volumes:
+      - name: mongo-persistent-storage
+        persistentVolumeClaim:
+          claimName: ubereats-db-pvc
+      - name: db-init-script
+        configMap:
+          name: ubereats-db-init-cm
+          items:
+          - key: init.js
+            path: init.js
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ubereats-db
+  labels:
+    app: ubereats
+    tier: db
+spec:
+  selector:
+    app: ubereats
+    tier: db
+  type: NodePort
+  ports:
+  - port: 27017
+    targetPort: 27017
