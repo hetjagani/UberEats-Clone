@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ubereats-db
+  name: mongodb
   labels:
     app: ubereats
     tier: db
@@ -52,7 +52,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ubereats-db
+  name: mongodb
   labels:
     app: ubereats
     tier: db
